@@ -1,16 +1,17 @@
 #include "Image.h"
+#include <iostream>
 
 Image::Image(const std::string &filename)
 {
     texture.loadFromFile(filename);
     texture.setSmooth(true);
+    sprite.setTexture(texture);
+    fitToScreen();
 }
 
 sf::Sprite&
 Image::getSprite()
 {
-    sprite.setTexture(texture);
-    fitToScreen();
     return sprite;
 }
 
@@ -33,5 +34,18 @@ Image::fitToScreen()
         sprite.setScale(yScale, yScale);
         float offset = (float)videoMode.width - texture.getSize().x * yScale;
         sprite.setPosition(offset / 2, 0);
+    }
+}
+
+void
+Image::zoom(sf::Event::MouseWheelScrollEvent& scrollEvent)
+{
+    if (scrollEvent.delta < 0)
+    {
+        sprite.scale(0.9f, 0.9f);
+    }
+    else if (scrollEvent.delta > 0)
+    {
+        sprite.scale(1.1f, 1.1f);
     }
 }

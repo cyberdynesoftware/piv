@@ -2,25 +2,30 @@
 #define __FOLDER_H__
 
 #include "Image.h"
+#include <boost/filesystem.hpp>
 
 class Folder
 {
     public:
-        Folder(std::string path);
+        Folder(char* arg);
+        ~Folder();
 
-        Image firstImage(void);
-        Image nextImage(void);
-        Image prevImage(void);
+        Image* getImage(void);
+        void next(void);
+        void previous(void);
+        void random(void);
+        void select(void);
+        void trash(void);
 
     private:
-        std::string directory;
-        std::vector<std::string> filenames;
-        std::vector<std::string>::const_iterator imageIter;
-        std::vector<std::string> extensions = {"jpg", "jpeg", "gif", "png"};
+        Image* current;
+        std::vector<boost::filesystem::path> files;
+        std::vector<boost::filesystem::path>::const_iterator file_iter;
+        std::vector<std::string> extensions = {".jpg", ".jpeg", ".gif", ".png"};
 
-        bool isDirectory(const std::string &path);
-        void scanDirectory(const std::string &dir);
-        bool isImage(const std::string &filename);
+        void scanDirectory(const boost::filesystem::path& p);
+        bool isImage(const boost::filesystem::path& p);
+        void init(void);
 };
 
 #endif

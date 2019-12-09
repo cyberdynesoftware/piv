@@ -6,14 +6,14 @@ int main(int argc, char** argv)
 {
     if (argc < 2)
     {
-        std::cerr << "usage: " << argv[0] << " <directory>" << std::endl;
+        std::cerr << "usage: piv <path>" << std::endl;
         return 1;
     }
 
     Folder folder(argv[1]);
 
     sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
-    window.draw(folder.firstImage().getSprite());
+    window.draw(folder.getImage()->getSprite());
     window.display();
 
     sf::Event event;
@@ -30,20 +30,36 @@ int main(int argc, char** argv)
                     window.close();
                     break;
                 case sf::Keyboard::Space:
-                    window.clear();
-                    window.draw(folder.nextImage().getSprite());
-                    window.display();
+                    folder.next();
                     break;
                 case sf::Keyboard::Backspace:
-                    window.clear();
-                    window.draw(folder.prevImage().getSprite());
-                    window.display();
+                    folder.previous();
+                    break;
+                case sf::Keyboard::R:
+                    folder.random();
+                    break;
+                case sf::Keyboard::A:
+                    folder.select();
+                    folder.next();
+                    break;
+                case sf::Keyboard::D:
+                    folder.trash();
+                    break;
+                case sf::Keyboard::O:
+                    folder.getImage()->fitToScreen();
                     break;
                 default:
                     break;
             }
         }
+        if (event.type == sf::Event::MouseWheelScrolled)
+        {
+            folder.getImage()->zoom(event.mouseWheelScroll);
+        }
 
+        window.clear();
+        window.draw(folder.getImage()->getSprite());
+        window.display();
     }
 
     return EXIT_SUCCESS;
