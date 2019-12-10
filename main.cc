@@ -7,7 +7,7 @@ int main(int argc, char** argv)
     if (argc < 2)
     {
         std::cerr << "usage: piv <path>" << std::endl;
-        return 1;
+        return EXIT_FAILURE;
     }
 
     Folder folder(argv[1]);
@@ -16,6 +16,11 @@ int main(int argc, char** argv)
     window.draw(folder.getImage()->getSprite());
     window.display();
 
+    sf::Cursor arrow;
+    arrow.loadFromSystem(sf::Cursor::Arrow);
+    sf::Cursor cross;
+    cross.loadFromSystem(sf::Cursor::Cross);
+
     sf::Event event;
     sf::Vector2i previousMousePosition = sf::Mouse::getPosition();
 
@@ -23,48 +28,73 @@ int main(int argc, char** argv)
     {
         window.waitEvent(event);
 
-        if (event.type == sf::Event::KeyPressed)
+        switch (event.type)
         {
-            switch (event.key.code)
-            {
-                case sf::Keyboard::Q:
-                    window.close();
-                    break;
-                case sf::Keyboard::Space:
-                    folder.next();
-                    break;
-                case sf::Keyboard::Backspace:
-                    folder.previous();
-                    break;
-                case sf::Keyboard::R:
-                    folder.random();
-                    break;
-                case sf::Keyboard::A:
-                    folder.select();
-                    folder.next();
-                    break;
-                case sf::Keyboard::D:
-                    folder.trash();
-                    break;
-                default:
-                    break;
-            }
-        }
-        if (event.type == sf::Event::MouseWheelScrolled)
-        {
-            folder.getImage()->zoom(event.mouseWheelScroll.delta);
-        }
-        if (event.type == sf::Event::MouseButtonPressed)
-        {
-            if (event.mouseButton.button == sf::Mouse::Button::Right)
-                folder.getImage()->fitToScreen();
-        }
-        if (event.type == sf::Event::MouseMoved)
-        {
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
-                folder.getImage()->move(sf::Mouse::getPosition() - previousMousePosition);
+            case sf::Event::KeyPressed:
+                switch (event.key.code)
+                {
+                    case sf::Keyboard::Q:
+                        window.close();
+                        break;
+                    case sf::Keyboard::Space:
+                        folder.next();
+                        break;
+                    case sf::Keyboard::Backspace:
+                        folder.previous();
+                        break;
+                    case sf::Keyboard::R:
+                        folder.random();
+                        break;
+                    case sf::Keyboard::A:
+                        folder.select();
+                        folder.next();
+                        break;
+                    case sf::Keyboard::D:
+                        folder.trash();
+                        break;
+                    default:
+                        break;
+                }
+                break;
 
-            previousMousePosition = sf::Mouse::getPosition();
+            case sf::Event::MouseWheelScrolled:
+                folder.getImage()->zoom(event.mouseWheelScroll.delta);
+                break;
+
+            case sf::Event::MouseButtonPressed:
+                switch (event.mouseButton.button)
+                {
+                    case sf::Mouse::Button::Left:
+                        window.setMouseCursor(cross);
+                        break;
+                    case sf::Mouse::Button::Right:
+                        folder.getImage()->fitToScreen();
+                        break;
+                    default:
+                        break;
+                }
+                break;
+
+            case sf::Event::MouseButtonReleased:
+                switch (event.mouseButton.button)
+                {
+                    case sf::Mouse::Button::Left:
+                        window.setMouseCursor(arrow);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+
+            case sf::Event::MouseMoved:
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+                    folder.getImage()->move(sf::Mouse::getPosition() - previousMousePosition);
+
+                previousMousePosition = sf::Mouse::getPosition();
+                break;
+
+            default:
+                break;
         }
 
         window.clear();
