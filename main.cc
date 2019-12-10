@@ -17,6 +17,8 @@ int main(int argc, char** argv)
     window.display();
 
     sf::Event event;
+    int mouseX = sf::Mouse::getPosition().x;
+    int mouseY = sf::Mouse::getPosition().y;
 
     while (window.isOpen())
     {
@@ -45,9 +47,6 @@ int main(int argc, char** argv)
                 case sf::Keyboard::D:
                     folder.trash();
                     break;
-                case sf::Keyboard::O:
-                    folder.getImage()->fitToScreen();
-                    break;
                 default:
                     break;
             }
@@ -55,6 +54,19 @@ int main(int argc, char** argv)
         if (event.type == sf::Event::MouseWheelScrolled)
         {
             folder.getImage()->zoom(event.mouseWheelScroll);
+        }
+        if (event.type == sf::Event::MouseButtonPressed)
+        {
+            if (event.mouseButton.button == sf::Mouse::Button::Right)
+                folder.getImage()->fitToScreen();
+        }
+        if (event.type == sf::Event::MouseMoved)
+        {
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+                folder.getImage()->move(event.mouseMove.x - mouseX, event.mouseMove.y - mouseY);
+
+            mouseX = event.mouseMove.x;
+            mouseY = event.mouseMove.y;
         }
 
         window.clear();
