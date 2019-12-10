@@ -33,13 +33,13 @@ Image::fitToScreen()
 }
 
 void
-Image::zoom(sf::Event::MouseWheelScrollEvent& scrollEvent)
+Image::zoom(float delta)
 {
-    if (scrollEvent.delta < 0)
+    if (delta < 0)
     {
         sprite.scale(0.95f, 0.95f);
     }
-    else if (scrollEvent.delta > 0)
+    else if (delta > 0)
     {
         sprite.setOrigin(mousePositionInSprite() / sprite.getScale().x);
         sprite.setPosition(sf::Mouse::getPosition().x, sf::Mouse::getPosition().y);
@@ -62,7 +62,7 @@ Image::mouseVector()
 }
 
 void
-Image::move(int deltaX, int deltaY)
+Image::move(sf::Vector2i delta)
 {
-    sprite.move(deltaX, deltaY);
+    sprite.move(delta.x, delta.y);
 }

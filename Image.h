@@ -9,8 +9,8 @@ class Image {
 
         sf::Sprite& getSprite(void);
         void fitToScreen(void);
-        void zoom(sf::Event::MouseWheelScrollEvent& scrollEvent);
-        void move(int deltaX, int deltaY);
+        void zoom(float delta);
+        void move(sf::Vector2i delta);
 
     private:
         sf::Texture texture;

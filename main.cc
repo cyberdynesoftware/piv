@@ -17,8 +17,7 @@ int main(int argc, char** argv)
     window.display();
 
     sf::Event event;
-    int mouseX = sf::Mouse::getPosition().x;
-    int mouseY = sf::Mouse::getPosition().y;
+    sf::Vector2i previousMousePosition = sf::Mouse::getPosition();
 
     while (window.isOpen())
     {
@@ -53,7 +52,7 @@ int main(int argc, char** argv)
         }
         if (event.type == sf::Event::MouseWheelScrolled)
         {
-            folder.getImage()->zoom(event.mouseWheelScroll);
+            folder.getImage()->zoom(event.mouseWheelScroll.delta);
         }
         if (event.type == sf::Event::MouseButtonPressed)
         {
@@ -63,10 +62,9 @@ int main(int argc, char** argv)
         if (event.type == sf::Event::MouseMoved)
         {
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
-                folder.getImage()->move(event.mouseMove.x - mouseX, event.mouseMove.y - mouseY);
+                folder.getImage()->move(sf::Mouse::getPosition() - previousMousePosition);
 
-            mouseX = event.mouseMove.x;
-            mouseY = event.mouseMove.y;
+            previousMousePosition = sf::Mouse::getPosition();
         }
 
         window.clear();
