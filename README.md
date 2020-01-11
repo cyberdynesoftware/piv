@@ -16,14 +16,14 @@ make
 
 ## Usage
 
-```
-Q                    quit
-Space                next image
-Backspace            previous image
-R                    random image
-A                    copy current image to folder 'selected'
-D                    move current image to folder '.trashed'
-Mouse Wheel          zoom image
-Left Mouse Button    move image
-Right Mouse Button   reset zoom and position
-```
+Key | description
+--- | ---
+Q | quit
+Space | next image
+Backspace | previous image
+R | random image
+A | copy current image to folder 'selected'
+D | move current image to folder '.trashed'
+Mouse Wheel | zoom image
+Left Mouse Button | move image on screen
+Right Mouse Button | reset zoom and position
