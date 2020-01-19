@@ -15,6 +15,11 @@ Folder::Folder(char* arg)
         scanDirectory(p);
         file_iter = files.cbegin();
     }
+    else if (p.parent_path().empty())
+    {
+        scanDirectory(current_path());
+        file_iter = std::find(files.cbegin(), files.cend(), current_path() / p);
+    }
     else
     {
         scanDirectory(p.parent_path());
