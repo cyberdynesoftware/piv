@@ -1,5 +1,4 @@
-#ifndef __SINGLEVIEW_H__
-#define __SINGLEVIEW_H__
+#pragma once
 
 #include "Stage.h"
 #include "Folder.h"
@@ -18,5 +17,3 @@ class SingleView : public Stage
         sf::Cursor cross;
         sf::Vector2i previousMousePosition;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef __FOLDER_H__
-#define __FOLDER_H__
+#pragma once
 
 #include "Image.h"
 #include <boost/filesystem.hpp>
@@ -27,5 +26,3 @@ class Folder
         bool isImage(const boost::filesystem::path& p);
         void init(void);
 };
-
-#endif

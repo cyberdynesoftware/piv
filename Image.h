@@ -1,5 +1,4 @@
-#ifndef __IMAGE_H__
-#define __IMAGE_H__
+#pragma once
 
 #include <SFML/Graphics.hpp>
 
@@ -19,5 +18,3 @@ class Image {
         sf::Vector2f mousePositionInSprite(void);
         sf::Vector2i mouseVector(void);
 };
-
-#endif
