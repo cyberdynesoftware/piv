@@ -1,5 +1,4 @@
-#include "Image.h"
-#include "Folder.h"
+#include "ImageCache.h"
 #include "Stage.h"
 #include "SingleView.h"
 
@@ -13,13 +12,13 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    Folder folder(argv[1]);
+    ImageCache imageCache(argv[1]);
 
     sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
-    window.draw(folder.getImage()->getSprite());
+    //window.draw(folder.getImage()->getSprite());
     window.display();
 
-    SingleView singleView(folder, window);
+    SingleView singleView(imageCache, window);
     Stage* stage = &singleView;
 
     sf::Event event;

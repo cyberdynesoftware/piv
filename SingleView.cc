@@ -1,7 +1,7 @@
 #include "SingleView.h"
 
-SingleView::SingleView(Folder& folder, sf::RenderWindow& window):
-    folder(folder),
+SingleView::SingleView(ImageCache& imageCache, sf::RenderWindow& window):
+    imageCache(imageCache),
     window(window)
 {
     arrow.loadFromSystem(sf::Cursor::Arrow);
@@ -18,20 +18,20 @@ SingleView::handle(sf::Event& event)
             switch (event.key.code)
             {
                 case sf::Keyboard::Space:
-                    folder.next();
+                    imageCache.next();
                     break;
                 case sf::Keyboard::Backspace:
-                    folder.previous();
+                    imageCache.previous();
                     break;
                 case sf::Keyboard::R:
-                    folder.random();
+                    imageCache.random();
                     break;
                 case sf::Keyboard::A:
-                    folder.select();
-                    folder.next();
+                    //folder.select();
+                    imageCache.next();
                     break;
                 case sf::Keyboard::D:
-                    folder.trash();
+                    //folder.trash();
                     break;
                 default:
                     break;
@@ -39,7 +39,7 @@ SingleView::handle(sf::Event& event)
             break;
 
         case sf::Event::MouseWheelScrolled:
-            folder.getImage()->zoom(event.mouseWheelScroll.delta);
+            imageCache.getCurrent()->zoom(event.mouseWheelScroll.delta);
             break;
 
         case sf::Event::MouseButtonPressed:
@@ -49,7 +49,7 @@ SingleView::handle(sf::Event& event)
                     window.setMouseCursor(cross);
                     break;
                 case sf::Mouse::Button::Right:
-                    folder.getImage()->fitToScreen();
+                    imageCache.getCurrent()->fitToScreen();
                     break;
                 default:
                     break;
@@ -69,7 +69,7 @@ SingleView::handle(sf::Event& event)
 
         case sf::Event::MouseMoved:
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
-                folder.getImage()->move(sf::Mouse::getPosition() - previousMousePosition);
+                imageCache.getCurrent()->move(sf::Mouse::getPosition() - previousMousePosition);
 
             previousMousePosition = sf::Mouse::getPosition();
             break;
@@ -82,5 +82,5 @@ SingleView::handle(sf::Event& event)
 void
 SingleView::draw()
 {
-    window.draw(folder.getImage()->getSprite());
+    window.draw(imageCache.getCurrent()->getSprite());
 }

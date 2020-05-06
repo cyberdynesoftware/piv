@@ -6,7 +6,7 @@
 
 using namespace boost::filesystem;
 
-Folder::Folder(char* arg)
+Folder::Folder(const char* arg)
 {
     path p(arg);
 
@@ -25,8 +25,6 @@ Folder::Folder(char* arg)
         scanDirectory(p.parent_path());
         file_iter = std::find(files.cbegin(), files.cend(), p);
     }
-
-    current = new Image(file_iter->string());
 
     srand(time(NULL));
 }
@@ -56,10 +54,10 @@ Folder::isImage(const path& p)
     return std::find(extensions.begin(), extensions.end(), extension) != extensions.end();
 }
 
-Image*
-Folder::getImage()
+const std::string&
+Folder::getCurrent()
 {
-    return current;
+    return file_iter->string();
 }
 
 void
@@ -67,14 +65,6 @@ Folder::next()
 {
     if (++file_iter == files.cend())
         file_iter = files.cbegin();
-    init();
-}
-
-void
-Folder::init()
-{
-    delete current;
-    current = new Image(file_iter->string());
 }
 
 void
@@ -83,7 +73,6 @@ Folder::previous()
     if (file_iter == files.cbegin())
         file_iter = files.cend();
     file_iter--;
-    init();
 }
 
 void
@@ -91,7 +80,6 @@ Folder::random()
 {
     file_iter = files.cbegin();
     std::advance(file_iter, rand() % files.size());
-    init();
 }
 
 void
@@ -121,10 +109,4 @@ Folder::trash()
     selected /= file_iter->filename();
     rename(*file_iter, selected);
     file_iter = files.erase(file_iter);
-    init();
-}
-
-Folder::~Folder() 
-{
-    delete current;
 }

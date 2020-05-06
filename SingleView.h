@@ -1,18 +1,18 @@
 #pragma once
 
 #include "Stage.h"
-#include "Folder.h"
+#include "ImageCache.h"
 
 class SingleView : public Stage
 {
     public:
-        SingleView(Folder&, sf::RenderWindow&);
+        SingleView(ImageCache&, sf::RenderWindow&);
 
         void handle(sf::Event&);
         void draw(void);
 
     private:
-        Folder& folder;
+        ImageCache& imageCache;
         sf::RenderWindow& window;
         sf::Cursor arrow;
         sf::Cursor cross;
