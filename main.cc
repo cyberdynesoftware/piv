@@ -48,7 +48,7 @@ int main(int argc, char** argv)
         }
 
         window.clear();
-        window.draw(folder.getImage()->getSprite());
+        stage->draw();
         window.display();
     }
 

@@ -4,7 +4,7 @@
 
 class Image {
     public:
-        Image(const std::string &filename);
+        Image(const std::string& filename);
 
         sf::Sprite& getSprite(void);
         void fitToScreen(void);

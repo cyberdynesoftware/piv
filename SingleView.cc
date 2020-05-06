@@ -78,3 +78,9 @@ SingleView::handle(sf::Event& event)
             break;
     }
 }
+
+void
+SingleView::draw()
+{
+    window.draw(folder.getImage()->getSprite());
+}

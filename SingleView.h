@@ -9,6 +9,7 @@ class SingleView : public Stage
         SingleView(Folder&, sf::RenderWindow&);
 
         void handle(sf::Event&);
+        void draw(void);
 
     private:
         Folder& folder;
