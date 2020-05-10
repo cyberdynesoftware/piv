@@ -14,9 +14,9 @@ int main(int argc, char** argv)
 
     ImageCache imageCache(argv[1]);
 
-    sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
-    //window.draw(folder.getImage()->getSprite());
-    window.display();
+    //sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
+    sf::RenderWindow window(sf::VideoMode(640, 480), "piv");
+    window.setFramerateLimit(60);
 
     SingleView singleView(imageCache, window);
     Stage* stage = &singleView;
@@ -25,27 +25,29 @@ int main(int argc, char** argv)
 
     while (window.isOpen())
     {
-        window.waitEvent(event);
-
-        switch (event.type)
+        while (window.pollEvent(event))
         {
-            case sf::Event::KeyPressed:
-                switch (event.key.code)
-                {
-                    case sf::Keyboard::Q:
-                        window.close();
-                        break;
-                    default:
-                        stage->handle(event);
-                        break;
-                }
-                break;
+            switch (event.type)
+            {
+                case sf::Event::KeyPressed:
+                    switch (event.key.code)
+                    {
+                        case sf::Keyboard::Q:
+                            window.close();
+                            break;
+                        default:
+                            stage->handle(event);
+                            break;
+                    }
+                    break;
 
-            default:
-                stage->handle(event);
-                break;
+                default:
+                    stage->handle(event);
+                    break;
+            }
         }
 
+        imageCache.update();
         window.clear();
         stage->draw();
         window.display();

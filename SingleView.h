@@ -17,4 +17,8 @@ class SingleView : public Stage
         sf::Cursor arrow;
         sf::Cursor cross;
         sf::Vector2i previousMousePosition;
+
+        void fitToScreen(sf::Sprite&);
+        void zoom(sf::Sprite&, float delta);
+        sf::Vector2f mousePositionInSprite(sf::Sprite&);
 };
