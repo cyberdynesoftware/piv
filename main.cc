@@ -14,8 +14,7 @@ int main(int argc, char** argv)
 
     ImageCache imageCache(argv[1]);
 
-    //sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
-    sf::RenderWindow window(sf::VideoMode(640, 480), "piv");
+    sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
     window.setFramerateLimit(60);
 
     SingleView singleView(imageCache, window);

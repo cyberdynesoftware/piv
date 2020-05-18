@@ -46,7 +46,10 @@ AnimatedGIF::load()
         sf::Texture texture;
         texture.loadFromImage(image);
 
-        frames.push_back(std::tuple<sf::Time, sf::Texture>(sf::milliseconds(delays[i]), texture));
+        int delay = delays[i];
+        if (delay == 0 || delay == 10) delay = 100;
+
+        frames.push_back(std::tuple<sf::Time, sf::Texture>(sf::milliseconds(delay), texture));
     }
 
     frameIter = frames.begin();
