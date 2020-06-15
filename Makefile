@@ -1,4 +1,4 @@
-OBJECTS = main.o Folder.o SingleView.o ImageCache.o AnimatedGIF.o ScrollView.o
+OBJECTS = main.o Folder.o ImageCache.o AnimatedGIF.o ScrollView.o
 
 CPP = g++
 CPPFLAGS = -g -Wall -std=c++14

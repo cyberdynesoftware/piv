@@ -6,29 +6,9 @@ ImageCache::ImageCache(const char* path)
     load();
 }
 
-sf::Sprite&
-ImageCache::getSprite()
-{
-    return sprite;
-}
-
 void
 ImageCache::load()
 {
-    gif = std::make_unique<AnimatedGIF>(folder.getCurrent().c_str());
-    if (gif->test())
-    {
-        gif->load();
-        gif->update(sprite);
-        currentIsGIF = true;
-    }
-    else
-    {
-        texture.loadFromFile(folder.getCurrent());
-        texture.setSmooth(true);
-        sprite.setTexture(texture, true);
-        currentIsGIF = false;
-    }
 }
 
 void
@@ -55,6 +35,4 @@ ImageCache::random()
 void
 ImageCache::update()
 {
-    if (currentIsGIF)
-        gif->update(sprite);
 }

@@ -14,4 +14,4 @@ class ScrollView : public Stage
     private:
         ImageCache& imageCache;
         sf::RenderWindow& window;
-}
+};

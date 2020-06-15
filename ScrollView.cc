@@ -6,12 +6,12 @@ ScrollView::ScrollView(ImageCache& imageCache, sf::RenderWindow& window):
 { }
 
 void
-SingleView::handle(sf::Event& event)
+ScrollView::handle(sf::Event& event)
 {
     switch (event.type)
     {
         case sf::Event::MouseWheelScrolled:
-            zoom(imageCache.getSprite(), event.mouseWheelScroll.delta);
+            //zoom(imageCache.getSprite(), event.mouseWheelScroll.delta);
             break;
 
         default:
@@ -20,7 +20,7 @@ SingleView::handle(sf::Event& event)
 }
 
 void
-SingleView::draw()
+ScrollView::draw()
 {
-    window.draw(imageCache.getSprite());
+    //window.draw(imageCache.getSprite());
 }

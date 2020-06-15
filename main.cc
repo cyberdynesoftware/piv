@@ -1,6 +1,6 @@
 #include "ImageCache.h"
 #include "Stage.h"
-#include "SingleView.h"
+#include "ScrollView.h"
 
 #include <iostream>
 
@@ -17,8 +17,8 @@ int main(int argc, char** argv)
     sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
     window.setFramerateLimit(60);
 
-    SingleView singleView(imageCache, window);
-    Stage* stage = &singleView;
+    ScrollView view(imageCache, window);
+    Stage* stage = &view;
 
     sf::Event event;
 

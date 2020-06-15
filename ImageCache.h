@@ -1,14 +1,13 @@
 #pragma once
 
 #include "Folder.h"
-#include "AnimatedGIF.h"
+#include "ImageData.h"
 
 class ImageCache
 {
     public:
         ImageCache(const char* path);
 
-        sf::Sprite& getSprite(void);
         void next(void);
         void previous(void);
         void random(void);
@@ -16,10 +15,7 @@ class ImageCache
 
     private:
         Folder folder;
-        sf::Texture texture;
-        sf::Sprite sprite;
-        bool currentIsGIF;
-        std::unique_ptr<AnimatedGIF> gif;
+        std::vector<ImageData> images;
 
         void load(void);
 };
