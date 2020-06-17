@@ -6,9 +6,10 @@
 class ImageData
 {
     public:
-        ImageData(std::string&);
+        ImageData(const std::string&);
 
-        sf::Sprite& getSprite(void);
+        const sf::Sprite& getSprite(void) const;
+        void update(void);
 
     private:
         sf::Texture texture;

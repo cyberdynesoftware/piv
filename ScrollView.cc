@@ -3,7 +3,16 @@
 ScrollView::ScrollView(ImageCache& imageCache, sf::RenderWindow& window):
     imageCache(imageCache),
     window(window)
-{ }
+{
+    layout();
+}
+
+void
+ScrollView::layout()
+{
+    sprite = &imageCache.next();
+    //window.draw(imageCache.next());
+}
 
 void
 ScrollView::handle(sf::Event& event)
@@ -22,5 +31,5 @@ ScrollView::handle(sf::Event& event)
 void
 ScrollView::draw()
 {
-    //window.draw(imageCache.getSprite());
+    window.draw(*sprite);
 }

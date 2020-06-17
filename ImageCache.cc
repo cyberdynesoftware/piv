@@ -3,36 +3,34 @@
 ImageCache::ImageCache(const char* path)
     : folder(path)
 { 
-    load();
+    //loadImages();
 }
 
 void
-ImageCache::load()
+ImageCache::loadImages()
 {
-}
-
-void
-ImageCache::next()
-{
-    folder.next();
-    load();
-}
-
-void
-ImageCache::previous()
-{
-    folder.previous();
-    load();
-}
-
-void
-ImageCache::random()
-{
-    folder.random();
-    load();
+    for (; folder.iterator != folder.iteratorEnd; folder.iterator++)
+    {
+        images.push_back(ImageData(folder.iterator->string()));
+    }
 }
 
 void
 ImageCache::update()
 {
+    std::for_each(images.begin(), images.end(), [](ImageData& p) { p.update(); });
+}
+
+const sf::Sprite&
+ImageCache::next()
+{
+    images.push_back(ImageData(folder.iterator->string()));
+    folder.iterator++;
+    return images.back().getSprite();
+}
+
+bool
+ImageCache::hasNext()
+{
+    return folder.iterator != folder.iteratorEnd;
 }

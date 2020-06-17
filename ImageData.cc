@@ -1,6 +1,6 @@
 #include "ImageData.h"
 
-ImageData::ImageData(std::string& path)
+ImageData::ImageData(const std::string& path)
 {
     gif = std::make_unique<AnimatedGIF>(path.c_str());
     if (gif->test())
@@ -18,8 +18,14 @@ ImageData::ImageData(std::string& path)
     }
 }
 
-sf::Sprite&
-ImageData::getSprite()
+const sf::Sprite&
+ImageData::getSprite() const
 {
     return sprite;
+}
+
+void
+ImageData::update()
+{
+    if (isGIF) gif->update(sprite);
 }

@@ -13,19 +13,20 @@ Folder::Folder(const char* arg)
     if (is_directory(status(p)))
     {
         scanDirectory(p);
-        file_iter = files.cbegin();
+        iterator = files.cbegin();
     }
     else if (p.parent_path().empty())
     {
         scanDirectory(current_path());
-        file_iter = std::find(files.cbegin(), files.cend(), current_path() / p);
+        iterator = std::find(files.cbegin(), files.cend(), current_path() / p);
     }
     else
     {
         scanDirectory(p.parent_path());
-        file_iter = std::find(files.cbegin(), files.cend(), p);
+        iterator = std::find(files.cbegin(), files.cend(), p);
     }
 
+    iteratorEnd = files.cend();
     srand(time(NULL));
 }
 
@@ -53,7 +54,7 @@ Folder::isImage(const path& p)
             [](const char c) { return std::tolower(c); });
     return std::find(extensions.begin(), extensions.end(), extension) != extensions.end();
 }
-
+/*
 const std::string&
 Folder::getCurrent()
 {
@@ -110,3 +111,4 @@ Folder::trash()
     rename(*file_iter, selected);
     file_iter = files.erase(file_iter);
 }
+*/

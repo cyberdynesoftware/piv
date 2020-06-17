@@ -14,4 +14,7 @@ class ScrollView : public Stage
     private:
         ImageCache& imageCache;
         sf::RenderWindow& window;
+        const sf::Sprite* sprite;
+
+        void layout(void);
 };
