@@ -2,22 +2,24 @@
 
 #include "Folder.h"
 #include "ImageData.h"
+#include <future>
 
 class ImageCache
 {
     public:
         ImageCache(const char* path);
 
-        const sf::Sprite& next(void);
-        bool hasNext(void);
+        void loadImages(int);
         void update(void);
 
-        std::vector<ImageData>::const_iterator cbegin(void) { return images.cbegin(); }
-        std::vector<ImageData>::const_iterator cend(void) { return images.cend(); }
+        typedef std::vector<ImageData*>::const_iterator ImageIter;
+        ImageIter cbegin(void);
+        ImageIter cend(void);
 
     private:
         Folder folder;
-        std::vector<ImageData> images;
+        std::vector<ImageData*> images;
+        std::vector<std::future<ImageData*>> futures;
 
-        void loadImages(void);
+        ImageData* loadImage(const std::string&);
 };
