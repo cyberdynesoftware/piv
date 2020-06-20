@@ -8,7 +8,7 @@ class ImageData
     public:
         ImageData(const std::string&);
 
-        const sf::Sprite& getSprite(void) const;
+        sf::Sprite& getSprite(void);
         void update(void);
 
     private:

@@ -18,8 +18,8 @@ ImageData::ImageData(const std::string& path)
     }
 }
 
-const sf::Sprite&
-ImageData::getSprite() const
+sf::Sprite&
+ImageData::getSprite()
 {
     return sprite;
 }

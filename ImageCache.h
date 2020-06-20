@@ -12,9 +12,9 @@ class ImageCache
         void loadImages(int);
         void update(void);
 
-        typedef std::vector<ImageData*>::const_iterator ImageIter;
-        ImageIter cbegin(void);
-        ImageIter cend(void);
+        typedef std::vector<ImageData*>::iterator ImageIter;
+        ImageIter begin(void);
+        ImageIter end(void);
 
     private:
         Folder folder;

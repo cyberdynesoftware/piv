@@ -15,5 +15,6 @@ class ScrollView : public Stage
         ImageCache& imageCache;
         sf::RenderWindow& window;
 
-        //int offset;
+        void assignToRow(void);
+        int layoutRow(std::vector<sf::Sprite>&, int);
 };

@@ -16,17 +16,16 @@ ImageCache::loadImages(int amount)
     }
 }
 
-ImageData*
+    ImageData*
 ImageCache::loadImage(const std::string& path)
 {
     return new ImageData(path);
 }
 
     ImageCache::ImageIter
-ImageCache::cbegin()
+ImageCache::begin()
 {
-    for (std::vector<std::future<ImageData*>>::iterator iter = futures.begin();
-            iter != futures.end(); )
+    for (auto iter = futures.begin(); iter != futures.end(); )
     {
         if (iter->wait_for(std::chrono::nanoseconds(0)) == std::future_status::ready)
         {
@@ -37,13 +36,13 @@ ImageCache::cbegin()
         }
 
     }
-    return images.cbegin();
+    return images.begin();
 }
 
     ImageCache::ImageIter
-ImageCache::cend()
+ImageCache::end()
 {
-    return images.cend();
+    return images.end();
 }
 
 void
