@@ -10,9 +10,9 @@ ImageCache::loadImages(int amount)
 {
     for (int i = 0; i < amount; i++)
     {
+        if (folder.iterator == folder.iteratorEnd) break;
         futures.push_back(std::async(std::launch::async, &ImageCache::loadImage, this, folder.iterator->string()));
         folder.iterator++;
-        if (folder.iterator == folder.iteratorEnd) break;
     }
 }
 
@@ -32,7 +32,8 @@ ImageCache::begin()
             images.push_back(iter->get());
             futures.erase(iter);
         } else {
-            iter++;
+            break;
+            //iter++;
         }
 
     }
@@ -45,16 +46,14 @@ ImageCache::end()
     return images.end();
 }
 
+bool
+ImageCache::loadingComplete()
+{
+    return futures.empty();
+}
+
 void
 ImageCache::update()
 {
     std::for_each(images.begin(), images.end(), [](ImageData* p) { p->update(); });
 }
-
-//const sf::Sprite&
-//ImageCache::next()
-//{
-//    images.push_back(ImageData(folder.iterator->string()));
-//    folder.iterator++;
-//    return images.back().getSprite();
-//}

@@ -5,7 +5,7 @@ ScrollView::ScrollView(ImageCache& imageCache, sf::RenderWindow& window):
     imageCache(imageCache),
     window(window)
 {
-    imageCache.loadImages(50);
+    imageCache.loadImages(5);
 }
 
 void
@@ -16,9 +16,9 @@ ScrollView::handle(sf::Event& event)
     {
         case sf::Event::MouseWheelScrolled:
             if (event.mouseWheelScroll.delta < 0)
-                view.move(0, 5);
+                view.move(0, 10);
             else if (event.mouseWheelScroll.delta > 0)
-                view.move(0, -5);
+                view.move(0, -10);
             window.setView(view);
             break;
 
@@ -26,11 +26,11 @@ ScrollView::handle(sf::Event& event)
             switch (event.key.code)
             {
                 case sf::Keyboard::Up:
-                    view.move(0, -50);
+                    view.move(0, -100);
                     window.setView(view);
                     break;
                 case sf::Keyboard::Down:
-                    view.move(0, 50);
+                    view.move(0, 100);
                     window.setView(view);
                     break;
                 default:
@@ -73,6 +73,10 @@ ScrollView::assignToRow()
     int heightOffset = 0;
     for (auto rowIter = rows.begin(); rowIter != rows.end(); rowIter++)
         heightOffset += layoutRow(*rowIter, heightOffset);
+
+    if (imageCache.loadingComplete() && 
+            heightOffset < window.getView().getSize().y / 2 + window.getView().getCenter().y)
+        imageCache.loadImages(5);
 }
 
 int
