@@ -10,6 +10,7 @@ class ScrollView : public Stage
 
         void handle(sf::Event&);
         void draw(void);
+        ImageCache::ImageIter getSelected(void);
 
     private:
         ImageCache& imageCache;

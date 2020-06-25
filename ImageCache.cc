@@ -8,12 +8,13 @@ ImageCache::ImageCache(const char* path)
 void
 ImageCache::loadImages(int amount)
 {
-    for (int i = 0; i < amount; i++)
-    {
-        if (folder.iterator == folder.iteratorEnd) break;
-        futures.push_back(std::async(std::launch::async, &ImageCache::loadImage, this, folder.iterator->string()));
-        folder.iterator++;
-    }
+    if (futures.empty())
+        for (int i = 0; i < amount; i++)
+        {
+            if (folder.iterator == folder.iteratorEnd) break;
+            futures.push_back(std::async(std::launch::async, &ImageCache::loadImage, this, folder.iterator->string()));
+            folder.iterator++;
+        }
 }
 
     ImageData*
@@ -44,12 +45,6 @@ ImageCache::begin()
 ImageCache::end()
 {
     return images.end();
-}
-
-bool
-ImageCache::loadingComplete()
-{
-    return futures.empty();
 }
 
 void

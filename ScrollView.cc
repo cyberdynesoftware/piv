@@ -73,10 +73,6 @@ ScrollView::assignToRow()
     int heightOffset = 0;
     for (auto rowIter = rows.begin(); rowIter != rows.end(); rowIter++)
         heightOffset += layoutRow(*rowIter, heightOffset);
-
-    if (imageCache.loadingComplete() && 
-            heightOffset < window.getView().getSize().y / 2 + window.getView().getCenter().y)
-        imageCache.loadImages(5);
 }
 
 int
@@ -96,5 +92,17 @@ ScrollView::layoutRow(std::vector<sf::Sprite>& row, int offset)
         x += iter->getLocalBounds().width;
         window.draw(*iter);
     }
+
+    if (offset < window.getView().getSize().y / 2 + window.getView().getCenter().y)
+        imageCache.loadImages(5);
+
     return height;
+}
+
+    ImageCache::ImageIter
+ScrollView::getSelected()
+{
+    for (auto iter = imageCache.begin(); iter != imageCache.end(); iter++)
+        if ((**iter).getSprite().getGlobalBounds().contains(Mouse::getPosition(window)))
+            return iter;
 }

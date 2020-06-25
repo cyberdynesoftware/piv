@@ -11,7 +11,6 @@ class ImageCache
 
         void loadImages(int);
         void update(void);
-        bool loadingComplete(void);
 
         typedef std::vector<ImageData*>::iterator ImageIter;
         ImageIter begin(void);
