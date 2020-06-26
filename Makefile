@@ -1,4 +1,4 @@
-OBJECTS = main.o Folder.o ImageCache.o AnimatedGIF.o ScrollView.o ImageData.o
+OBJECTS = main.o Folder.o ImageCache.o AnimatedGIF.o SingleView.o ScrollView.o ImageData.o
 
 CPP = g++
 CPPFLAGS = -g -Wall -std=c++14
@@ -8,7 +8,7 @@ all: $(OBJECTS)
 
 main.o: ImageCache.h Stage.h SingleView.h ScrollView.h ImageCache.h ImageData.h AnimatedGIF.h
 Folder.o: Folder.h
-SingleView.o: SingleView.h Stage.h ImageCache.h
+SingleView.o: SingleView.h Stage.h ImageCache.h ImageData.h
 ImageCache.o: ImageCache.h Folder.h ImageData.h
 AnimatedGIF.o: AnimatedGIF.h
 ScrollView.o: ScrollView.h Stage.h ImageCache.h ImageData.h

@@ -1,5 +1,6 @@
 #include "ImageCache.h"
 #include "Stage.h"
+#include "SingleView.h"
 #include "ScrollView.h"
 
 #include <iostream>
@@ -17,9 +18,11 @@ int main(int argc, char** argv)
     sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
     window.setFramerateLimit(60);
 
-    ScrollView view(imageCache, window);
-    Stage* stage = &view;
+    SingleView singleView(imageCache, window);
+    ScrollView scrollView(imageCache, window);
+    Stage* stage = &scrollView;
 
+    sf::View defaultView = window.getView();
     sf::Event event;
 
     while (window.isOpen())
@@ -34,8 +37,24 @@ int main(int argc, char** argv)
                         case sf::Keyboard::Q:
                             window.close();
                             break;
+                        case sf::Keyboard::M:
+                            stage = &scrollView;
+                            break;
                         default:
                             stage->handle(event);
+                            break;
+                    }
+                    break;
+
+                case sf::Event::MouseButtonReleased:
+                    switch (event.mouseButton.button)
+                    {
+                        case sf::Mouse::Button::Left:
+                            singleView.select(scrollView.getSelected());
+                            window.setView(defaultView);
+                            stage = &singleView;
+                            break;
+                        default:
                             break;
                     }
                     break;

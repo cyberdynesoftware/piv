@@ -17,5 +17,5 @@ class ScrollView : public Stage
         sf::RenderWindow& window;
 
         void assignToRow(void);
-        int layoutRow(std::vector<sf::Sprite>&, int);
+        int layoutRow(std::vector<sf::Sprite*>&, int);
 };

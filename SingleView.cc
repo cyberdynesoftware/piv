@@ -7,7 +7,6 @@ SingleView::SingleView(ImageCache& imageCache, sf::RenderWindow& window):
     arrow.loadFromSystem(sf::Cursor::Arrow);
     cross.loadFromSystem(sf::Cursor::Cross);
     previousMousePosition = sf::Mouse::getPosition();
-    fitToScreen(imageCache.getSprite());
 }
 
 void
@@ -19,20 +18,19 @@ SingleView::handle(sf::Event& event)
             switch (event.key.code)
             {
                 case sf::Keyboard::Space:
-                    imageCache.next();
-                    fitToScreen(imageCache.getSprite());
+                    imageIter++;
+                    fitToScreen((**imageIter).getSprite());
                     break;
                 case sf::Keyboard::Backspace:
-                    imageCache.previous();
-                    fitToScreen(imageCache.getSprite());
+                    imageIter--;
+                    fitToScreen((**imageIter).getSprite());
                     break;
                 case sf::Keyboard::R:
-                    imageCache.random();
-                    fitToScreen(imageCache.getSprite());
+                    //imageCache.random();
+                    fitToScreen((**imageIter).getSprite());
                     break;
                 case sf::Keyboard::A:
                     //folder.select();
-                    imageCache.next();
                     break;
                 case sf::Keyboard::D:
                     //folder.trash();
@@ -43,7 +41,7 @@ SingleView::handle(sf::Event& event)
             break;
 
         case sf::Event::MouseWheelScrolled:
-            zoom(imageCache.getSprite(), event.mouseWheelScroll.delta);
+            zoom((**imageIter).getSprite(), event.mouseWheelScroll.delta);
             break;
 
         case sf::Event::MouseButtonPressed:
@@ -53,7 +51,7 @@ SingleView::handle(sf::Event& event)
                     window.setMouseCursor(cross);
                     break;
                 case sf::Mouse::Button::Right:
-                    fitToScreen(imageCache.getSprite());
+                    fitToScreen((**imageIter).getSprite());
                     break;
                 default:
                     break;
@@ -75,7 +73,7 @@ SingleView::handle(sf::Event& event)
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
             {
                 sf::Vector2i delta(sf::Mouse::getPosition() - previousMousePosition);
-                imageCache.getSprite().move(delta.x, delta.y);
+                (**imageIter).getSprite().move(delta.x, delta.y);
             }
 
             previousMousePosition = sf::Mouse::getPosition();
@@ -89,7 +87,7 @@ SingleView::handle(sf::Event& event)
 void
 SingleView::draw()
 {
-    window.draw(imageCache.getSprite());
+    window.draw((**imageIter).getSprite());
 }
 
 void
@@ -129,4 +127,11 @@ SingleView::mousePositionInSprite(sf::Sprite& sprite)
 {
     return sf::Vector2f(sf::Mouse::getPosition().x - sprite.getGlobalBounds().left,
             sf::Mouse::getPosition().y - sprite.getGlobalBounds().top);
+}
+
+void
+SingleView::select(ImageCache::ImageIter iter)
+{
+    imageIter = iter;
+    fitToScreen((**imageIter).getSprite());
 }
