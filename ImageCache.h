@@ -15,6 +15,7 @@ class ImageCache
         typedef std::vector<ImageData*>::iterator ImageIter;
         ImageIter begin(void);
         ImageIter end(void);
+        ImageIter currentImage;
 
     private:
         Folder folder;

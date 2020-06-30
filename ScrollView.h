@@ -10,12 +10,13 @@ class ScrollView : public Stage
 
         void handle(sf::Event&);
         void draw(void);
-        ImageCache::ImageIter getSelected(void);
+        void selectImage(void);
+        void scrollToCurrentImage(void);
 
     private:
         ImageCache& imageCache;
         sf::RenderWindow& window;
 
-        void assignToRow(void);
+        std::vector<std::vector<sf::Sprite*>> spreadImagesToRows(void);
         int layoutRow(std::vector<sf::Sprite*>&, int);
 };

@@ -7,8 +7,10 @@ class Folder
     public:
         Folder(const char* arg);
 
-        std::vector<boost::filesystem::path>::const_iterator iterator;
-        std::vector<boost::filesystem::path>::const_iterator iteratorEnd;
+        typedef std::vector<boost::filesystem::path>::const_iterator FolderIter;
+        FolderIter cbegin(void);
+        FolderIter cend(void);
+        FolderIter currentItem;
 
     private:
         std::vector<boost::filesystem::path> files;

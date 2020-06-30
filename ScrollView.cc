@@ -46,15 +46,23 @@ ScrollView::handle(sf::Event& event)
 void
 ScrollView::draw()
 {
-    assignToRow();
+    auto rows = spreadImagesToRows();
+
+    int heightOffset = 0;
+    for (auto rowIter = rows.begin(); rowIter != rows.end(); rowIter++)
+        heightOffset += layoutRow(*rowIter, heightOffset);
+
+    if (heightOffset < window.getView().getCenter().y + window.getView().getSize().y)
+        imageCache.loadImages(5);
 }
 
-void
-ScrollView::assignToRow()
+std::vector<std::vector<sf::Sprite*>>
+ScrollView::spreadImagesToRows()
 {
-    auto maxRowWidth = window.getView().getSize().x;
     std::vector<std::vector<sf::Sprite*>> rows;
     rows.push_back(std::vector<sf::Sprite*>());
+
+    auto maxRowWidth = window.getView().getSize().x;
     int index = 0, rowWidth = 0;
 
     for (ImageCache::ImageIter iter = imageCache.begin(); iter != imageCache.end(); iter++)
@@ -70,9 +78,7 @@ ScrollView::assignToRow()
         rowWidth += sprite->getLocalBounds().width;
     }
 
-    int heightOffset = 0;
-    for (auto rowIter = rows.begin(); rowIter != rows.end(); rowIter++)
-        heightOffset += layoutRow(*rowIter, heightOffset);
+    return rows;
 }
 
 int
@@ -95,19 +101,22 @@ ScrollView::layoutRow(std::vector<sf::Sprite*>& row, int offset)
         window.draw(**iter);
     }
 
-    if (offset < window.getView().getSize().y / 2 + window.getView().getCenter().y)
-        imageCache.loadImages(5);
-
     return height;
 }
 
-    ImageCache::ImageIter
-ScrollView::getSelected()
+void
+ScrollView::selectImage()
 {
+    imageCache.currentImage = imageCache.begin();
+
     auto mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
     for (auto iter = imageCache.begin(); iter != imageCache.end(); iter++)
         if ((**iter).getSprite().getGlobalBounds().contains(mouse.x, mouse.y))
-            return iter;
+            imageCache.currentImage = iter;
+}
 
-    return imageCache.begin();
+void
+ScrollView::scrollToCurrentImage()
+{
+    // TODO
 }

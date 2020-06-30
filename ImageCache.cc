@@ -11,9 +11,9 @@ ImageCache::loadImages(int amount)
     if (futures.empty())
         for (int i = 0; i < amount; i++)
         {
-            if (folder.iterator == folder.iteratorEnd) break;
-            futures.push_back(std::async(std::launch::async, &ImageCache::loadImage, this, folder.iterator->string()));
-            folder.iterator++;
+            if (folder.currentItem == folder.cend()) break;
+            futures.push_back(std::async(std::launch::async, &ImageCache::loadImage, this, folder.currentItem->string()));
+            folder.currentItem++;
         }
 }
 

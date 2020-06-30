@@ -10,7 +10,7 @@ class SingleView : public Stage
 
         void handle(sf::Event&);
         void draw(void);
-        void select(ImageCache::ImageIter);
+        void init(void);
 
     private:
         ImageCache& imageCache;
@@ -18,7 +18,6 @@ class SingleView : public Stage
         sf::Cursor arrow;
         sf::Cursor cross;
         sf::Vector2i previousMousePosition;
-        ImageCache::ImageIter imageIter;
 
         void fitToScreen(sf::Sprite&);
         void zoom(sf::Sprite&, float delta);

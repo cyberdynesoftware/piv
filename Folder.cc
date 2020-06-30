@@ -13,20 +13,19 @@ Folder::Folder(const char* arg)
     if (is_directory(status(p)))
     {
         scanDirectory(p);
-        iterator = files.cbegin();
+        currentItem = files.cbegin();
     }
     else if (p.parent_path().empty())
     {
         scanDirectory(current_path());
-        iterator = std::find(files.cbegin(), files.cend(), current_path() / p);
+        currentItem = std::find(files.cbegin(), files.cend(), current_path() / p);
     }
     else
     {
         scanDirectory(p.parent_path());
-        iterator = std::find(files.cbegin(), files.cend(), p);
+        currentItem = std::find(files.cbegin(), files.cend(), p);
     }
 
-    iteratorEnd = files.cend();
     srand(time(NULL));
 }
 
@@ -53,6 +52,18 @@ Folder::isImage(const path& p)
     std::transform(extension.begin(), extension.end(), extension.begin(),
             [](const char c) { return std::tolower(c); });
     return std::find(extensions.begin(), extensions.end(), extension) != extensions.end();
+}
+
+    Folder::FolderIter
+Folder::cbegin()
+{
+    return files.cbegin();
+}
+
+    Folder::FolderIter
+Folder::cend()
+{
+    return files.cend();
 }
 /*
 const std::string&

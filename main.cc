@@ -50,9 +50,10 @@ int main(int argc, char** argv)
                     switch (event.mouseButton.button)
                     {
                         case sf::Mouse::Button::Left:
-                            singleView.select(scrollView.getSelected());
-                            window.setView(defaultView);
+                            scrollView.selectImage();
+                            singleView.init();
                             stage = &singleView;
+                            window.setView(defaultView);
                             break;
                         default:
                             break;
