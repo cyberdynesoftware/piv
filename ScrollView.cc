@@ -33,6 +33,36 @@ ScrollView::handle(sf::Event& event)
                     view.move(0, 100);
                     window.setView(view);
                     break;
+                case sf::Keyboard::Num1:
+                    numberOfColumns = 1;
+                    break;
+                case sf::Keyboard::Num2:
+                    numberOfColumns = 2;
+                    break;
+                case sf::Keyboard::Num3:
+                    numberOfColumns = 3;
+                    break;
+                case sf::Keyboard::Num4:
+                    numberOfColumns = 4;
+                    break;
+                case sf::Keyboard::Num5:
+                    numberOfColumns = 5;
+                    break;
+                case sf::Keyboard::Num6:
+                    numberOfColumns = 6;
+                    break;
+                case sf::Keyboard::Num7:
+                    numberOfColumns = 7;
+                    break;
+                case sf::Keyboard::Num8:
+                    numberOfColumns = 8;
+                    break;
+                case sf::Keyboard::Num9:
+                    numberOfColumns = 9;
+                    break;
+                case sf::Keyboard::Num0:
+                    numberOfColumns = 10;
+                    break;
                 default:
                     break;
             }
