@@ -1,5 +1,6 @@
 #include "ImageCache.h"
 #include <chrono>
+#include <iostream>
 
 ImageCache::ImageCache(const char* path)
     : folder(path)
@@ -26,18 +27,6 @@ ImageCache::loadImage(const std::string& path)
     ImageCache::ImageIter
 ImageCache::begin()
 {
-    for (auto iter = futures.begin(); iter != futures.end(); )
-    {
-        if (iter->wait_for(std::chrono::nanoseconds(0)) == std::future_status::ready)
-        {
-            images.push_back(iter->get());
-            futures.erase(iter);
-        } else {
-            break;
-            //iter++;
-        }
-
-    }
     return images.begin();
 }
 
@@ -50,5 +39,19 @@ ImageCache::end()
 void
 ImageCache::update()
 {
+    std::cout << "update" << std::endl;
     std::for_each(images.begin(), images.end(), [](ImageData* p) { p->update(); });
+    std::cout << "2" << std::endl;
+
+    for (auto iter = futures.begin(); iter != futures.end(); )
+    {
+        if (iter->wait_for(std::chrono::nanoseconds(0)) == std::future_status::ready)
+        {
+            images.push_back(iter->get());
+            futures.erase(iter);
+        } else {
+            break;
+        }
+    }
+    std::cout << "update done" << std::endl;
 }
