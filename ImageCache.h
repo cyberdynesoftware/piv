@@ -3,6 +3,7 @@
 #include "Folder.h"
 #include "ImageData.h"
 #include <future>
+#include <queue>
 
 class ImageCache
 {
@@ -20,7 +21,7 @@ class ImageCache
     private:
         Folder folder;
         std::list<ImageData*> images;
-        std::vector<std::future<ImageData*>> futures;
+        std::queue<std::future<ImageData*>> futures;
 
         ImageData* loadImage(const std::string&);
 };

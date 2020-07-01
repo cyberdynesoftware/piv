@@ -12,7 +12,7 @@ ImageCache::loadImages(int amount)
         for (int i = 0; i < amount; i++)
         {
             if (folder.currentItem == folder.cend()) break;
-            futures.push_back(std::async(std::launch::async, &ImageCache::loadImage, this, folder.currentItem->string()));
+            futures.push(std::async(std::launch::async, &ImageCache::loadImage, this, folder.currentItem->string()));
             folder.currentItem++;
         }
 }
@@ -40,12 +40,12 @@ ImageCache::update()
 {
     std::for_each(images.begin(), images.end(), [](ImageData* p) { p->update(); });
 
-    for (auto iter = futures.begin(); iter != futures.end(); )
+    while (!futures.empty())
     {
-        if (iter->wait_for(std::chrono::nanoseconds(0)) == std::future_status::ready)
+        if (futures.front().wait_for(std::chrono::nanoseconds(0)) == std::future_status::ready)
         {
-            images.push_back(iter->get());
-            futures.erase(iter);
+            images.push_back(futures.front().get());
+            futures.pop();
         } else {
             break;
         }
