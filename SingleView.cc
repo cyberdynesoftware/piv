@@ -24,11 +24,14 @@ SingleView::handle(sf::Event& event)
             switch (event.key.code)
             {
                 case sf::Keyboard::Space:
-                    imageCache.currentImage++;
+                    imageCache.loadImages(1);
+                    if (++imageCache.currentImage == imageCache.end()) 
+                        imageCache.currentImage--;
                     fitToScreen((**imageCache.currentImage).getSprite());
                     break;
                 case sf::Keyboard::Backspace:
-                    imageCache.currentImage--;
+                    if (imageCache.currentImage != imageCache.begin())
+                        imageCache.currentImage--;
                     fitToScreen((**imageCache.currentImage).getSprite());
                     break;
                 case sf::Keyboard::R:
