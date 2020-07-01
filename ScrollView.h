@@ -2,6 +2,7 @@
 
 #include "Stage.h"
 #include "ImageCache.h"
+#include "ImageData.h"
 
 class ScrollView : public Stage
 {

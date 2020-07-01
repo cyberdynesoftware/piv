@@ -67,7 +67,7 @@ AnimatedGIF::getSize()
 }
 
 void
-AnimatedGIF::update(sf::Sprite& sprite)
+AnimatedGIF::update(sf::Sprite& sprite, bool square)
 {
     sf::Time& delay = std::get<0>(*frameIter);
 

@@ -9,11 +9,13 @@ class ImageData
         ImageData(const std::string&);
 
         sf::Sprite& getSprite(void);
+        sf::Sprite& getSquareSprite(void);
         void update(void);
 
     private:
         sf::Texture texture;
         sf::Sprite sprite;
+        sf::Sprite squareSprite;
         bool isGIF;
         std::unique_ptr<AnimatedGIF> gif;
 };

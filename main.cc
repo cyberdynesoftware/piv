@@ -38,6 +38,7 @@ int main(int argc, char** argv)
                             window.close();
                             break;
                         case sf::Keyboard::M:
+                            scrollView.scrollToCurrentImage();
                             stage = &scrollView;
                             break;
                         default:

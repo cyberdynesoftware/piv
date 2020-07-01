@@ -67,7 +67,7 @@ ScrollView::spreadImagesToRows()
 
     for (ImageCache::ImageIter iter = imageCache.begin(); iter != imageCache.end(); iter++)
     {
-        sf::Sprite* sprite = &(**iter).getSprite();
+        sf::Sprite* sprite = &(**iter).getSquareSprite();
         if (rowWidth + sprite->getLocalBounds().width > maxRowWidth)
         {
             index++;
@@ -93,8 +93,6 @@ ScrollView::layoutRow(std::vector<sf::Sprite*>& row, int offset)
     int x = (window.getView().getSize().x - width) / 2;
     for (auto iter = row.begin(); iter != row.end(); iter++)
     {
-        (**iter).setScale(1, 1);
-        (**iter).setOrigin(0, 0);
         int y = offset + (height - (**iter).getLocalBounds().height) / 2;
         (**iter).setPosition(x, y);
         x += (**iter).getLocalBounds().width;
@@ -111,12 +109,15 @@ ScrollView::selectImage()
 
     auto mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
     for (auto iter = imageCache.begin(); iter != imageCache.end(); iter++)
-        if ((**iter).getSprite().getGlobalBounds().contains(mouse.x, mouse.y))
+        if ((**iter).getSquareSprite().getGlobalBounds().contains(mouse.x, mouse.y))
             imageCache.currentImage = iter;
 }
 
 void
 ScrollView::scrollToCurrentImage()
 {
-    // TODO
+    auto bounds = (**imageCache.currentImage).getSquareSprite().getGlobalBounds();
+    auto view = window.getView();
+    view.setCenter(view.getCenter().x, bounds.top + bounds.height / 2);
+    window.setView(view);
 }

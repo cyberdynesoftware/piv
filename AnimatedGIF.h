@@ -12,7 +12,7 @@ class AnimatedGIF
         bool test(void);
         void load(void);
         const sf::Vector2i& getSize(void);
-        void update(sf::Sprite&);
+        void update(sf::Sprite&, bool);
 
     private:
         struct stbi_var;

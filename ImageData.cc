@@ -6,7 +6,8 @@ ImageData::ImageData(const std::string& path)
     if (gif->test())
     {
         gif->load();
-        gif->update(sprite);
+        gif->update(sprite, false);
+        gif->update(squareSprite, true);
         isGIF = true;
     }
     else
@@ -14,6 +15,7 @@ ImageData::ImageData(const std::string& path)
         texture.loadFromFile(path);
         texture.setSmooth(true);
         sprite.setTexture(texture, true);
+        squareSprite.setTexture(texture, true);
         isGIF = false;
     }
 }
@@ -24,8 +26,18 @@ ImageData::getSprite()
     return sprite;
 }
 
+sf::Sprite&
+ImageData::getSquareSprite()
+{
+    return squareSprite;
+}
+
 void
 ImageData::update()
 {
-    if (isGIF) gif->update(sprite);
+    if (isGIF)
+    {
+        gif->update(sprite, false);
+        gif->update(squareSprite, true);
+    }
 }
