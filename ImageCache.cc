@@ -46,8 +46,7 @@ ImageCache::update()
         {
             images.push_back(futures.front().get());
             futures.pop();
-        } else {
-            break;
         }
+        else break;
     }
 }

@@ -17,7 +17,5 @@ class ScrollView : public Stage
     private:
         ImageCache& imageCache;
         sf::RenderWindow& window;
-
-        std::vector<std::vector<sf::Sprite*>> spreadImagesToRows(void);
-        int layoutRow(std::vector<sf::Sprite*>&, int);
+        int numberOfColumns = 4;
 };

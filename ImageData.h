@@ -12,6 +12,8 @@ class ImageData
         sf::Sprite& getSquareSprite(void);
         void update(void);
 
+        static void square(sf::Sprite&);
+
     private:
         sf::Texture texture;
         sf::Sprite sprite;

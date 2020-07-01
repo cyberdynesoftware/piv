@@ -1,4 +1,5 @@
 #include "AnimatedGIF.h"
+#include "ImageData.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ONLY_GIF
@@ -45,6 +46,7 @@ AnimatedGIF::load()
 
         sf::Texture texture;
         texture.loadFromImage(image);
+        texture.setSmooth(true);
 
         int delay = delays[i];
         if (delay == 0 || delay == 10) delay = 100;
@@ -82,4 +84,5 @@ AnimatedGIF::update(sf::Sprite& sprite, bool square)
     // TODO: only when dirty
     sf::Texture& texture = std::get<1>(*frameIter);
     sprite.setTexture(texture, true);
+    if (square) ImageData::square(sprite);
 }
