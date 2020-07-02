@@ -25,13 +25,18 @@ SingleView::handle(sf::Event& event)
             {
                 case sf::Keyboard::Space:
                     imageCache.loadImages(1);
-                    if (++imageCache.currentImage == imageCache.end()) 
+                    do if (++imageCache.currentImage == imageCache.end()) 
+                    {
                         imageCache.currentImage--;
+                        break;
+                    }
+                    while (!(**imageCache.currentImage).isValid());
                     fitToScreen((**imageCache.currentImage).getSprite());
                     break;
                 case sf::Keyboard::Backspace:
-                    if (imageCache.currentImage != imageCache.begin())
+                    do if (imageCache.currentImage != imageCache.begin())
                         imageCache.currentImage--;
+                    while (!(**imageCache.currentImage).isValid());
                     fitToScreen((**imageCache.currentImage).getSprite());
                     break;
                 case sf::Keyboard::R:

@@ -9,10 +9,11 @@ ImageData::ImageData(const std::string& path)
         gif->update(sprite, false);
         gif->update(squareSprite, true);
         isGIF = true;
+        valid = true;
     }
     else
     {
-        texture.loadFromFile(path);
+        valid = texture.loadFromFile(path);
         texture.setSmooth(true);
         sprite.setTexture(texture, true);
         squareSprite.setTexture(texture, true);
@@ -43,7 +44,11 @@ ImageData::update()
     }
 }
 
-#include <iostream>
+bool
+ImageData::isValid()
+{
+    return valid;
+}
 
 void
 ImageData::square(sf::Sprite& sprite)

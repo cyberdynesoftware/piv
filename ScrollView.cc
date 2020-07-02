@@ -82,6 +82,8 @@ ScrollView::draw()
 
     for (auto iter = imageCache.begin(); iter != imageCache.end(); iter++)
     {
+        if (!(**iter).isValid()) continue;
+
         sf::Sprite& sprite = (**iter).getSquareSprite();
         float factor = size / sprite.getLocalBounds().width;
         sprite.setScale(factor, factor);
