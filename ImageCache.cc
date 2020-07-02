@@ -49,4 +49,6 @@ ImageCache::update()
         }
         else break;
     }
+
+    //while (images.size() > 100) images.pop_front();
 }

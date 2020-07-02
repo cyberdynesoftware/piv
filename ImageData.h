@@ -19,7 +19,6 @@ class ImageData
         sf::Texture texture;
         sf::Sprite sprite;
         sf::Sprite squareSprite;
-        bool isGIF;
         bool valid;
         std::unique_ptr<AnimatedGIF> gif;
 };

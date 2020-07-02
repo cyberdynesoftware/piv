@@ -5,37 +5,31 @@
 #define STBI_ONLY_GIF
 #include <stb/stb_image.h>
 
-struct AnimatedGIF::stbi_var
-{
-    stbi__context s;
-};
-
-AnimatedGIF::AnimatedGIF(const char* filename)
-{
-    pImpl = new stbi_var;
-
-    FILE *f = stbi__fopen(filename, "rb");
-    stbi__start_file(&pImpl->s, f);
-}
-
-AnimatedGIF::~AnimatedGIF()
-{
-    delete pImpl;
-}
+AnimatedGIF::AnimatedGIF()
+{ }
 
 bool
-AnimatedGIF::test()
+AnimatedGIF::test(const char* filename)
 {
-    return stbi__gif_test(&pImpl->s);
+    FILE *f = stbi__fopen(filename, "rb");
+    stbi__context s;
+    stbi__start_file(&s, f);
+    bool result = stbi__gif_test(&s);
+    fclose(f);
+    return result;
 }
 
 void
-AnimatedGIF::load()
+AnimatedGIF::load(const char* filename)
 {
+    FILE *f = stbi__fopen(filename, "rb");
+    stbi__context s;
+    stbi__start_file(&s, f);
+
     int *delays;
     int z = 0, comp = 0;
 
-    void *pixels = stbi__load_gif_main(&pImpl->s, &delays, &size.x, &size.y, &z, &comp, STBI_rgb_alpha);
+    void *pixels = stbi__load_gif_main(&s, &delays, &size.x, &size.y, &z, &comp, STBI_rgb_alpha);
 
     sf::Image image;
     int step = size.x * size.y * 4;
@@ -57,6 +51,7 @@ AnimatedGIF::load()
     frameIter = frames.begin();
     
     stbi_image_free(pixels);
+    fclose(f);
 
     totalDelay = sf::Time::Zero;
     startTime = clock.getElapsedTime();

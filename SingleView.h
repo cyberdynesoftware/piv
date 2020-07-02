@@ -8,6 +8,7 @@ class SingleView : public Stage
     public:
         SingleView(ImageCache&, sf::RenderWindow&);
 
+        bool instanceOf(const SubType&);
         void handle(sf::Event&);
         void draw(void);
         void init(void);

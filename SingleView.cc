@@ -9,6 +9,12 @@ SingleView::SingleView(ImageCache& imageCache, sf::RenderWindow& window):
     previousMousePosition = sf::Mouse::getPosition();
 }
 
+bool
+SingleView::instanceOf(const SubType& subType)
+{
+    return subType == SubType::SingleView;
+}
+
 void
 SingleView::init()
 {

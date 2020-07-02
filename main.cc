@@ -38,9 +38,12 @@ int main(int argc, char** argv)
                             window.close();
                             break;
                         case sf::Keyboard::M:
-                            scrollView.scrollToCurrentImage();
-                            stage = &scrollView;
-                            break;
+                            if (stage->instanceOf(Stage::SubType::SingleView))
+                            {
+                                scrollView.scrollToCurrentImage();
+                                stage = &scrollView;
+                                break;
+                            }
                         default:
                             stage->handle(event);
                             break;
@@ -51,11 +54,14 @@ int main(int argc, char** argv)
                     switch (event.mouseButton.button)
                     {
                         case sf::Mouse::Button::Left:
-                            scrollView.selectImage();
-                            singleView.init();
-                            stage = &singleView;
-                            window.setView(defaultView);
-                            break;
+                            if (stage->instanceOf(Stage::SubType::ScrollView))
+                            {
+                                scrollView.selectImage();
+                                singleView.init();
+                                stage = &singleView;
+                                window.setView(defaultView);
+                                break;
+                            }
                         default:
                             break;
                     }

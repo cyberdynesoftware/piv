@@ -6,18 +6,14 @@
 class AnimatedGIF
 {
     public:
-        AnimatedGIF(const char* filename);
-        ~AnimatedGIF();
+        AnimatedGIF();
 
-        bool test(void);
-        void load(void);
+        static bool test(const char*);
+        void load(const char*);
         const sf::Vector2i& getSize(void);
         void update(sf::Sprite&, bool);
 
     private:
-        struct stbi_var;
-        struct stbi_var* pImpl;
-
         sf::Vector2i size;
         sf::Clock clock;
         sf::Time startTime;

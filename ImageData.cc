@@ -1,14 +1,14 @@
 #include "ImageData.h"
+#include <iostream>
 
 ImageData::ImageData(const std::string& path)
 {
-    gif = std::make_unique<AnimatedGIF>(path.c_str());
-    if (gif->test())
+    if (AnimatedGIF::test(path.c_str()))
     {
-        gif->load();
+        gif = std::make_unique<AnimatedGIF>();
+        gif->load(path.c_str());
         gif->update(sprite, false);
         gif->update(squareSprite, true);
-        isGIF = true;
         valid = true;
     }
     else
@@ -18,7 +18,6 @@ ImageData::ImageData(const std::string& path)
         sprite.setTexture(texture, true);
         squareSprite.setTexture(texture, true);
         square(squareSprite);
-        isGIF = false;
     }
 }
 
@@ -37,7 +36,7 @@ ImageData::getSquareSprite()
 void
 ImageData::update()
 {
-    if (isGIF)
+    if (gif != nullptr)
     {
         gif->update(sprite, false);
         gif->update(squareSprite, true);

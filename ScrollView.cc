@@ -8,6 +8,12 @@ ScrollView::ScrollView(ImageCache& imageCache, sf::RenderWindow& window):
     imageCache.loadImages(numberOfColumns * 3);
 }
 
+bool
+ScrollView::instanceOf(const SubType& subType)
+{
+    return subType == SubType::ScrollView;
+}
+
 void
 ScrollView::handle(sf::Event& event)
 {

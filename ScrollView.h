@@ -9,6 +9,7 @@ class ScrollView : public Stage
     public:
         ScrollView(ImageCache&, sf::RenderWindow&);
 
+        bool instanceOf(const SubType&);
         void handle(sf::Event&);
         void draw(void);
         void selectImage(void);
@@ -17,5 +18,5 @@ class ScrollView : public Stage
     private:
         ImageCache& imageCache;
         sf::RenderWindow& window;
-        int numberOfColumns = 4;
+        int numberOfColumns = 5;
 };
