@@ -12,7 +12,7 @@ ImageCache::loadImages(int amount)
         for (int i = 0; i < amount; i++)
         {
             if (folder.currentItem == folder.cend()) break;
-            futures.push(std::async(std::launch::async, &ImageCache::loadImage, this, folder.currentItem->string()));
+            futures.push(std::async(std::launch::async, &ImageCache::loadImage, this, *folder.currentItem));
             folder.currentItem++;
         }
 }

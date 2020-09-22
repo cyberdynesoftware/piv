@@ -4,6 +4,7 @@
 #include "ImageData.h"
 #include <future>
 #include <queue>
+#include <list>
 
 class ImageCache
 {

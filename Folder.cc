@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <stdlib.h>
 #include <time.h>
+#include <boost/filesystem.hpp>
 
 using namespace boost::filesystem;
 
@@ -12,29 +13,30 @@ Folder::Folder(const char* arg)
 
     if (is_directory(status(p)))
     {
-        scanDirectory(p);
+        scanDirectory(p.string());
         currentItem = files.cbegin();
     }
     else if (p.parent_path().empty())
     {
-        scanDirectory(current_path());
-        currentItem = std::find(files.cbegin(), files.cend(), current_path() / p);
+        scanDirectory(current_path().string());
+        currentItem = std::find(files.cbegin(), files.cend(), (current_path() / p).string());
     }
     else
     {
-        scanDirectory(p.parent_path());
-        currentItem = std::find(files.cbegin(), files.cend(), p);
+        scanDirectory(p.parent_path().string());
+        currentItem = std::find(files.cbegin(), files.cend(), p.string());
     }
 
     srand(time(NULL));
 }
 
 void
-Folder::scanDirectory(const path& p)
+Folder::scanDirectory(const std::string& dir)
 {
+    path p(dir);
+
     for (directory_iterator dir_iter(p); dir_iter != directory_iterator(); dir_iter++)
-        if (isImage(*dir_iter))
-            files.push_back(*dir_iter);
+        files.push_back(dir_iter->path().string());
 
     if (files.empty())
     {
@@ -43,15 +45,6 @@ Folder::scanDirectory(const path& p)
     }
 
     std::sort(files.begin(), files.end());
-}
-
-bool
-Folder::isImage(const path& p)
-{
-    std::string extension = p.extension().string();
-    std::transform(extension.begin(), extension.end(), extension.begin(),
-            [](const char c) { return std::tolower(c); });
-    return std::find(extensions.begin(), extensions.end(), extension) != extensions.end();
 }
 
     Folder::FolderIter
