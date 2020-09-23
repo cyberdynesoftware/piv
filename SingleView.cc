@@ -1,12 +1,12 @@
 #include "SingleView.h"
 #include <OpenImageIO/imagebuf.h>
 #include <OpenImageIO/imagebufalgo.h>
+#include <iostream>
 
 SingleView::SingleView(Folder& folder, sf::RenderWindow& window):
     folder(folder),
     window(window)
 {
-    arrow.loadFromSystem(sf::Cursor::Arrow);
     cross.loadFromSystem(sf::Cursor::Cross);
     previousMousePosition = sf::Mouse::getPosition();
 }
@@ -42,9 +42,9 @@ SingleView::loadImage(const std::string& path)
 
     if (spec.nchannels == 3)
         buffer = OIIO::ImageBufAlgo::channels(buffer, 4,
-                { 0, 1, 2, -1 /*use a float value*/ },
-                { 0 /*ignore*/, 0 /*ignore*/, 0 /*ignore*/, 1.0 },
-                { "", "", "", "A" });
+                /* channelorder */ { 0, 1, 2, -1 /*use a float value*/ },
+                /* channelvalues */ { 0 /*ignore*/, 0 /*ignore*/, 0 /*ignore*/, 1.0 },
+                /* channelnames */ { "", "", "", "A" });
     else if (spec.nchannels != 4)
         std::cerr << "Error: " << path << ": nchannels = " << spec.nchannels << std::endl;
 
@@ -117,17 +117,6 @@ SingleView::handle(sf::Event& event)
             }
             break;
 
-        case sf::Event::MouseButtonReleased:
-            switch (event.mouseButton.button)
-            {
-                case sf::Mouse::Button::Left:
-                    window.setMouseCursor(arrow);
-                    break;
-                default:
-                    break;
-            }
-            break;
-
         case sf::Event::MouseMoved:
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
             {
@@ -146,6 +135,7 @@ SingleView::handle(sf::Event& event)
 void
 SingleView::draw()
 {
+    //fitToScreen(sprite);
     window.draw(sprite);
 }
 
@@ -156,13 +146,10 @@ SingleView::fitToScreen(sf::Sprite& sprite)
 
     float xScale = (float)window.getSize().x / size.x;
     float yScale = (float)window.getSize().y / size.y;
-
-    if (xScale < yScale)
-        sprite.setScale(xScale, xScale);
-    else
-        sprite.setScale(yScale, yScale);
+    float scale = (xScale < yScale) ? xScale : yScale;
 
     sprite.setOrigin(size.x / 2, size.y / 2);
+    sprite.setScale(scale, scale);
     sprite.setPosition(window.getSize().x / 2, window.getSize().y / 2);
 }
 

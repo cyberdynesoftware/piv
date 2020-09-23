@@ -16,7 +16,8 @@ int main(int argc, char** argv)
     //ImageCache imageCache(argv[1]);
     Folder folder(argv[1]);
 
-    sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
+    //sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
+    sf::RenderWindow window(sf::VideoMode(800, 600), "piv");
     window.setFramerateLimit(60);
 
     SingleView singleView(folder, window);
@@ -25,6 +26,8 @@ int main(int argc, char** argv)
     singleView.init();
 
     sf::View defaultView = window.getView();
+    sf::Cursor arrow;
+    arrow.loadFromSystem(sf::Cursor::Arrow);
     sf::Event event;
 
     while (window.isOpen())
@@ -33,6 +36,16 @@ int main(int argc, char** argv)
         {
             switch (event.type)
             {
+                case sf::Event::Closed:
+                    window.close();
+                    break;
+
+                case sf::Event::Resized:
+                    defaultView.setSize(event.size.width, event.size.height);
+                    defaultView.setCenter(event.size.width / 2, event.size.height / 2);
+                    window.setView(defaultView);
+                    break;
+
                 case sf::Event::KeyPressed:
                     switch (event.key.code)
                     {
@@ -66,6 +79,7 @@ int main(int argc, char** argv)
                                 window.setView(defaultView);
                                 break;
                             }
+                            window.setMouseCursor(arrow);
                         default:
                             break;
                     }

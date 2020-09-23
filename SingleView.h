@@ -18,7 +18,6 @@ class SingleView : public Stage
         sf::RenderWindow& window;
         sf::Texture texture;
         sf::Sprite sprite;
-        sf::Cursor arrow;
         sf::Cursor cross;
         sf::Vector2i previousMousePosition;
 
