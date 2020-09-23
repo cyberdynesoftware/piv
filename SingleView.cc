@@ -1,7 +1,9 @@
 #include "SingleView.h"
+#include <OpenImageIO/imagebuf.h>
+#include <OpenImageIO/imagebufalgo.h>
 
-SingleView::SingleView(ImageCache& imageCache, sf::RenderWindow& window):
-    imageCache(imageCache),
+SingleView::SingleView(Folder& folder, sf::RenderWindow& window):
+    folder(folder),
     window(window)
 {
     arrow.loadFromSystem(sf::Cursor::Arrow);
@@ -18,7 +20,48 @@ SingleView::instanceOf(const SubType& subType)
 void
 SingleView::init()
 {
-    fitToScreen((**imageCache.currentImage).getSprite());
+    loadImage(*folder.currentItem);
+    fitToScreen(sprite);
+}
+
+bool
+SingleView::loadImage(const std::string& path)
+{
+    OIIO::ustring upath = OIIO::ustring(path.c_str());
+
+    OIIO::ImageSpec spec;
+    bool ok = folder.imageCache->get_imagespec(upath, spec);
+    if (!ok)
+    {
+        std::cout << "\nERROR: " << path << std::endl;
+        std::cerr << folder.imageCache->geterror() << std::endl;
+        return false;
+    }
+
+    OIIO::ImageBuf buffer(upath);
+
+    if (spec.nchannels == 3)
+        buffer = OIIO::ImageBufAlgo::channels(buffer, 4,
+                { 0, 1, 2, -1 /*use a float value*/ },
+                { 0 /*ignore*/, 0 /*ignore*/, 0 /*ignore*/, 1.0 },
+                { "", "", "", "A" });
+    else if (spec.nchannels != 4)
+        std::cerr << "Error: " << path << ": nchannels = " << spec.nchannels << std::endl;
+
+    sf::Uint8 pixels[spec.width * spec.height * 4];
+    ok = buffer.get_pixels(buffer.roi(), OIIO::TypeDesc::UINT8, pixels);
+    if (!ok || buffer.has_error())
+    {
+        std::cout << "\nERROR: " << path << std::endl;
+        std::cerr << buffer.geterror() << std::endl;
+        return false;
+    }
+
+    texture.create(spec.width, spec.height);
+    texture.update(pixels, spec.width, spec.height, 0, 0);
+    texture.setSmooth(true);
+    sprite.setTexture(texture, true);
+    return true;
 }
 
 void
@@ -30,24 +73,20 @@ SingleView::handle(sf::Event& event)
             switch (event.key.code)
             {
                 case sf::Keyboard::Space:
-                    imageCache.loadImages(1);
-                    do if (++imageCache.currentImage == imageCache.end()) 
-                    {
-                        imageCache.currentImage--;
-                        break;
-                    }
-                    while (!(**imageCache.currentImage).isValid());
-                    fitToScreen((**imageCache.currentImage).getSprite());
+                    if (++folder.currentItem == folder.cend())
+                        folder.currentItem--;
+                    loadImage(*folder.currentItem);
+                    fitToScreen(sprite);
                     break;
                 case sf::Keyboard::Backspace:
-                    do if (imageCache.currentImage != imageCache.begin())
-                        imageCache.currentImage--;
-                    while (!(**imageCache.currentImage).isValid());
-                    fitToScreen((**imageCache.currentImage).getSprite());
+                    if (folder.currentItem != folder.cbegin())
+                        folder.currentItem--;
+                    loadImage(*folder.currentItem);
+                    fitToScreen(sprite);
                     break;
                 case sf::Keyboard::R:
                     //imageCache.random();
-                    fitToScreen((**imageCache.currentImage).getSprite());
+                    //fitToScreen((**imageCache.currentImage).getSprite());
                     break;
                 case sf::Keyboard::A:
                     //folder.select();
@@ -61,7 +100,7 @@ SingleView::handle(sf::Event& event)
             break;
 
         case sf::Event::MouseWheelScrolled:
-            zoom((**imageCache.currentImage).getSprite(), event.mouseWheelScroll.delta);
+            zoom(sprite, event.mouseWheelScroll.delta);
             break;
 
         case sf::Event::MouseButtonPressed:
@@ -71,7 +110,7 @@ SingleView::handle(sf::Event& event)
                     window.setMouseCursor(cross);
                     break;
                 case sf::Mouse::Button::Right:
-                    fitToScreen((**imageCache.currentImage).getSprite());
+                    fitToScreen(sprite);
                     break;
                 default:
                     break;
@@ -93,7 +132,7 @@ SingleView::handle(sf::Event& event)
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
             {
                 sf::Vector2i delta(sf::Mouse::getPosition() - previousMousePosition);
-                (**imageCache.currentImage).getSprite().move(delta.x, delta.y);
+                sprite.move(delta.x, delta.y);
             }
 
             previousMousePosition = sf::Mouse::getPosition();
@@ -107,7 +146,7 @@ SingleView::handle(sf::Event& event)
 void
 SingleView::draw()
 {
-    window.draw((**imageCache.currentImage).getSprite());
+    window.draw(sprite);
 }
 
 void

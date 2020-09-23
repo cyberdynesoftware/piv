@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <OpenImageIO/imagecache.h>
 
 class Folder
 {
@@ -12,6 +13,8 @@ class Folder
         FolderIter cbegin(void);
         FolderIter cend(void);
         FolderIter currentItem;
+
+        OIIO::ImageCache* imageCache;
 
     private:
         std::vector<std::string> files;

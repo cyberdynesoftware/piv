@@ -13,14 +13,16 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    ImageCache imageCache(argv[1]);
+    //ImageCache imageCache(argv[1]);
+    Folder folder(argv[1]);
 
     sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
     window.setFramerateLimit(60);
 
-    SingleView singleView(imageCache, window);
-    ScrollView scrollView(imageCache, window);
-    Stage* stage = &scrollView;
+    SingleView singleView(folder, window);
+    //ScrollView scrollView(imageCache, window);
+    Stage* stage = &singleView;
+    singleView.init();
 
     sf::View defaultView = window.getView();
     sf::Event event;
@@ -37,6 +39,7 @@ int main(int argc, char** argv)
                         case sf::Keyboard::Q:
                             window.close();
                             break;
+                            /*
                         case sf::Keyboard::M:
                             if (stage->instanceOf(Stage::SubType::SingleView))
                             {
@@ -44,6 +47,7 @@ int main(int argc, char** argv)
                                 stage = &scrollView;
                                 break;
                             }
+                            */
                         default:
                             stage->handle(event);
                             break;
@@ -56,7 +60,7 @@ int main(int argc, char** argv)
                         case sf::Mouse::Button::Left:
                             if (stage->instanceOf(Stage::SubType::ScrollView))
                             {
-                                scrollView.selectImage();
+                                //scrollView.selectImage();
                                 singleView.init();
                                 stage = &singleView;
                                 window.setView(defaultView);
@@ -73,7 +77,7 @@ int main(int argc, char** argv)
             }
         }
 
-        imageCache.update();
+        //imageCache.update();
         window.clear();
         stage->draw();
         window.display();

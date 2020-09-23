@@ -28,6 +28,8 @@ Folder::Folder(const char* arg)
     }
 
     srand(time(NULL));
+
+    imageCache = OIIO::ImageCache::create();
 }
 
 void
