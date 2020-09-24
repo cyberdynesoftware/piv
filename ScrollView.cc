@@ -109,6 +109,11 @@ ScrollView::draw()
 }
 
 void
+ScrollView::fullscreenToggle()
+{
+}
+
+void
 ScrollView::selectImage()
 {
     imageCache.currentImage = imageCache.begin();

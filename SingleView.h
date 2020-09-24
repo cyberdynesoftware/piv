@@ -12,12 +12,14 @@ class SingleView : public Stage
         void handle(sf::Event&);
         void draw(void);
         void init(void);
+        void fullscreenToggle(void);
 
     private:
         Folder& folder;
         sf::RenderWindow& window;
         sf::Texture texture;
         sf::Sprite sprite;
+        sf::Cursor arrow;
         sf::Cursor cross;
         sf::Vector2i previousMousePosition;
 

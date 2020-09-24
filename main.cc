@@ -26,8 +26,6 @@ int main(int argc, char** argv)
     singleView.init();
 
     sf::View defaultView = window.getView();
-    sf::Cursor arrow;
-    arrow.loadFromSystem(sf::Cursor::Arrow);
     sf::Event event;
 
     while (window.isOpen())
@@ -64,21 +62,15 @@ int main(int argc, char** argv)
                         case sf::Keyboard::F:
                             if (fullscreen)
                             {
-                                window.create(sf::VideoMode(800, 600), "piv", sf::Style::Default);
-                                defaultView.setSize(800, 600);
-                                defaultView.setCenter(400, 300);
-                                window.setView(defaultView);
+                                window.create(sf::VideoMode(800, 600), "piv");
                                 fullscreen = false;
                             }
                             else
                             {
-                                auto mode = sf::VideoMode::getDesktopMode();
-                                window.create(mode, "piv", sf::Style::Fullscreen);
-                                defaultView.setSize(mode.width, mode.height);
-                                defaultView.setCenter(mode.width / 2, mode.height / 2);
-                                window.setView(defaultView);
+                                window.create(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
                                 fullscreen = true;
                             }
+                            stage->fullscreenToggle();
                             break;
 
                         default:
@@ -97,10 +89,12 @@ int main(int argc, char** argv)
                                 singleView.init();
                                 stage = &singleView;
                                 window.setView(defaultView);
-                                break;
                             }
-                            window.setMouseCursor(arrow);
+                            else stage->handle(event);
+                            break;
+
                         default:
+                            stage->handle(event);
                             break;
                     }
                     break;

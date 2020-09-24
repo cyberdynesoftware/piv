@@ -7,6 +7,7 @@ SingleView::SingleView(Folder& folder, sf::RenderWindow& window):
     folder(folder),
     window(window)
 {
+    arrow.loadFromSystem(sf::Cursor::Arrow);
     cross.loadFromSystem(sf::Cursor::Cross);
     previousMousePosition = sf::Mouse::getPosition();
 }
@@ -117,6 +118,18 @@ SingleView::handle(sf::Event& event)
             }
             break;
 
+        case sf::Event::MouseButtonReleased:
+            switch (event.mouseButton.button)
+            {
+                case sf::Mouse::Button::Left:
+                    window.setMouseCursor(arrow);
+                    break;
+
+                default:
+                    break;
+            }
+            break;
+
         case sf::Event::MouseMoved:
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
             {
@@ -137,6 +150,12 @@ SingleView::draw()
 {
     //fitToScreen(sprite);
     window.draw(sprite);
+}
+
+void
+SingleView::fullscreenToggle()
+{
+    fitToScreen(sprite);
 }
 
 void

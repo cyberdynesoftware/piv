@@ -10,4 +10,5 @@ class Stage
 
         virtual void handle(sf::Event&) = 0;
         virtual void draw(void) = 0;
+        virtual void fullscreenToggle(void) = 0;
 };
