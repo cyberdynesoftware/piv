@@ -9,6 +9,10 @@ SingleView::SingleView(Folder& folder, sf::RenderWindow& window):
 {
     arrow.loadFromSystem(sf::Cursor::Arrow);
     cross.loadFromSystem(sf::Cursor::Cross);
+    font.loadFromFile("font.ttf");
+    text.setFont(font);
+    text.setCharacterSize(15);
+    text.setPosition(10, 10);
     previousMousePosition = sf::Mouse::getPosition();
 }
 
@@ -21,7 +25,7 @@ SingleView::instanceOf(const SubType& subType)
 void
 SingleView::init()
 {
-    loadImage(*folder.currentItem);
+    imageValid = loadImage(*folder.currentItem);
     fitToScreen(sprite);
 }
 
@@ -34,8 +38,7 @@ SingleView::loadImage(const std::string& path)
     bool ok = folder.imageCache->get_imagespec(upath, spec);
     if (!ok)
     {
-        std::cout << "\nERROR: " << path << std::endl;
-        std::cerr << folder.imageCache->geterror() << std::endl;
+        text.setString("Error loading image: " + path);
         return false;
     }
 
@@ -53,8 +56,7 @@ SingleView::loadImage(const std::string& path)
     ok = buffer.get_pixels(buffer.roi(), OIIO::TypeDesc::UINT8, pixels);
     if (!ok || buffer.has_error())
     {
-        std::cout << "\nERROR: " << path << std::endl;
-        std::cerr << buffer.geterror() << std::endl;
+        text.setString("Error loading image: " + path);
         return false;
     }
 
@@ -76,13 +78,13 @@ SingleView::handle(sf::Event& event)
                 case sf::Keyboard::Space:
                     if (++folder.currentItem == folder.cend())
                         folder.currentItem--;
-                    loadImage(*folder.currentItem);
+                    imageValid = loadImage(*folder.currentItem);
                     fitToScreen(sprite);
                     break;
                 case sf::Keyboard::Backspace:
                     if (folder.currentItem != folder.cbegin())
                         folder.currentItem--;
-                    loadImage(*folder.currentItem);
+                    imageValid = loadImage(*folder.currentItem);
                     fitToScreen(sprite);
                     break;
                 case sf::Keyboard::R:
@@ -94,6 +96,9 @@ SingleView::handle(sf::Event& event)
                     break;
                 case sf::Keyboard::D:
                     //folder.trash();
+                    break;
+                case sf::Keyboard::O:
+                    sprite.setScale(1.0, 1.0);
                     break;
                 default:
                     break;
@@ -148,8 +153,10 @@ SingleView::handle(sf::Event& event)
 void
 SingleView::draw()
 {
-    //fitToScreen(sprite);
-    window.draw(sprite);
+    if (imageValid)
+        window.draw(sprite);
+    else
+        window.draw(text);
 }
 
 void

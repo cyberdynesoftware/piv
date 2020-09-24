@@ -19,9 +19,12 @@ class SingleView : public Stage
         sf::RenderWindow& window;
         sf::Texture texture;
         sf::Sprite sprite;
+        sf::Text text;
+        sf::Font font;
         sf::Cursor arrow;
         sf::Cursor cross;
         sf::Vector2i previousMousePosition;
+        bool imageValid;
 
         bool loadImage(const std::string&);
         void fitToScreen(sf::Sprite&);
