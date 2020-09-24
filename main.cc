@@ -20,6 +20,10 @@ int main(int argc, char** argv)
     window.setFramerateLimit(60);
     bool fullscreen = false;
 
+    sf::Image icon;
+    icon.loadFromFile("icon.png");
+    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+
     SingleView singleView(folder, window);
     //ScrollView scrollView(imageCache, window);
     Stage* stage = &singleView;
@@ -63,11 +67,13 @@ int main(int argc, char** argv)
                             if (fullscreen)
                             {
                                 window.create(sf::VideoMode(800, 600), "piv");
+                                window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
                                 fullscreen = false;
                             }
                             else
                             {
                                 window.create(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
+                                window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
                                 fullscreen = true;
                             }
                             stage->fullscreenToggle();

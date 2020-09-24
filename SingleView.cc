@@ -32,6 +32,7 @@ SingleView::init()
 bool
 SingleView::loadImage(const std::string& path)
 {
+    window.setTitle(path + " - piv");
     OIIO::ustring upath = OIIO::ustring(path.c_str());
 
     OIIO::ImageSpec spec;
