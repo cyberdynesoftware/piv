@@ -16,9 +16,9 @@ int main(int argc, char** argv)
     //ImageCache imageCache(argv[1]);
     Folder folder(argv[1]);
 
-    //sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
     sf::RenderWindow window(sf::VideoMode(800, 600), "piv");
     window.setFramerateLimit(60);
+    bool fullscreen = false;
 
     SingleView singleView(folder, window);
     //ScrollView scrollView(imageCache, window);
@@ -61,6 +61,26 @@ int main(int argc, char** argv)
                                 break;
                             }
                             */
+                        case sf::Keyboard::F:
+                            if (fullscreen)
+                            {
+                                window.create(sf::VideoMode(800, 600), "piv", sf::Style::Default);
+                                defaultView.setSize(800, 600);
+                                defaultView.setCenter(400, 300);
+                                window.setView(defaultView);
+                                fullscreen = false;
+                            }
+                            else
+                            {
+                                auto mode = sf::VideoMode::getDesktopMode();
+                                window.create(mode, "piv", sf::Style::Fullscreen);
+                                defaultView.setSize(mode.width, mode.height);
+                                defaultView.setCenter(mode.width / 2, mode.height / 2);
+                                window.setView(defaultView);
+                                fullscreen = true;
+                            }
+                            break;
+
                         default:
                             stage->handle(event);
                             break;
