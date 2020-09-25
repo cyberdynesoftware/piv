@@ -23,46 +23,52 @@ SingleView::instanceOf(const SubType& subType)
 }
 
 void
-SingleView::init()
+SingleView::initImage()
 {
+    window.setTitle(*folder.currentItem + " - piv");
+
     imageValid = loadImage(*folder.currentItem);
-    fitToScreen(sprite);
+    if (imageValid)
+        fitToScreen(sprite);
 }
 
 bool
 SingleView::loadImage(const std::string& path)
 {
-    window.setTitle(path + " - piv");
     OIIO::ustring upath = OIIO::ustring(path.c_str());
+    OIIO::ImageBuf buffer(upath);
 
-    OIIO::ImageSpec spec;
-    bool ok = folder.imageCache->get_imagespec(upath, spec);
-    if (!ok)
+    if (buffer.spec().get_int_attribute("oiio:Movie", 0))
     {
-        text.setString("Error loading image: " + path);
+        int fps[2];
+        OIIO::TypeDesc type = buffer.spec().getattributetype("FramesPerSecond");
+        buffer.spec().getattribute("FramesPerSecond", type, &fps);
+        std::cout << path << ": " << buffer.nsubimages() <<  ", " << type <<  ", " << fps[0] << ":" << fps[1] << std::endl;
+    }
+    if (buffer.nsubimages() == 0)
+    {
+        text.setString("Not an image: " + path);
         return false;
     }
 
-    OIIO::ImageBuf buffer(upath);
-
-    if (spec.nchannels == 3)
+    if (buffer.nchannels() == 3)
         buffer = OIIO::ImageBufAlgo::channels(buffer, 4,
                 /* channelorder */ { 0, 1, 2, -1 /*use a float value*/ },
                 /* channelvalues */ { 0 /*ignore*/, 0 /*ignore*/, 0 /*ignore*/, 1.0 },
                 /* channelnames */ { "", "", "", "A" });
-    else if (spec.nchannels != 4)
-        std::cerr << "Error: " << path << ": nchannels = " << spec.nchannels << std::endl;
+    else if (buffer.nchannels() != 4)
+        std::cerr << "Error: " << path << ": nchannels = " << buffer.nchannels() << std::endl;
 
-    sf::Uint8 pixels[spec.width * spec.height * 4];
-    ok = buffer.get_pixels(buffer.roi(), OIIO::TypeDesc::UINT8, pixels);
+    sf::Uint8 pixels[buffer.roi().width() * buffer.roi().height() * 4];
+    bool ok = buffer.get_pixels(buffer.roi(), OIIO::TypeDesc::UINT8, pixels);
     if (!ok || buffer.has_error())
     {
         text.setString("Error loading image: " + path);
         return false;
     }
 
-    texture.create(spec.width, spec.height);
-    texture.update(pixels, spec.width, spec.height, 0, 0);
+    texture.create(buffer.roi().width(), buffer.roi().height());
+    texture.update(pixels, buffer.roi().width(), buffer.roi().height(), 0, 0);
     texture.setSmooth(true);
     sprite.setTexture(texture, true);
     return true;
@@ -79,14 +85,12 @@ SingleView::handle(sf::Event& event)
                 case sf::Keyboard::Space:
                     if (++folder.currentItem == folder.cend())
                         folder.currentItem--;
-                    imageValid = loadImage(*folder.currentItem);
-                    fitToScreen(sprite);
+                    initImage();
                     break;
                 case sf::Keyboard::Backspace:
                     if (folder.currentItem != folder.cbegin())
                         folder.currentItem--;
-                    imageValid = loadImage(*folder.currentItem);
-                    fitToScreen(sprite);
+                    initImage();
                     break;
                 case sf::Keyboard::R:
                     //imageCache.random();
@@ -163,7 +167,10 @@ SingleView::draw()
 void
 SingleView::fullscreenToggle()
 {
-    fitToScreen(sprite);
+    window.setTitle(*folder.currentItem + " - piv");
+
+    if (imageValid)
+        fitToScreen(sprite);
 }
 
 void

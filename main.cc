@@ -4,6 +4,7 @@
 #include "ScrollView.h"
 
 #include <iostream>
+#include <OpenImageIO/imagecache.h>
 
 int main(int argc, char** argv)
 {
@@ -14,6 +15,7 @@ int main(int argc, char** argv)
     }
 
     //ImageCache imageCache(argv[1]);
+    OIIO::ImageCache::create();
     Folder folder(argv[1]);
 
     sf::RenderWindow window(sf::VideoMode(800, 600), "piv");
@@ -27,7 +29,7 @@ int main(int argc, char** argv)
     SingleView singleView(folder, window);
     //ScrollView scrollView(imageCache, window);
     Stage* stage = &singleView;
-    singleView.init();
+    singleView.initImage();
 
     sf::View defaultView = window.getView();
     sf::Event event;
@@ -92,7 +94,7 @@ int main(int argc, char** argv)
                             if (stage->instanceOf(Stage::SubType::ScrollView))
                             {
                                 //scrollView.selectImage();
-                                singleView.init();
+                                singleView.initImage();
                                 stage = &singleView;
                                 window.setView(defaultView);
                             }

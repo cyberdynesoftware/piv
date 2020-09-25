@@ -11,7 +11,7 @@ class SingleView : public Stage
         bool instanceOf(const SubType&);
         void handle(sf::Event&);
         void draw(void);
-        void init(void);
+        void initImage(void);
         void fullscreenToggle(void);
 
     private:
