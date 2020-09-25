@@ -27,7 +27,7 @@ SingleView::initImage()
 {
     window.setTitle(*folder.currentItem + " - piv");
 
-    image.load(*folder.currentItem);
+    image.init(*folder.currentItem);
     image.fitTo(window.getSize());
 }
 
@@ -116,7 +116,10 @@ void
 SingleView::draw()
 {
     if (image.valid)
+    {
+        image.update();
         window.draw(image.sprite);
+    }
     else
     {
         text.setString(image.errormsg);
