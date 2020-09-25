@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Stage.h"
-#include "ImageCache.h"
+#include "Image.h"
+#include "Folder.h"
+#include <SFML/Graphics.hpp>
 
 class SingleView : public Stage
 {
@@ -17,17 +19,13 @@ class SingleView : public Stage
     private:
         Folder& folder;
         sf::RenderWindow& window;
-        sf::Texture texture;
-        sf::Sprite sprite;
+        Image image;
         sf::Text text;
         sf::Font font;
         sf::Cursor arrow;
         sf::Cursor cross;
         sf::Vector2i previousMousePosition;
-        bool imageValid;
 
-        bool loadImage(const std::string&);
-        void fitToScreen(sf::Sprite&);
         void zoom(sf::Sprite&, float delta);
         sf::Vector2f mousePositionInSprite(sf::Sprite&);
 };

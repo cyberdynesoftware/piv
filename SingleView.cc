@@ -27,51 +27,8 @@ SingleView::initImage()
 {
     window.setTitle(*folder.currentItem + " - piv");
 
-    imageValid = loadImage(*folder.currentItem);
-    if (imageValid)
-        fitToScreen(sprite);
-}
-
-bool
-SingleView::loadImage(const std::string& path)
-{
-    OIIO::ustring upath = OIIO::ustring(path.c_str());
-    OIIO::ImageBuf buffer(upath);
-
-    if (buffer.spec().get_int_attribute("oiio:Movie", 0))
-    {
-        int fps[2];
-        OIIO::TypeDesc type = buffer.spec().getattributetype("FramesPerSecond");
-        buffer.spec().getattribute("FramesPerSecond", type, &fps);
-        std::cout << path << ": " << buffer.nsubimages() <<  ", " << type <<  ", " << fps[0] << ":" << fps[1] << std::endl;
-    }
-    if (buffer.nsubimages() == 0)
-    {
-        text.setString("Not an image: " + path);
-        return false;
-    }
-
-    if (buffer.nchannels() == 3)
-        buffer = OIIO::ImageBufAlgo::channels(buffer, 4,
-                /* channelorder */ { 0, 1, 2, -1 /*use a float value*/ },
-                /* channelvalues */ { 0 /*ignore*/, 0 /*ignore*/, 0 /*ignore*/, 1.0 },
-                /* channelnames */ { "", "", "", "A" });
-    else if (buffer.nchannels() != 4)
-        std::cerr << "Error: " << path << ": nchannels = " << buffer.nchannels() << std::endl;
-
-    sf::Uint8 pixels[buffer.roi().width() * buffer.roi().height() * 4];
-    bool ok = buffer.get_pixels(buffer.roi(), OIIO::TypeDesc::UINT8, pixels);
-    if (!ok || buffer.has_error())
-    {
-        text.setString("Error loading image: " + path);
-        return false;
-    }
-
-    texture.create(buffer.roi().width(), buffer.roi().height());
-    texture.update(pixels, buffer.roi().width(), buffer.roi().height(), 0, 0);
-    texture.setSmooth(true);
-    sprite.setTexture(texture, true);
-    return true;
+    image.load(*folder.currentItem);
+    image.fitTo(window.getSize());
 }
 
 void
@@ -103,7 +60,7 @@ SingleView::handle(sf::Event& event)
                     //folder.trash();
                     break;
                 case sf::Keyboard::O:
-                    sprite.setScale(1.0, 1.0);
+                    image.sprite.setScale(1.0, 1.0);
                     break;
                 default:
                     break;
@@ -111,7 +68,7 @@ SingleView::handle(sf::Event& event)
             break;
 
         case sf::Event::MouseWheelScrolled:
-            zoom(sprite, event.mouseWheelScroll.delta);
+            zoom(image.sprite, event.mouseWheelScroll.delta);
             break;
 
         case sf::Event::MouseButtonPressed:
@@ -121,7 +78,7 @@ SingleView::handle(sf::Event& event)
                     window.setMouseCursor(cross);
                     break;
                 case sf::Mouse::Button::Right:
-                    fitToScreen(sprite);
+                    image.fitTo(window.getSize());
                     break;
                 default:
                     break;
@@ -144,7 +101,7 @@ SingleView::handle(sf::Event& event)
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
             {
                 sf::Vector2i delta(sf::Mouse::getPosition() - previousMousePosition);
-                sprite.move(delta.x, delta.y);
+                image.sprite.move(delta.x, delta.y);
             }
 
             previousMousePosition = sf::Mouse::getPosition();
@@ -158,10 +115,13 @@ SingleView::handle(sf::Event& event)
 void
 SingleView::draw()
 {
-    if (imageValid)
-        window.draw(sprite);
+    if (image.valid)
+        window.draw(image.sprite);
     else
+    {
+        text.setString(image.errormsg);
         window.draw(text);
+    }
 }
 
 void
@@ -169,22 +129,7 @@ SingleView::fullscreenToggle()
 {
     window.setTitle(*folder.currentItem + " - piv");
 
-    if (imageValid)
-        fitToScreen(sprite);
-}
-
-void
-SingleView::fitToScreen(sf::Sprite& sprite)
-{
-    const sf::Vector2u& size = sprite.getTexture()->getSize();
-
-    float xScale = (float)window.getSize().x / size.x;
-    float yScale = (float)window.getSize().y / size.y;
-    float scale = (xScale < yScale) ? xScale : yScale;
-
-    sprite.setOrigin(size.x / 2, size.y / 2);
-    sprite.setScale(scale, scale);
-    sprite.setPosition(window.getSize().x / 2, window.getSize().y / 2);
+    image.fitTo(window.getSize());
 }
 
 void
