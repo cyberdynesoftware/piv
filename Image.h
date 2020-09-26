@@ -6,6 +6,9 @@
 class Image
 {
     public:
+        Image();
+        ~Image();
+
         void init(const std::string&);
         void load(void);
         void fitTo(const sf::Vector2u&);
@@ -16,7 +19,7 @@ class Image
         std::string errormsg;
 
     private:
-        OIIO::ImageBuf buffer;
+        OIIO::ImageBuf *buffer;
         sf::Texture texture;
         sf::Clock clock;
 

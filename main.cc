@@ -36,6 +36,11 @@ int main(int argc, char** argv)
 
     while (window.isOpen())
     {
+        //imageCache.update();
+        window.clear();
+        stage->draw();
+        window.display();
+
         while (window.pollEvent(event))
         {
             switch (event.type)
@@ -112,11 +117,6 @@ int main(int argc, char** argv)
                     break;
             }
         }
-
-        //imageCache.update();
-        window.clear();
-        stage->draw();
-        window.display();
     }
 
     return EXIT_SUCCESS;
