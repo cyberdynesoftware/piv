@@ -41,12 +41,14 @@ SingleView::handle(sf::Event& event)
             {
                 case sf::Keyboard::Space:
                     if (++folder.currentItem == folder.cend())
-                        folder.currentItem--;
+                        folder.currentItem = folder.cbegin();
                     initImage();
                     break;
                 case sf::Keyboard::Backspace:
                     if (folder.currentItem != folder.cbegin())
                         folder.currentItem--;
+                    else
+                        folder.currentItem = --folder.cend();
                     initImage();
                     break;
                 case sf::Keyboard::R:
@@ -60,7 +62,7 @@ SingleView::handle(sf::Event& event)
                     //folder.trash();
                     break;
                 case sf::Keyboard::O:
-                    image.sprite.setScale(1.0, 1.0);
+                    original(image.sprite);
                     break;
                 default:
                     break;
@@ -145,7 +147,7 @@ SingleView::zoom(sf::Sprite& sprite, float delta)
     else if (delta > 0)
     {
         sprite.setOrigin(mousePositionInSprite(sprite) / sprite.getScale().x);
-        sprite.setPosition(sf::Mouse::getPosition().x, sf::Mouse::getPosition().y);
+        sprite.setPosition(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y);
         sprite.scale(1.05f, 1.05f);
     }
 }
@@ -153,6 +155,15 @@ SingleView::zoom(sf::Sprite& sprite, float delta)
 sf::Vector2f
 SingleView::mousePositionInSprite(sf::Sprite& sprite)
 {
-    return sf::Vector2f(sf::Mouse::getPosition().x - sprite.getGlobalBounds().left,
-            sf::Mouse::getPosition().y - sprite.getGlobalBounds().top);
+    return sf::Vector2f(sf::Mouse::getPosition(window).x - sprite.getGlobalBounds().left,
+            sf::Mouse::getPosition(window).y - sprite.getGlobalBounds().top);
+}
+
+void
+SingleView::original(sf::Sprite& sprite)
+{
+    sprite.setScale(1.f, 1.f);
+    const sf::Vector2u& size = sprite.getTexture()->getSize();
+    sprite.setOrigin(size.x / 2, size.y / 2);
+    sprite.setPosition(window.getSize().x / 2, window.getSize().y / 2);
 }
