@@ -31,7 +31,6 @@ Image::load()
     if (!ok || buffer.has_error())
     {
         errormsg = "Error loading image: ";// + path;
-        valid = false;
         return;
     }
 

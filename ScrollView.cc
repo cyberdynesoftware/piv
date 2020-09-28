@@ -1,5 +1,6 @@
 #include "ScrollView.h"
 #include <iostream>
+#include <set>
 
 ScrollView::ScrollView(Folder& folder, sf::RenderWindow& window):
     folder(folder),
@@ -97,9 +98,14 @@ ScrollView::draw()
     auto end = folder.cbegin();
     std::advance(end, std::min(lastImage, (int)std::distance(folder.cbegin(), folder.cend())));
 
+    std::set<std::string> unusedImages;
+    for (auto const& entry: imageCache)
+        unusedImages.insert(entry.first);
+
     while (iter != end)
     {
         Image* image = getImage(*iter);
+        unusedImages.erase(*iter);
         if (image->valid)
         {
             image->update();
@@ -117,6 +123,9 @@ ScrollView::draw()
             column = 0;
         }
     }
+
+    for (auto const& path: unusedImages)
+        imageCache.erase(path);
 }
 
 Image*
