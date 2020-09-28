@@ -18,7 +18,7 @@ class SingleView : public Stage
 
     private:
         Folder& folder;
-        Image image;
+        Image* image;
         sf::RenderWindow& window;
         sf::Text text;
         sf::Font font;

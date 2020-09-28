@@ -8,10 +8,10 @@ all: $(OBJECTS)
 
 main.o: ImageCache.h Stage.h SingleView.h ScrollView.h ImageCache.h ImageData.h AnimatedGIF.h
 Folder.o: Folder.h
-SingleView.o: SingleView.h Stage.h ImageCache.h ImageData.h Image.h
+SingleView.o: SingleView.h Stage.h Image.h
 ImageCache.o: ImageCache.h Folder.h ImageData.h
 AnimatedGIF.o: AnimatedGIF.h
-ScrollView.o: ScrollView.h Stage.h ImageCache.h ImageData.h
+ScrollView.o: ScrollView.h Stage.h Image.h
 ImageData.o: ImageData.h AnimatedGIF.h
 Image.o: Image.h
 

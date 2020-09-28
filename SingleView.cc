@@ -27,8 +27,9 @@ SingleView::initImage()
 {
     window.setTitle(*folder.currentItem + " - piv");
 
-    image.init(*folder.currentItem);
-    image.fitTo(window.getSize());
+    delete image;
+    image = new Image(*folder.currentItem, false);
+    image->fitTo(window.getSize());
 }
 
 void
@@ -62,7 +63,7 @@ SingleView::handle(sf::Event& event)
                     //folder.trash();
                     break;
                 case sf::Keyboard::O:
-                    original(image.sprite);
+                    original(image->sprite);
                     break;
                 default:
                     break;
@@ -70,7 +71,7 @@ SingleView::handle(sf::Event& event)
             break;
 
         case sf::Event::MouseWheelScrolled:
-            zoom(image.sprite, event.mouseWheelScroll.delta);
+            zoom(image->sprite, event.mouseWheelScroll.delta);
             break;
 
         case sf::Event::MouseButtonPressed:
@@ -80,7 +81,7 @@ SingleView::handle(sf::Event& event)
                     window.setMouseCursor(cross);
                     break;
                 case sf::Mouse::Button::Right:
-                    image.fitTo(window.getSize());
+                    image->fitTo(window.getSize());
                     break;
                 default:
                     break;
@@ -103,7 +104,7 @@ SingleView::handle(sf::Event& event)
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
             {
                 sf::Vector2i delta(sf::Mouse::getPosition() - previousMousePosition);
-                image.sprite.move(delta.x, delta.y);
+                image->sprite.move(delta.x, delta.y);
             }
 
             previousMousePosition = sf::Mouse::getPosition();
@@ -117,14 +118,14 @@ SingleView::handle(sf::Event& event)
 void
 SingleView::draw()
 {
-    if (image.valid)
+    if (image->valid)
     {
-        image.update();
-        window.draw(image.sprite);
+        image->update();
+        window.draw(image->sprite);
     }
     else
     {
-        text.setString(image.errormsg);
+        text.setString(image->errormsg);
         window.draw(text);
     }
 }
@@ -134,7 +135,7 @@ SingleView::fullscreenToggle()
 {
     window.setTitle(*folder.currentItem + " - piv");
 
-    image.fitTo(window.getSize());
+    image->fitTo(window.getSize());
 }
 
 void

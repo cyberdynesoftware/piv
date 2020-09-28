@@ -88,7 +88,7 @@ ScrollView::draw()
     int firstImage = firstVisibleRow * numberOfColumns;
     int heightOffset = firstVisibleRow * size;
     int column = 0;
-    int lastVisibleRow = std::ceil(windowBot / size + 0.5f);
+    int lastVisibleRow = std::ceil(1.f * windowBot / size);
     int lastImage = lastVisibleRow * numberOfColumns;
 
     auto iter = folder.cbegin();
@@ -103,7 +103,6 @@ ScrollView::draw()
         if (image->valid)
         {
             image->update();
-            image->square();
             float factor = size / image->sprite.getLocalBounds().width;
             image->sprite.setScale(factor, factor);
             image->sprite.setPosition(size * column, heightOffset);
@@ -125,8 +124,7 @@ ScrollView::getImage(const std::string& path)
 {
     if (imageCache.count(path) == 0)
     {
-        Image* image = new Image();
-        image->init(path);
+        Image* image = new Image(path, true);
         imageCache.insert(std::pair<std::string, Image*>(path, image));
     }
     return imageCache.find(path)->second;

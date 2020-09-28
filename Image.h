@@ -6,23 +6,24 @@
 class Image
 {
     public:
-        Image();
-        ~Image();
+        Image(const std::string&, bool);
 
-        void init(const std::string&);
-        void load(void);
         void fitTo(const sf::Vector2u&);
         void update(void);
-        void square(void);
 
         sf::Sprite sprite;
-        bool valid;
+        bool valid = false;
         std::string errormsg;
 
     private:
-        OIIO::ImageBuf *buffer;
+        OIIO::ImageBuf buffer;
         sf::Texture texture;
         sf::Clock clock;
+        std::future<void> future;
+        bool squareImage;
 
+        void init(const std::string&);
+        void load(void);
         void addAlphaChannel(void);
+        void square(void);
 };
