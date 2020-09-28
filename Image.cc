@@ -15,7 +15,7 @@ Image::~Image()
 void
 Image::init(const std::string& path)
 {
-    delete buffer;
+    //delete buffer;
     buffer = new OIIO::ImageBuf(path);
 
     if (buffer->nsubimages() == 0)
@@ -99,5 +99,20 @@ Image::update()
         load();
 
         clock.restart();
+    }
+}
+
+void
+Image::square()
+{
+    if (valid)
+    {
+        auto size = sprite.getTexture()->getSize();
+        auto offset = std::abs((int)size.x - (int)size.y) / 2;
+
+        if (size.x < size.y)
+            sprite.setTextureRect(sf::IntRect(0, offset, size.x, size.x));
+        else
+            sprite.setTextureRect(sf::IntRect(offset, 0, size.y, size.y));
     }
 }

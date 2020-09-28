@@ -1,11 +1,10 @@
 #include "ScrollView.h"
 #include <iostream>
 
-ScrollView::ScrollView(ImageCache& imageCache, sf::RenderWindow& window):
-    imageCache(imageCache),
+ScrollView::ScrollView(Folder& folder, sf::RenderWindow& window):
+    folder(folder),
     window(window)
 {
-    imageCache.loadImages(numberOfColumns * 3);
 }
 
 bool
@@ -82,20 +81,36 @@ ScrollView::handle(sf::Event& event)
 void
 ScrollView::draw()
 {
+    int windowTop = window.getView().getCenter().y - window.getView().getSize().y / 2;
+    int windowBot = window.getView().getCenter().y + window.getView().getSize().y / 2;
     int size = window.getView().getSize().x / numberOfColumns;
-    int heightOffset = 0;
+    int firstVisibleRow = windowTop / size;
+    int firstImage = firstVisibleRow * numberOfColumns;
+    int heightOffset = firstVisibleRow * size;
     int column = 0;
+    int lastVisibleRow = std::ceil(windowBot / size + 0.5f);
+    int lastImage = lastVisibleRow * numberOfColumns;
 
-    for (auto iter = imageCache.begin(); iter != imageCache.end(); iter++)
+    auto iter = folder.cbegin();
+    std::advance(iter, firstImage);
+
+    auto end = folder.cbegin();
+    std::advance(end, std::min(lastImage, (int)std::distance(folder.cbegin(), folder.cend())));
+
+    while (iter != end)
     {
-        if (!(**iter).isValid()) continue;
+        Image* image = getImage(*iter);
+        if (image->valid)
+        {
+            image->update();
+            image->square();
+            float factor = size / image->sprite.getLocalBounds().width;
+            image->sprite.setScale(factor, factor);
+            image->sprite.setPosition(size * column, heightOffset);
+            window.draw(image->sprite);
+        }
 
-        sf::Sprite& sprite = (**iter).getSquareSprite();
-        float factor = size / sprite.getLocalBounds().width;
-        sprite.setScale(factor, factor);
-        sprite.setPosition(size * column, heightOffset);
-        window.draw(sprite);
-
+        iter++;
         column++;
         if (column == numberOfColumns)
         {
@@ -103,9 +118,18 @@ ScrollView::draw()
             column = 0;
         }
     }
+}
 
-    if (heightOffset < window.getView().getCenter().y + window.getView().getSize().y)
-        imageCache.loadImages(numberOfColumns);
+Image*
+ScrollView::getImage(const std::string& path)
+{
+    if (imageCache.count(path) == 0)
+    {
+        Image* image = new Image();
+        image->init(path);
+        imageCache.insert(std::pair<std::string, Image*>(path, image));
+    }
+    return imageCache.find(path)->second;
 }
 
 void
@@ -116,19 +140,23 @@ ScrollView::fullscreenToggle()
 void
 ScrollView::selectImage()
 {
+    /*
     imageCache.currentImage = imageCache.begin();
 
     auto mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
     for (auto iter = imageCache.begin(); iter != imageCache.end(); iter++)
         if ((**iter).getSquareSprite().getGlobalBounds().contains(mouse.x, mouse.y))
             imageCache.currentImage = iter;
+            */
 }
 
 void
 ScrollView::scrollToCurrentImage()
 {
+    /*
     auto bounds = (**imageCache.currentImage).getSquareSprite().getGlobalBounds();
     auto view = window.getView();
     view.setCenter(view.getCenter().x, bounds.top + bounds.height / 2);
     window.setView(view);
+    */
 }

@@ -1,13 +1,13 @@
 #pragma once
 
 #include "Stage.h"
-#include "ImageCache.h"
-#include "ImageData.h"
+#include "Image.h"
+#include "Folder.h"
 
 class ScrollView : public Stage
 {
     public:
-        ScrollView(ImageCache&, sf::RenderWindow&);
+        ScrollView(Folder&, sf::RenderWindow&);
 
         bool instanceOf(const SubType&);
         void handle(sf::Event&);
@@ -17,7 +17,10 @@ class ScrollView : public Stage
         void scrollToCurrentImage(void);
 
     private:
-        ImageCache& imageCache;
+        Folder& folder;
         sf::RenderWindow& window;
-        int numberOfColumns = 5;
+        int numberOfColumns = 4;
+        std::map<std::string, Image*> imageCache;
+
+        Image* getImage(const std::string&);
 };

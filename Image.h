@@ -13,6 +13,7 @@ class Image
         void load(void);
         void fitTo(const sf::Vector2u&);
         void update(void);
+        void square(void);
 
         sf::Sprite sprite;
         bool valid;

@@ -1,7 +1,7 @@
-#include "ImageCache.h"
 #include "Stage.h"
 #include "SingleView.h"
 #include "ScrollView.h"
+#include "Folder.h"
 
 #include <iostream>
 #include <OpenImageIO/imagecache.h>
@@ -14,7 +14,6 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    //ImageCache imageCache(argv[1]);
     OIIO::ImageCache::create();
     Folder folder(argv[1]);
 
@@ -27,8 +26,8 @@ int main(int argc, char** argv)
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
     SingleView singleView(folder, window);
-    //ScrollView scrollView(imageCache, window);
-    Stage* stage = &singleView;
+    ScrollView scrollView(folder, window);
+    Stage* stage = &scrollView;
     singleView.initImage();
 
     sf::View defaultView = window.getView();
@@ -36,7 +35,6 @@ int main(int argc, char** argv)
 
     while (window.isOpen())
     {
-        //imageCache.update();
         window.clear();
         stage->draw();
         window.display();
