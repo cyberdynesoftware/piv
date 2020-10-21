@@ -147,23 +147,19 @@ ScrollView::fullscreenToggle()
 void
 ScrollView::selectImage()
 {
-    /*
-    imageCache.currentImage = imageCache.begin();
-
     auto mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-    for (auto iter = imageCache.begin(); iter != imageCache.end(); iter++)
-        if ((**iter).getSquareSprite().getGlobalBounds().contains(mouse.x, mouse.y))
-            imageCache.currentImage = iter;
-            */
+    for (auto const& entry: imageCache)
+        if (entry.second->sprite.getGlobalBounds().contains(mouse.x, mouse.y))
+            folder.currentItem = std::find(folder.cbegin(), folder.cend(), entry.first);
 }
 
 void
 ScrollView::scrollToCurrentImage()
 {
-    /*
-    auto bounds = (**imageCache.currentImage).getSquareSprite().getGlobalBounds();
+    int index = std::distance(folder.cbegin(), folder.currentItem);
+    int size = window.getView().getSize().x / numberOfColumns;
+
     auto view = window.getView();
-    view.setCenter(view.getCenter().x, bounds.top + bounds.height / 2);
+    view.setCenter(view.getCenter().x, index / numberOfColumns * size + size / 2);
     window.setView(view);
-    */
 }

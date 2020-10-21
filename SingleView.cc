@@ -121,6 +121,7 @@ SingleView::draw()
     if (image->valid)
     {
         image->update();
+        image->fitTo(window.getSize());
         window.draw(image->sprite);
     }
     else

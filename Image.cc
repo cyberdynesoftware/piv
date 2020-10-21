@@ -11,7 +11,6 @@ Image::Image(const std::string& path, bool squareImage):
 void
 Image::init(const std::string& path)
 {
-    //delete buffer;
     buffer.reset(path);
 
     if (buffer.nsubimages() == 0)

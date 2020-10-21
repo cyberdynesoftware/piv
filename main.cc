@@ -59,7 +59,6 @@ int main(int argc, char** argv)
                         case sf::Keyboard::Q:
                             window.close();
                             break;
-                            /*
                         case sf::Keyboard::M:
                             if (stage->instanceOf(Stage::SubType::SingleView))
                             {
@@ -67,7 +66,6 @@ int main(int argc, char** argv)
                                 stage = &scrollView;
                                 break;
                             }
-                            */
                         case sf::Keyboard::F:
                             if (fullscreen)
                             {
@@ -96,7 +94,7 @@ int main(int argc, char** argv)
                         case sf::Mouse::Button::Left:
                             if (stage->instanceOf(Stage::SubType::ScrollView))
                             {
-                                //scrollView.selectImage();
+                                scrollView.selectImage();
                                 singleView.initImage();
                                 stage = &singleView;
                                 window.setView(defaultView);
