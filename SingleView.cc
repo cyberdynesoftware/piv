@@ -26,6 +26,10 @@ SingleView::instanceOf(const SubType& subType)
 void
 SingleView::initImage()
 {
+    sf::View view = window.getView();
+    view.setCenter(window.getSize().x / 2, window.getSize().y / 2);
+    window.setView(view);
+
     window.setTitle(*folder.currentItem + " - piv");
 
     if (image != NULL) delete image;
@@ -133,10 +137,14 @@ SingleView::draw()
 }
 
 void
-SingleView::fullscreenToggle()
+SingleView::resizeEvent(sf::Event::SizeEvent& size)
 {
-    window.setTitle(*folder.currentItem + " - piv");
+    sf::View view = window.getView();
+    view.setSize(size.width, size.height);
+    view.setCenter(size.width / 2, size.height / 2);
+    window.setView(view);
 
+    window.setTitle(*folder.currentItem + " - piv");
     image->fitTo(window.getSize());
 }
 

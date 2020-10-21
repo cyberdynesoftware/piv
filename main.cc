@@ -28,9 +28,8 @@ int main(int argc, char** argv)
     SingleView singleView(folder, window);
     ScrollView scrollView(folder, window);
     Stage* stage = &scrollView;
-    singleView.initImage();
+    //singleView.initImage();
 
-    sf::View defaultView = window.getView();
     sf::Event event;
 
     while (window.isOpen())
@@ -48,9 +47,7 @@ int main(int argc, char** argv)
                     break;
 
                 case sf::Event::Resized:
-                    defaultView.setSize(event.size.width, event.size.height);
-                    defaultView.setCenter(event.size.width / 2, event.size.height / 2);
-                    window.setView(defaultView);
+                    stage->resizeEvent(event.size);
                     break;
 
                 case sf::Event::KeyPressed:
@@ -59,27 +56,27 @@ int main(int argc, char** argv)
                         case sf::Keyboard::Q:
                             window.close();
                             break;
+
                         case sf::Keyboard::M:
                             if (stage->instanceOf(Stage::SubType::SingleView))
                             {
                                 scrollView.scrollToCurrentImage();
                                 stage = &scrollView;
-                                break;
                             }
+                            break;
+
                         case sf::Keyboard::F:
                             if (fullscreen)
                             {
                                 window.create(sf::VideoMode(800, 600), "piv");
-                                window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
                                 fullscreen = false;
                             }
                             else
                             {
                                 window.create(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
-                                window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
                                 fullscreen = true;
                             }
-                            stage->fullscreenToggle();
+                            window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
                             break;
 
                         default:
@@ -97,9 +94,16 @@ int main(int argc, char** argv)
                                 scrollView.selectImage();
                                 singleView.initImage();
                                 stage = &singleView;
-                                window.setView(defaultView);
                             }
                             else stage->handle(event);
+                            break;
+
+                        case sf::Mouse::Button::XButton1:
+                            if (stage->instanceOf(Stage::SubType::SingleView))
+                            {
+                                scrollView.scrollToCurrentImage();
+                                stage = &scrollView;
+                            }
                             break;
 
                         default:

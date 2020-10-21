@@ -22,9 +22,9 @@ ScrollView::handle(sf::Event& event)
     {
         case sf::Event::MouseWheelScrolled:
             if (event.mouseWheelScroll.delta < 0)
-                view.move(0, 10);
+                view.move(0, window.getView().getSize().x / numberOfColumns);
             else if (event.mouseWheelScroll.delta > 0)
-                view.move(0, -10);
+                view.move(0, -window.getView().getSize().x / numberOfColumns);
             window.setView(view);
             break;
 
@@ -32,11 +32,19 @@ ScrollView::handle(sf::Event& event)
             switch (event.key.code)
             {
                 case sf::Keyboard::Up:
-                    view.move(0, -100);
+                    view.move(0, -window.getView().getSize().x / numberOfColumns);
                     window.setView(view);
                     break;
                 case sf::Keyboard::Down:
-                    view.move(0, 100);
+                    view.move(0, window.getView().getSize().x / numberOfColumns);
+                    window.setView(view);
+                    break;
+                case sf::Keyboard::PageUp:
+                    view.move(0, -window.getView().getSize().y);
+                    window.setView(view);
+                    break;
+                case sf::Keyboard::PageDown:
+                    view.move(0, window.getView().getSize().y);
                     window.setView(view);
                     break;
                 case sf::Keyboard::Num1:
@@ -142,8 +150,13 @@ ScrollView::getImage(const std::string& path)
 }
 
 void
-ScrollView::fullscreenToggle()
+ScrollView::resizeEvent(sf::Event::SizeEvent& size)
 {
+    sf::View view = window.getView();
+    float y = view.getCenter().y * size.width / view.getSize().x;
+    view.setSize(size.width, size.height);
+    view.setCenter(size.width / 2, y);
+    window.setView(view);
 }
 
 void

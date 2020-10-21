@@ -12,7 +12,7 @@ class ScrollView : public Stage
         bool instanceOf(const SubType&);
         void handle(sf::Event&);
         void draw(void);
-        void fullscreenToggle(void);
+        void resizeEvent(sf::Event::SizeEvent&);
         void selectImage(void);
         void scrollToCurrentImage(void);
 
