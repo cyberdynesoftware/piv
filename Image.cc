@@ -73,11 +73,12 @@ Image::fitTo(const sf::Vector2u& window)
 void
 Image::update()
 {
-    if (buffer.nsubimages() == 1)
+    if (buffer.nsubimages() == 0)
         return;
 
     float fps = buffer.spec().get_float_attribute("FramesPerSecond");
-    if (clock.getElapsedTime() > sf::seconds(1 / fps))
+    float delay = (fps == 0.f) ? .1f : 1.f / fps;
+    if (clock.getElapsedTime() > sf::seconds(delay))
     {
         int index = buffer.subimage() + 1;
         if (index == buffer.nsubimages())

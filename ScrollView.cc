@@ -124,8 +124,10 @@ ScrollView::draw()
         }
     }
 
-    for (auto const& path: unusedImages)
+    for (auto const& path: unusedImages) {
+        delete imageCache[path];
         imageCache.erase(path);
+    }
 }
 
 Image*

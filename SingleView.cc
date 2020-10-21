@@ -14,6 +14,7 @@ SingleView::SingleView(Folder& folder, sf::RenderWindow& window):
     text.setCharacterSize(15);
     text.setPosition(10, 10);
     previousMousePosition = sf::Mouse::getPosition();
+    image = NULL;
 }
 
 bool
@@ -27,7 +28,7 @@ SingleView::initImage()
 {
     window.setTitle(*folder.currentItem + " - piv");
 
-    delete image;
+    if (image != NULL) delete image;
     image = new Image(*folder.currentItem, false);
     image->fitTo(window.getSize());
 }
