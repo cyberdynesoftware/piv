@@ -17,64 +17,68 @@ ScrollView::instanceOf(const SubType& subType)
 void
 ScrollView::handle(sf::Event& event)
 {
-    auto view = window.getView();
     switch (event.type)
     {
         case sf::Event::MouseWheelScrolled:
             if (event.mouseWheelScroll.delta < 0)
-                view.move(0, window.getView().getSize().x / numberOfColumns);
+                scrollToPosition(window.getView().getCenter().y + imageSize());
             else if (event.mouseWheelScroll.delta > 0)
-                view.move(0, -window.getView().getSize().x / numberOfColumns);
-            window.setView(view);
+                scrollToPosition(window.getView().getCenter().y - imageSize());
             break;
 
         case sf::Event::KeyPressed:
             switch (event.key.code)
             {
                 case sf::Keyboard::Up:
-                    view.move(0, -window.getView().getSize().x / numberOfColumns);
-                    window.setView(view);
+                    scrollToPosition(window.getView().getCenter().y - imageSize());
                     break;
                 case sf::Keyboard::Down:
-                    view.move(0, window.getView().getSize().x / numberOfColumns);
-                    window.setView(view);
+                    scrollToPosition(window.getView().getCenter().y + imageSize());
                     break;
                 case sf::Keyboard::PageUp:
-                    view.move(0, -window.getView().getSize().y);
-                    window.setView(view);
+                    scrollToPosition(window.getView().getCenter().y - window.getView().getSize().y);
                     break;
                 case sf::Keyboard::PageDown:
-                    view.move(0, window.getView().getSize().y);
-                    window.setView(view);
+                    scrollToPosition(window.getView().getCenter().y + window.getView().getSize().y);
                     break;
                 case sf::Keyboard::Num1:
+                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 1.f, 2));
                     numberOfColumns = 1;
                     break;
                 case sf::Keyboard::Num2:
+                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 2.f, 2));
                     numberOfColumns = 2;
                     break;
                 case sf::Keyboard::Num3:
+                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 3.f, 2));
                     numberOfColumns = 3;
                     break;
                 case sf::Keyboard::Num4:
+                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 4.f, 2));
                     numberOfColumns = 4;
                     break;
                 case sf::Keyboard::Num5:
+                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 5.f, 2));
                     numberOfColumns = 5;
                     break;
                 case sf::Keyboard::Num6:
+                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 6.f, 2));
                     numberOfColumns = 6;
                     break;
                 case sf::Keyboard::Num7:
+                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 7.f, 2));
                     numberOfColumns = 7;
                     break;
                 case sf::Keyboard::Num8:
+                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 8.f, 2));
                     numberOfColumns = 8;
                     break;
                 case sf::Keyboard::Num9:
+                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 9.f, 2));
                     numberOfColumns = 9;
                     break;
                 case sf::Keyboard::Num0:
+                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 10.f, 2));
                     numberOfColumns = 10;
                     break;
                 default:
@@ -92,7 +96,7 @@ ScrollView::draw()
 {
     int windowTop = window.getView().getCenter().y - window.getView().getSize().y / 2;
     int windowBot = window.getView().getCenter().y + window.getView().getSize().y / 2;
-    int size = window.getView().getSize().x / numberOfColumns;
+    int size = imageSize();
     int firstVisibleRow = windowTop / size;
     int firstImage = firstVisibleRow * numberOfColumns;
     int heightOffset = firstVisibleRow * size;
@@ -172,8 +176,7 @@ void
 ScrollView::scrollToCurrentImage()
 {
     int index = std::distance(folder.cbegin(), folder.currentItem);
-    int size = window.getView().getSize().x / numberOfColumns;
-    scrollToPosition(index / numberOfColumns * size + size / 2);
+    scrollToPosition(index / numberOfColumns * imageSize() + imageSize() / 2);
 }
 
 void
@@ -182,4 +185,10 @@ ScrollView::scrollToPosition(float y)
     auto view = window.getView();
     view.setCenter(view.getCenter().x, y);
     window.setView(view);
+}
+
+int
+ScrollView::imageSize()
+{
+    return window.getView().getSize().x / numberOfColumns;
 }

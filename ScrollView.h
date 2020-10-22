@@ -24,4 +24,5 @@ class ScrollView : public Stage
         std::map<std::string, Image*> imageCache;
 
         Image* getImage(const std::string&);
+        int imageSize(void);
 };
