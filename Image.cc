@@ -3,7 +3,8 @@
 #include <iostream>
 
 Image::Image(const std::string& path, bool squareImage):
-    squareImage(squareImage)
+    squareImage(squareImage),
+    enframe(false)
 {
     future = std::async(std::launch::async, &Image::init, this, path);
 }
@@ -41,6 +42,7 @@ Image::load()
     delete[] pixels;
     valid = true;
     if (squareImage) square();
+    if (enframe) fitTo(frame);
     clock.restart();
 }
 
@@ -67,6 +69,11 @@ Image::fitTo(const sf::Vector2u& window)
 
         sprite.setOrigin(size.x / 2, size.y / 2);
         sprite.setPosition(window.x / 2, window.y / 2);
+    }
+    else
+    {
+        enframe = true;
+        frame = window;
     }
 }
 

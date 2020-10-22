@@ -15,6 +15,7 @@ class ScrollView : public Stage
         void resizeEvent(sf::Event::SizeEvent&);
         void selectImage(void);
         void scrollToCurrentImage(void);
+        void scrollToPosition(float);
 
     private:
         Folder& folder;

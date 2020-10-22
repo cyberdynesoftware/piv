@@ -21,6 +21,8 @@ class Image
         sf::Clock clock;
         std::future<void> future;
         bool squareImage;
+        bool enframe;
+        sf::Vector2u frame;
 
         void init(const std::string&);
         void load(void);

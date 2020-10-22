@@ -66,17 +66,21 @@ int main(int argc, char** argv)
                             break;
 
                         case sf::Keyboard::F:
-                            if (fullscreen)
                             {
-                                window.create(sf::VideoMode(800, 600), "piv");
-                                fullscreen = false;
+                                float y = window.getView().getCenter().y / window.getSize().x;
+                                if (fullscreen)
+                                {
+                                    window.create(sf::VideoMode(800, 600), "piv");
+                                    fullscreen = false;
+                                }
+                                else
+                                {
+                                    window.create(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
+                                    fullscreen = true;
+                                }
+                                stage->scrollToPosition(y * window.getSize().x);
+                                window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
                             }
-                            else
-                            {
-                                window.create(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
-                                fullscreen = true;
-                            }
-                            window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
                             break;
 
                         default:

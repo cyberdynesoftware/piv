@@ -126,7 +126,6 @@ SingleView::draw()
     if (image->valid)
     {
         image->update();
-        image->fitTo(window.getSize());
         window.draw(image->sprite);
     }
     else
@@ -146,6 +145,11 @@ SingleView::resizeEvent(sf::Event::SizeEvent& size)
 
     window.setTitle(*folder.currentItem + " - piv");
     image->fitTo(window.getSize());
+}
+
+void
+SingleView::scrollToPosition(float y)
+{
 }
 
 void

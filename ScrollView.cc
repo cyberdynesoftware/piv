@@ -173,8 +173,13 @@ ScrollView::scrollToCurrentImage()
 {
     int index = std::distance(folder.cbegin(), folder.currentItem);
     int size = window.getView().getSize().x / numberOfColumns;
+    scrollToPosition(index / numberOfColumns * size + size / 2);
+}
 
+void
+ScrollView::scrollToPosition(float y)
+{
     auto view = window.getView();
-    view.setCenter(view.getCenter().x, index / numberOfColumns * size + size / 2);
+    view.setCenter(view.getCenter().x, y);
     window.setView(view);
 }

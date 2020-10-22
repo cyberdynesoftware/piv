@@ -15,6 +15,7 @@ class SingleView : public Stage
         void draw(void);
         void initImage(void);
         void resizeEvent(sf::Event::SizeEvent&);
+        void scrollToPosition(float);
 
     private:
         Folder& folder;
