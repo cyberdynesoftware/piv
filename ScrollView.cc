@@ -95,24 +95,28 @@ void
 ScrollView::draw()
 {
     int windowTop = window.getView().getCenter().y - window.getView().getSize().y / 2;
-    int windowBot = window.getView().getCenter().y + window.getView().getSize().y / 2;
+    windowTop = (windowTop < 0) ? 0 : windowTop;
+
     int size = imageSize();
     int firstVisibleRow = windowTop / size;
     int firstImage = firstVisibleRow * numberOfColumns;
-    int heightOffset = firstVisibleRow * size;
-    int column = 0;
-    int lastVisibleRow = std::ceil(1.f * windowBot / size);
-    int lastImage = lastVisibleRow * numberOfColumns;
 
     auto iter = folder.cbegin();
     std::advance(iter, firstImage);
 
+    int windowBot = window.getView().getCenter().y + window.getView().getSize().y / 2;
+    int lastVisibleRow = std::ceil(1.f * windowBot / size);
+    int lastImage = lastVisibleRow * numberOfColumns;
+
     auto end = folder.cbegin();
-    std::advance(end, std::min(lastImage, (int)std::distance(folder.cbegin(), folder.cend())));
+    std::advance(end, std::min(lastImage, folder.size()));
 
     std::set<std::string> unusedImages;
     for (auto const& entry: imageCache)
         unusedImages.insert(entry.first);
+
+    int heightOffset = firstVisibleRow * size;
+    int column = 0;
 
     while (iter != end)
     {
@@ -182,6 +186,13 @@ ScrollView::scrollToCurrentImage()
 void
 ScrollView::scrollToPosition(float y)
 {
+    if (y < window.getSize().y / 2)
+        y = window.getSize().y / 2;
+    else if (y > std::ceil(1.f * folder.size() / numberOfColumns) * imageSize() - window.getSize().y / 2)
+        y = std::ceil(1.f * folder.size() / numberOfColumns) * imageSize() - window.getSize().y / 2;
+    else
+        y = std::floor((y - window.getSize().y / 2) / imageSize()) * imageSize() + window.getSize().y / 2;
+
     auto view = window.getView();
     view.setCenter(view.getCenter().x, y);
     window.setView(view);
@@ -190,5 +201,5 @@ ScrollView::scrollToPosition(float y)
 int
 ScrollView::imageSize()
 {
-    return window.getView().getSize().x / numberOfColumns;
+    return window.getSize().x / numberOfColumns;
 }

@@ -13,6 +13,8 @@ class Folder
         FolderIter cend(void);
         FolderIter currentItem;
 
+        int size(void);
+
     private:
         std::vector<std::string> files;
 

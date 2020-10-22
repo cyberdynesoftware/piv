@@ -47,16 +47,22 @@ Folder::scanDirectory(const std::string& dir)
     std::sort(files.begin(), files.end());
 }
 
-    Folder::FolderIter
+Folder::FolderIter
 Folder::cbegin()
 {
     return files.cbegin();
 }
 
-    Folder::FolderIter
+Folder::FolderIter
 Folder::cend()
 {
     return files.cend();
+}
+
+int
+Folder::size()
+{
+    return files.size();
 }
 /*
 const std::string&
