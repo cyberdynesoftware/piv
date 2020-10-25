@@ -23,9 +23,11 @@ class Image
         bool squareImage;
         bool enframe;
         sf::Vector2u frame;
+        std::string path;
 
         void init(const std::string&);
         void load(void);
         void addAlphaChannel(void);
+        void padChannels(void);
         void square(void);
 };

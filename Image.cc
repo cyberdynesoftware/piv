@@ -4,7 +4,8 @@
 
 Image::Image(const std::string& path, bool squareImage):
     squareImage(squareImage),
-    enframe(false)
+    enframe(false),
+    path(path)
 {
     future = std::async(std::launch::async, &Image::init, this, path);
 }
@@ -17,20 +18,30 @@ Image::init(const std::string& path)
     if (buffer.nsubimages() == 0)
         errormsg = "Not an image: " + path;
     else
-        load();
+    {
+        if (buffer.nchannels() == 3)
+            addAlphaChannel();
+
+        if (buffer.nchannels() == 1)
+            padChannels();
+
+        if (buffer.nchannels() != 4)
+            errormsg = path + ": Incorrect number of channels: " + std::to_string(buffer.nchannels());
+        else
+            load();
+    }
 }
 
 void
 Image::load()
 {
-    if (buffer.nchannels() == 3)
-        addAlphaChannel();
+    //std::cout << path << " nsubimages: " << buffer.nsubimages() << std::endl;
 
     sf::Uint8 *pixels = new sf::Uint8[buffer.roi().width() * buffer.roi().height() * 4];
     bool ok = buffer.get_pixels(buffer.roi(), OIIO::TypeDesc::UINT8, pixels);
     if (!ok || buffer.has_error())
     {
-        errormsg = "Error loading image: ";// + path;
+        errormsg = "Error loading image: " + path;
         return;
     }
 
@@ -53,6 +64,15 @@ Image::addAlphaChannel()
                 /* channelorder */ { 0, 1, 2, -1 /*use a float value*/ },
                 /* channelvalues */ { 0 /*ignore*/, 0 /*ignore*/, 0 /*ignore*/, 1.0 },
                 /* channelnames */ { "", "", "", "A" });
+}
+
+void
+Image::padChannels()
+{
+    buffer = OIIO::ImageBufAlgo::channels(buffer, 4,
+                /* channelorder */ { 0, 0, 0, -1 },
+                /* channelvalues */ { 0 /*ignore*/, 0 /*ignore*/, 0 /*ignore*/, 1.0 },
+                /* channelnames */ { "R", "G", "B", "A" });
 }
 
 void
