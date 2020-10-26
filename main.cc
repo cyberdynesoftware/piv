@@ -14,7 +14,7 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    OIIO::ImageCache::create();
+    auto cache = OIIO::ImageCache::create();
     Folder folder(argv[1]);
 
     sf::RenderWindow window(sf::VideoMode(800, 600), "piv");
@@ -123,5 +123,6 @@ int main(int argc, char** argv)
         }
     }
 
+    OIIO::ImageCache::destroy(cache);
     return EXIT_SUCCESS;
 }

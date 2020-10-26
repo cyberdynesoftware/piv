@@ -28,6 +28,6 @@ class Image
         void init(const std::string&);
         void load(void);
         void addAlphaChannel(void);
-        void padChannels(void);
+        void spread1Channel(void);
         void square(void);
 };

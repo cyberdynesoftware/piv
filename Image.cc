@@ -21,9 +21,8 @@ Image::init(const std::string& path)
     {
         if (buffer.nchannels() == 3)
             addAlphaChannel();
-
-        if (buffer.nchannels() == 1)
-            padChannels();
+        else if (buffer.nchannels() == 1)
+            spread1Channel();
 
         if (buffer.nchannels() != 4)
             errormsg = path + ": Incorrect number of channels: " + std::to_string(buffer.nchannels());
@@ -35,8 +34,6 @@ Image::init(const std::string& path)
 void
 Image::load()
 {
-    //std::cout << path << " nsubimages: " << buffer.nsubimages() << std::endl;
-
     sf::Uint8 *pixels = new sf::Uint8[buffer.roi().width() * buffer.roi().height() * 4];
     bool ok = buffer.get_pixels(buffer.roi(), OIIO::TypeDesc::UINT8, pixels);
     if (!ok || buffer.has_error())
@@ -67,10 +64,10 @@ Image::addAlphaChannel()
 }
 
 void
-Image::padChannels()
+Image::spread1Channel()
 {
     buffer = OIIO::ImageBufAlgo::channels(buffer, 4,
-                /* channelorder */ { 0, 0, 0, -1 },
+                /* channelorder */ { 0, 0, 0, -1 /*use a float value*/ },
                 /* channelvalues */ { 0 /*ignore*/, 0 /*ignore*/, 0 /*ignore*/, 1.0 },
                 /* channelnames */ { "R", "G", "B", "A" });
 }
