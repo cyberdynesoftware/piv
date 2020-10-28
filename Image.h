@@ -24,10 +24,11 @@ class Image
         bool enframe;
         sf::Vector2u frame;
         std::string path;
+        bool animateImage;
+        sf::Time delay;
 
         void init(const std::string&);
-        void load(void);
-        void addAlphaChannel(void);
-        void spread1Channel(void);
+        void readPixels(void);
+        OIIO::ImageBuf fixChannels(OIIO::ImageBuf&);
         void square(void);
 };

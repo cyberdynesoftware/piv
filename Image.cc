@@ -5,7 +5,8 @@
 Image::Image(const std::string& path, bool squareImage):
     squareImage(squareImage),
     enframe(false),
-    path(path)
+    path(path),
+    animateImage(false)
 {
     future = std::async(std::launch::async, &Image::init, this, path);
 }
@@ -19,21 +20,17 @@ Image::init(const std::string& path)
         errormsg = "Not an image: " + path;
     else
     {
-        if (buffer.nchannels() == 3)
-            addAlphaChannel();
-        else if (buffer.nchannels() == 1)
-            spread1Channel();
-
-        if (buffer.nchannels() != 4)
-            errormsg = path + ": Incorrect number of channels: " + std::to_string(buffer.nchannels());
-        else
-            load();
+        animateImage = !(buffer.nsubimages() == 1);
+        readPixels();
     }
 }
 
 void
-Image::load()
+Image::readPixels()
 {
+    if (buffer.nchannels() != 4)
+        buffer = fixChannels(buffer);
+
     sf::Uint8 *pixels = new sf::Uint8[buffer.roi().width() * buffer.roi().height() * 4];
     bool ok = buffer.get_pixels(buffer.roi(), OIIO::TypeDesc::UINT8, pixels);
     if (!ok || buffer.has_error())
@@ -51,25 +48,32 @@ Image::load()
     valid = true;
     if (squareImage) square();
     if (enframe) fitTo(frame);
+    if (animateImage)
+    {
+        float fps = buffer.spec().get_float_attribute("FramesPerSecond");
+        delay = sf::seconds((fps == 0.f) ? .1f : 1.f / fps);
+    }
     clock.restart();
 }
 
-void
-Image::addAlphaChannel()
+OIIO::ImageBuf
+Image::fixChannels(OIIO::ImageBuf& buffer)
 {
-    buffer = OIIO::ImageBufAlgo::channels(buffer, 4,
+    if (buffer.nchannels() == 3)
+        return OIIO::ImageBufAlgo::channels(buffer, 4,
                 /* channelorder */ { 0, 1, 2, -1 /*use a float value*/ },
                 /* channelvalues */ { 0 /*ignore*/, 0 /*ignore*/, 0 /*ignore*/, 1.0 },
                 /* channelnames */ { "", "", "", "A" });
-}
-
-void
-Image::spread1Channel()
-{
-    buffer = OIIO::ImageBufAlgo::channels(buffer, 4,
+    else if (buffer.nchannels() == 1)
+        return OIIO::ImageBufAlgo::channels(buffer, 4,
                 /* channelorder */ { 0, 0, 0, -1 /*use a float value*/ },
                 /* channelvalues */ { 0 /*ignore*/, 0 /*ignore*/, 0 /*ignore*/, 1.0 },
                 /* channelnames */ { "R", "G", "B", "A" });
+    else
+    {
+        errormsg = path + ": Incorrect number of channels: " + std::to_string(buffer.nchannels());
+        return buffer;
+    }
 }
 
 void
@@ -86,6 +90,7 @@ Image::fitTo(const sf::Vector2u& window)
 
         sprite.setOrigin(size.x / 2, size.y / 2);
         sprite.setPosition(window.x / 2, window.y / 2);
+        enframe = false;
     }
     else
     {
@@ -97,19 +102,16 @@ Image::fitTo(const sf::Vector2u& window)
 void
 Image::update()
 {
-    if (buffer.nsubimages() == 0)
-        return;
+    if (!animateImage) return;
 
-    float fps = buffer.spec().get_float_attribute("FramesPerSecond");
-    float delay = (fps == 0.f) ? .1f : 1.f / fps;
-    if (clock.getElapsedTime() > sf::seconds(delay))
+    if (clock.getElapsedTime() > delay)
     {
         int index = buffer.subimage() + 1;
         if (index == buffer.nsubimages())
             index = 0;
 
         buffer.read(index);
-        load();
+        readPixels();
 
         clock.restart();
 
