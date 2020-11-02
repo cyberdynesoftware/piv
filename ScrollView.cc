@@ -24,25 +24,19 @@ ScrollView::handle(sf::Event& event)
     {
         case sf::Event::MouseWheelScrolled:
             if (event.mouseWheelScroll.delta < 0)
-                scrollDown(1);
+                scrollDown();
             else if (event.mouseWheelScroll.delta > 0)
-                scrollUp(1);
+                scrollUp();
             break;
 
         case sf::Event::KeyPressed:
             switch (event.key.code)
             {
                 case sf::Keyboard::Up:
-                    scrollUp(1);
+                    scrollUp();
                     break;
                 case sf::Keyboard::Down:
-                    scrollDown(1);
-                    break;
-                case sf::Keyboard::PageUp:
-                    scrollUp(1);
-                    break;
-                case sf::Keyboard::PageDown:
-                    scrollDown(1);
+                    scrollDown();
                     break;
                 case sf::Keyboard::Num1:
                     numberOfColumns = 1;
@@ -137,7 +131,7 @@ ScrollView::initImages()
 }
 
 void
-ScrollView::scrollDown(int rows)
+ScrollView::scrollDown()
 {
     if (lastItem == folder.cend())
     {
@@ -146,14 +140,14 @@ ScrollView::scrollDown(int rows)
     }
     else
     {
-        for (int i = 0; i < numberOfColumns * rows; i++)
+        for (int i = 0; i < numberOfColumns; i++)
         {
             delete images.front();
             images.pop_front();
             firstItem++;
         }
 
-        for (int i = 0; i < numberOfColumns * rows; i++)
+        for (int i = 0; i < numberOfColumns; i++)
         {
             Image* image = new Image(*lastItem++);
             image->square(imageSize());
@@ -165,14 +159,12 @@ ScrollView::scrollDown(int rows)
 }
 
 void
-ScrollView::scrollUp(int rows)
+ScrollView::scrollUp()
 {
     heightOffset = 0;
     if (firstItem == folder.cbegin()) return;
 
-    int removeCount = numberOfColumns * rows;
-    if (lastItem == folder.cend())
-        removeCount = folder.size() % numberOfColumns + numberOfColumns * (rows - 1);
+    int removeCount = (lastItem == folder.cend()) ? folder.size() % numberOfColumns : numberOfColumns;
 
     for (int i = 0; i < removeCount; i++)
     {
@@ -181,7 +173,7 @@ ScrollView::scrollUp(int rows)
         lastItem--;
     }
 
-    for (int i = 0; i < numberOfColumns * rows; i++)
+    for (int i = 0; i < numberOfColumns; i++)
     {
         Image* image = new Image(*--firstItem);
         image->square(imageSize());

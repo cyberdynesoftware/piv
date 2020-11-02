@@ -27,7 +27,7 @@ class ScrollView : public Stage
         Folder::FolderIter lastItem;
 
         void initImages(void);
-        void scrollDown(int);
-        void scrollUp(int);
+        void scrollDown(void);
+        void scrollUp(void);
         int imageSize(void);
 };
