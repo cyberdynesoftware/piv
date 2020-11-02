@@ -33,7 +33,7 @@ SingleView::initImage()
     window.setTitle(*folder.currentItem + " - piv");
 
     if (image != NULL) delete image;
-    image = new Image(*folder.currentItem, false);
+    image = new Image(*folder.currentItem);
     image->fitTo(window.getSize());
 }
 
@@ -123,7 +123,7 @@ SingleView::handle(sf::Event& event)
 void
 SingleView::draw()
 {
-    if (image->valid)
+    if (image->ready)
     {
         image->update();
         window.draw(image->sprite);
@@ -136,13 +136,8 @@ SingleView::draw()
 }
 
 void
-SingleView::resizeEvent(sf::Event::SizeEvent& size)
+SingleView::resizeEvent()
 {
-    sf::View view = window.getView();
-    view.setSize(size.width, size.height);
-    view.setCenter(size.width / 2, size.height / 2);
-    window.setView(view);
-
     window.setTitle(*folder.currentItem + " - piv");
     image->fitTo(window.getSize());
 }

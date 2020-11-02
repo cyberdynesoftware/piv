@@ -53,7 +53,7 @@ int main(int argc, char** argv)
                         view.setCenter(event.size.width / 2, event.size.height / 2);
                         window.setView(view);
                     }
-                    stage->resizeEvent(event.size);
+                    stage->resizeEvent();
                     break;
 
                 case sf::Event::KeyPressed:
@@ -84,6 +84,7 @@ int main(int argc, char** argv)
                                     fullscreen = true;
                                 }
                                 window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+                                stage->resizeEvent();
                             }
                             break;
 

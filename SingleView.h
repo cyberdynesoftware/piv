@@ -14,7 +14,7 @@ class SingleView : public Stage
         void handle(sf::Event&);
         void draw(void);
         void initImage(void);
-        void resizeEvent(sf::Event::SizeEvent&);
+        void resizeEvent(void);
 
     private:
         Folder& folder;

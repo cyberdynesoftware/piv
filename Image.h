@@ -6,13 +6,14 @@
 class Image
 {
     public:
-        Image(const std::string&, bool);
+        Image(const std::string&);
 
         void fitTo(const sf::Vector2u&);
+        void square(int);
         void update(void);
 
         sf::Sprite sprite;
-        bool valid = false;
+        bool ready = false;
         std::string errormsg;
         std::string path;
 
@@ -21,8 +22,9 @@ class Image
         sf::Texture texture;
         sf::Clock clock;
         std::future<void> future;
-        bool squareImage;
-        bool enframe;
+        bool squareImage = false;
+        int imageSize;
+        bool enframe = false;
         sf::Vector2u frame;
         bool animateImage;
         sf::Time delay;

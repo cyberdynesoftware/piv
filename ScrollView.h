@@ -13,7 +13,7 @@ class ScrollView : public Stage
         bool instanceOf(const SubType&);
         void handle(sf::Event&);
         void draw(void);
-        void resizeEvent(sf::Event::SizeEvent&);
+        void resizeEvent(void);
         void selectImage(void);
         void scrollToCurrentImage(void);
 
@@ -21,6 +21,7 @@ class ScrollView : public Stage
         Folder& folder;
         sf::RenderWindow& window;
         int numberOfColumns = 4;
+        int heightOffset = 0;
         std::deque<Image*> images;
         Folder::FolderIter firstItem;
         Folder::FolderIter lastItem;

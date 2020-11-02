@@ -10,5 +10,5 @@ class Stage
 
         virtual void handle(sf::Event&) = 0;
         virtual void draw(void) = 0;
-        virtual void resizeEvent(sf::Event::SizeEvent&) = 0;
+        virtual void resizeEvent(void) = 0;
 };

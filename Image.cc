@@ -2,11 +2,8 @@
 #include <OpenImageIO/imagebufalgo.h>
 #include <iostream>
 
-Image::Image(const std::string& path, bool squareImage):
-    squareImage(squareImage),
-    enframe(false),
-    path(path),
-    animateImage(false)
+Image::Image(const std::string& path):
+    path(path)
 {
     future = std::async(std::launch::async, &Image::init, this, path);
 }
@@ -48,8 +45,8 @@ Image::readPixels()
     sprite.setTexture(texture, true);
 
     delete[] pixels;
-    valid = true;
-    if (squareImage) square();
+    ready = true;
+    if (squareImage) square(imageSize);
     if (enframe) fitTo(frame);
     if (animateImage)
     {
@@ -82,7 +79,10 @@ Image::fixChannels(OIIO::ImageBuf& buffer)
 void
 Image::fitTo(const sf::Vector2u& window)
 {
-    if (valid)
+    enframe = true;
+    frame = window;
+
+    if (ready)
     {
         const sf::Vector2u& size = sprite.getTexture()->getSize();
 
@@ -93,12 +93,29 @@ Image::fitTo(const sf::Vector2u& window)
 
         sprite.setOrigin(size.x / 2, size.y / 2);
         sprite.setPosition(window.x / 2, window.y / 2);
+
         enframe = false;
     }
-    else
+}
+
+void
+Image::square(int targetSize)
+{
+    squareImage = true;
+    imageSize = targetSize;
+
+    if (ready)
     {
-        enframe = true;
-        frame = window;
+        auto size = sprite.getTexture()->getSize();
+        auto offset = std::abs((int)size.x - (int)size.y) / 2;
+
+        if (size.x < size.y)
+            sprite.setTextureRect(sf::IntRect(0, offset, size.x, size.x));
+        else
+            sprite.setTextureRect(sf::IntRect(offset, 0, size.y, size.y));
+        
+        float factor = 1.f * targetSize / sprite.getLocalBounds().width;
+        sprite.setScale(factor, factor);
     }
 }
 
@@ -117,22 +134,5 @@ Image::update()
         readPixels();
 
         clock.restart();
-
-        if (squareImage) square();
-    }
-}
-
-void
-Image::square()
-{
-    if (valid)
-    {
-        auto size = sprite.getTexture()->getSize();
-        auto offset = std::abs((int)size.x - (int)size.y) / 2;
-
-        if (size.x < size.y)
-            sprite.setTextureRect(sf::IntRect(0, offset, size.x, size.x));
-        else
-            sprite.setTextureRect(sf::IntRect(offset, 0, size.y, size.y));
     }
 }

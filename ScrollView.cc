@@ -104,7 +104,7 @@ ScrollView::initImages()
 
     for (int i = 0; i < indent; i++)
     {
-        Image* image = new Image(*--firstItem, true);
+        Image* image = new Image(*--firstItem);
         images.push_front(image);
     }
 
@@ -116,7 +116,7 @@ ScrollView::initImages()
     {
         for (int i = 0; i < delta; i++)
         {
-            Image* image = new Image(*lastItem++, true);
+            Image* image = new Image(*lastItem++);
             images.push_back(image);
 
             if (lastItem == folder.cend()) break;
@@ -131,7 +131,9 @@ ScrollView::initImages()
             lastItem--;
         }
     }
-    std::cout << "Images: " << images.size() << std::endl;
+
+    for (auto image : images)
+        image->square(imageSize());
 }
 
 void
@@ -139,7 +141,8 @@ ScrollView::scrollDown(int rows)
 {
     if (lastItem == folder.cend())
     {
-        // move view to bottom
+        int rows = std::ceil(1.f * window.getSize().y / imageSize());
+        heightOffset = window.getSize().y - rows * imageSize();
     }
     else
     {
@@ -152,7 +155,8 @@ ScrollView::scrollDown(int rows)
 
         for (int i = 0; i < numberOfColumns * rows; i++)
         {
-            Image* image = new Image(*lastItem++, true);
+            Image* image = new Image(*lastItem++);
+            image->square(imageSize());
             images.push_back(image);
 
             if (lastItem == folder.cend()) break;
@@ -163,6 +167,7 @@ ScrollView::scrollDown(int rows)
 void
 ScrollView::scrollUp(int rows)
 {
+    heightOffset = 0;
     if (firstItem == folder.cbegin()) return;
 
     int removeCount = numberOfColumns * rows;
@@ -178,7 +183,8 @@ ScrollView::scrollUp(int rows)
 
     for (int i = 0; i < numberOfColumns * rows; i++)
     {
-        Image* image = new Image(*--firstItem, true);
+        Image* image = new Image(*--firstItem);
+        image->square(imageSize());
         images.push_front(image);
 
         if (firstItem == folder.cbegin()) break;
@@ -188,31 +194,29 @@ ScrollView::scrollUp(int rows)
 void
 ScrollView::draw()
 {
-    int heightOffset = 0;
+    int offset = heightOffset;
     int column = 0;
 
     for (auto image : images)
     {
-        if (image->valid)
+        if (image->ready)
         {
             image->update();
-            float factor = imageSize() / image->sprite.getLocalBounds().width;
-            image->sprite.setScale(factor, factor);
-            image->sprite.setPosition(imageSize() * column, heightOffset);
+            image->sprite.setPosition(imageSize() * column, offset);
             window.draw(image->sprite);
         }
 
         column++;
         if (column == numberOfColumns)
         {
-            heightOffset += imageSize();
+            offset += imageSize();
             column = 0;
         }
     }
 }
 
 void
-ScrollView::resizeEvent(sf::Event::SizeEvent& size)
+ScrollView::resizeEvent()
 {
     initImages();
 }
@@ -229,6 +233,17 @@ ScrollView::selectImage()
 void
 ScrollView::scrollToCurrentImage()
 {
+    if (folder.currentItem < firstItem || folder.currentItem >= lastItem)
+    {
+        for (Image* image: images)
+            delete image;
+
+        images.clear();
+
+        firstItem = folder.currentItem;
+        lastItem = folder.currentItem;
+        initImages();
+    }
 }
 
 int
