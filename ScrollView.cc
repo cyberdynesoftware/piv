@@ -6,6 +6,9 @@ ScrollView::ScrollView(Folder& folder, sf::RenderWindow& window):
     folder(folder),
     window(window)
 {
+    firstItem = folder.currentItem;
+    lastItem = folder.currentItem;
+    initImages();
 }
 
 bool
@@ -21,65 +24,65 @@ ScrollView::handle(sf::Event& event)
     {
         case sf::Event::MouseWheelScrolled:
             if (event.mouseWheelScroll.delta < 0)
-                scrollToPosition(window.getView().getCenter().y + imageSize());
+                scrollDown(1);
             else if (event.mouseWheelScroll.delta > 0)
-                scrollToPosition(window.getView().getCenter().y - imageSize());
+                scrollUp(1);
             break;
 
         case sf::Event::KeyPressed:
             switch (event.key.code)
             {
                 case sf::Keyboard::Up:
-                    scrollToPosition(window.getView().getCenter().y - imageSize());
+                    scrollUp(1);
                     break;
                 case sf::Keyboard::Down:
-                    scrollToPosition(window.getView().getCenter().y + imageSize());
+                    scrollDown(1);
                     break;
                 case sf::Keyboard::PageUp:
-                    scrollToPosition(window.getView().getCenter().y - window.getView().getSize().y);
+                    scrollUp(1);
                     break;
                 case sf::Keyboard::PageDown:
-                    scrollToPosition(window.getView().getCenter().y + window.getView().getSize().y);
+                    scrollDown(1);
                     break;
                 case sf::Keyboard::Num1:
-                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 1.f, 2));
                     numberOfColumns = 1;
+                    initImages();
                     break;
                 case sf::Keyboard::Num2:
-                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 2.f, 2));
                     numberOfColumns = 2;
+                    initImages();
                     break;
                 case sf::Keyboard::Num3:
-                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 3.f, 2));
                     numberOfColumns = 3;
+                    initImages();
                     break;
                 case sf::Keyboard::Num4:
-                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 4.f, 2));
                     numberOfColumns = 4;
+                    initImages();
                     break;
                 case sf::Keyboard::Num5:
-                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 5.f, 2));
                     numberOfColumns = 5;
+                    initImages();
                     break;
                 case sf::Keyboard::Num6:
-                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 6.f, 2));
                     numberOfColumns = 6;
+                    initImages();
                     break;
                 case sf::Keyboard::Num7:
-                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 7.f, 2));
                     numberOfColumns = 7;
+                    initImages();
                     break;
                 case sf::Keyboard::Num8:
-                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 8.f, 2));
                     numberOfColumns = 8;
+                    initImages();
                     break;
                 case sf::Keyboard::Num9:
-                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 9.f, 2));
                     numberOfColumns = 9;
+                    initImages();
                     break;
                 case sf::Keyboard::Num0:
-                    scrollToPosition(window.getView().getCenter().y * std::pow(numberOfColumns / 10.f, 2));
                     numberOfColumns = 10;
+                    initImages();
                     break;
                 default:
                     break;
@@ -92,110 +95,140 @@ ScrollView::handle(sf::Event& event)
 }
 
 void
-ScrollView::draw()
+ScrollView::initImages()
 {
-    int windowTop = window.getView().getCenter().y - window.getView().getSize().y / 2;
-    windowTop = (windowTop < 0) ? 0 : windowTop;
+    int index = std::distance(folder.cbegin(), firstItem);
+    int row =  index / numberOfColumns;
+    int firstImage = row * numberOfColumns;
+    int indent = index - firstImage;
 
-    int size = imageSize();
-    int firstVisibleRow = windowTop / size;
-    int firstImage = firstVisibleRow * numberOfColumns;
-
-    auto iter = folder.cbegin();
-    std::advance(iter, firstImage);
-
-    int windowBot = window.getView().getCenter().y + window.getView().getSize().y / 2;
-    int lastVisibleRow = std::ceil(1.f * windowBot / size);
-    int lastImage = lastVisibleRow * numberOfColumns;
-
-    auto end = folder.cbegin();
-    std::advance(end, std::min(lastImage, folder.size()));
-
-    std::set<std::string> unusedImages;
-    for (auto const& entry: imageCache)
-        unusedImages.insert(entry.first);
-
-    int heightOffset = firstVisibleRow * size;
-    int column = 0;
-
-    while (iter != end)
+    for (int i = 0; i < indent; i++)
     {
-        Image* image = getImage(*iter);
-        unusedImages.erase(*iter);
-        if (image->valid)
-        {
-            image->update();
-            float factor = size / image->sprite.getLocalBounds().width;
-            image->sprite.setScale(factor, factor);
-            image->sprite.setPosition(size * column, heightOffset);
-            window.draw(image->sprite);
-        }
-
-        iter++;
-        column++;
-        if (column == numberOfColumns)
-        {
-            heightOffset += size;
-            column = 0;
-        }
+        Image* image = new Image(*--firstItem, true);
+        images.push_front(image);
     }
 
-    for (auto const& path: unusedImages) {
-        delete imageCache[path];
-        imageCache.erase(path);
+    int rows = std::ceil(1.f * window.getSize().y / imageSize());
+    int imageCount = rows * numberOfColumns;
+    int delta = imageCount - images.size();
+
+    if (delta > 0)
+    {
+        for (int i = 0; i < delta; i++)
+        {
+            Image* image = new Image(*lastItem++, true);
+            images.push_back(image);
+
+            if (lastItem == folder.cend()) break;
+        }
+    }
+    else 
+    {
+        for (int i = 0; i < -delta; i++)
+        {
+            delete images.back();
+            images.pop_back();
+            lastItem--;
+        }
+    }
+    std::cout << "Images: " << images.size() << std::endl;
+}
+
+void
+ScrollView::scrollDown(int rows)
+{
+    if (lastItem == folder.cend())
+    {
+        // move view to bottom
+    }
+    else
+    {
+        for (int i = 0; i < numberOfColumns * rows; i++)
+        {
+            delete images.front();
+            images.pop_front();
+            firstItem++;
+        }
+
+        for (int i = 0; i < numberOfColumns * rows; i++)
+        {
+            Image* image = new Image(*lastItem++, true);
+            images.push_back(image);
+
+            if (lastItem == folder.cend()) break;
+        }
     }
 }
 
-Image*
-ScrollView::getImage(const std::string& path)
+void
+ScrollView::scrollUp(int rows)
 {
-    if (imageCache.count(path) == 0)
+    if (firstItem == folder.cbegin()) return;
+
+    int removeCount = numberOfColumns * rows;
+    if (lastItem == folder.cend())
+        removeCount = folder.size() % numberOfColumns + numberOfColumns * (rows - 1);
+
+    for (int i = 0; i < removeCount; i++)
     {
-        Image* image = new Image(path, true);
-        imageCache.insert(std::pair<std::string, Image*>(path, image));
+        delete images.back();
+        images.pop_back();
+        lastItem--;
     }
-    return imageCache.find(path)->second;
+
+    for (int i = 0; i < numberOfColumns * rows; i++)
+    {
+        Image* image = new Image(*--firstItem, true);
+        images.push_front(image);
+
+        if (firstItem == folder.cbegin()) break;
+    }
+}
+
+void
+ScrollView::draw()
+{
+    int heightOffset = 0;
+    int column = 0;
+
+    for (auto image : images)
+    {
+        if (image->valid)
+        {
+            image->update();
+            float factor = imageSize() / image->sprite.getLocalBounds().width;
+            image->sprite.setScale(factor, factor);
+            image->sprite.setPosition(imageSize() * column, heightOffset);
+            window.draw(image->sprite);
+        }
+
+        column++;
+        if (column == numberOfColumns)
+        {
+            heightOffset += imageSize();
+            column = 0;
+        }
+    }
 }
 
 void
 ScrollView::resizeEvent(sf::Event::SizeEvent& size)
 {
-    sf::View view = window.getView();
-    float y = view.getCenter().y * size.width / view.getSize().x;
-    view.setSize(size.width, size.height);
-    view.setCenter(size.width / 2, y);
-    window.setView(view);
+    initImages();
 }
 
 void
 ScrollView::selectImage()
 {
     auto mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-    for (auto const& entry: imageCache)
-        if (entry.second->sprite.getGlobalBounds().contains(mouse.x, mouse.y))
-            folder.currentItem = std::find(folder.cbegin(), folder.cend(), entry.first);
+    for (auto const& image: images)
+        if (image->sprite.getGlobalBounds().contains(mouse.x, mouse.y))
+            folder.currentItem = std::find(folder.cbegin(), folder.cend(), image->path);
 }
 
 void
 ScrollView::scrollToCurrentImage()
 {
-    int index = std::distance(folder.cbegin(), folder.currentItem);
-    scrollToPosition(index / numberOfColumns * imageSize() + imageSize() / 2);
-}
-
-void
-ScrollView::scrollToPosition(float y)
-{
-    if (y < window.getSize().y / 2)
-        y = window.getSize().y / 2;
-    else if (y > std::ceil(1.f * folder.size() / numberOfColumns) * imageSize() - window.getSize().y / 2)
-        y = std::ceil(1.f * folder.size() / numberOfColumns) * imageSize() - window.getSize().y / 2;
-    else
-        y = std::floor((y - window.getSize().y / 2) / imageSize()) * imageSize() + window.getSize().y / 2;
-
-    auto view = window.getView();
-    view.setCenter(view.getCenter().x, y);
-    window.setView(view);
 }
 
 int

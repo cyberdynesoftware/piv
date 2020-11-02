@@ -14,6 +14,7 @@ class Image
         sf::Sprite sprite;
         bool valid = false;
         std::string errormsg;
+        std::string path;
 
     private:
         OIIO::ImageBuf buffer;
@@ -23,7 +24,6 @@ class Image
         bool squareImage;
         bool enframe;
         sf::Vector2u frame;
-        std::string path;
         bool animateImage;
         sf::Time delay;
 

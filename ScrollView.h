@@ -3,6 +3,7 @@
 #include "Stage.h"
 #include "Image.h"
 #include "Folder.h"
+#include <deque>
 
 class ScrollView : public Stage
 {
@@ -15,14 +16,17 @@ class ScrollView : public Stage
         void resizeEvent(sf::Event::SizeEvent&);
         void selectImage(void);
         void scrollToCurrentImage(void);
-        void scrollToPosition(float);
 
     private:
         Folder& folder;
         sf::RenderWindow& window;
         int numberOfColumns = 4;
-        std::map<std::string, Image*> imageCache;
+        std::deque<Image*> images;
+        Folder::FolderIter firstItem;
+        Folder::FolderIter lastItem;
 
-        Image* getImage(const std::string&);
+        void initImages(void);
+        void scrollDown(int);
+        void scrollUp(int);
         int imageSize(void);
 };

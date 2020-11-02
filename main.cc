@@ -14,11 +14,11 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    auto cache = OIIO::ImageCache::create();
+    //auto cache = OIIO::ImageCache::create();
     Folder folder(argv[1]);
 
     sf::RenderWindow window(sf::VideoMode(800, 600), "piv");
-    window.setFramerateLimit(60);
+    window.setFramerateLimit(30);
     bool fullscreen = false;
 
     sf::Image icon;
@@ -47,6 +47,12 @@ int main(int argc, char** argv)
                     break;
 
                 case sf::Event::Resized:
+                    {
+                        sf::View view = window.getView();
+                        view.setSize(event.size.width, event.size.height);
+                        view.setCenter(event.size.width / 2, event.size.height / 2);
+                        window.setView(view);
+                    }
                     stage->resizeEvent(event.size);
                     break;
 
@@ -67,7 +73,6 @@ int main(int argc, char** argv)
 
                         case sf::Keyboard::F:
                             {
-                                float y = window.getView().getCenter().y / window.getSize().x;
                                 if (fullscreen)
                                 {
                                     window.create(sf::VideoMode(800, 600), "piv");
@@ -78,7 +83,6 @@ int main(int argc, char** argv)
                                     window.create(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
                                     fullscreen = true;
                                 }
-                                stage->scrollToPosition(y * window.getSize().x);
                                 window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
                             }
                             break;
@@ -123,6 +127,6 @@ int main(int argc, char** argv)
         }
     }
 
-    OIIO::ImageCache::destroy(cache);
+    //OIIO::ImageCache::destroy(cache);
     return EXIT_SUCCESS;
 }

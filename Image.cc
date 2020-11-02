@@ -28,18 +28,21 @@ Image::init(const std::string& path)
 void
 Image::readPixels()
 {
+    OIIO::ImageBuf buf;
     if (buffer.nchannels() != 4)
-        buffer = fixChannels(buffer);
+        buf = fixChannels(buffer);
+    else
+        buf = buffer;
 
-    sf::Uint8 *pixels = new sf::Uint8[buffer.roi().width() * buffer.roi().height() * 4];
-    bool ok = buffer.get_pixels(buffer.roi(), OIIO::TypeDesc::UINT8, pixels);
-    if (!ok || buffer.has_error())
+    sf::Uint8 *pixels = new sf::Uint8[buf.roi().width() * buf.roi().height() * 4];
+    bool ok = buf.get_pixels(buf.roi(), OIIO::TypeDesc::UINT8, pixels);
+    if (!ok || buf.has_error())
     {
         errormsg = "Error loading image: " + path;
         return;
     }
 
-    texture.create(buffer.roi().width(), buffer.roi().height());
+    texture.create(buf.roi().width(), buf.roi().height());
     texture.update(pixels);
     texture.setSmooth(true);
     sprite.setTexture(texture, true);

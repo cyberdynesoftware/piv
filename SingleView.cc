@@ -148,11 +148,6 @@ SingleView::resizeEvent(sf::Event::SizeEvent& size)
 }
 
 void
-SingleView::scrollToPosition(float y)
-{
-}
-
-void
 SingleView::zoom(sf::Sprite& sprite, float delta)
 {
     if (delta < 0)
