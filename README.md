@@ -13,17 +13,22 @@ make
 
 * [sfml](https://www.sfml-dev.org)
 * [boost](https://www.boost.org)
+* [stb_image](https://github.com/nothings/stb)
+* [OpenImageIO](https://github/OpenImageIO/oiio)
 
 ## Usage
 
 Key | description
 --- | ---
 Q | quit
+F | Toggle fullscreen
+Arrow Up/Down & Mouse Wheel | Scroll Up/Down
+1-0 | Set columns to 1-10
+Left Mouse Click | View selected image in single image view
 Space | next image
 Backspace | previous image
-R | random image
-A | copy current image to folder 'selected'
-D | move current image to folder '.trashed'
 Mouse Wheel | zoom image
 Left Mouse Button | move image on screen
 Right Mouse Button | reset zoom and position
+O | Original size
+M & Mouse Extra Button 1 | Exit single image view
