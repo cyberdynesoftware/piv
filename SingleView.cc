@@ -1,6 +1,4 @@
 #include "SingleView.h"
-#include <OpenImageIO/imagebuf.h>
-#include <OpenImageIO/imagebufalgo.h>
 #include <iostream>
 
 SingleView::SingleView(Folder& folder, sf::RenderWindow& window):

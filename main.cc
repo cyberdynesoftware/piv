@@ -4,7 +4,6 @@
 #include "Folder.h"
 
 #include <iostream>
-#include <OpenImageIO/imagecache.h>
 
 int main(int argc, char** argv)
 {
@@ -14,7 +13,6 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    //auto cache = OIIO::ImageCache::create();
     Folder folder(argv[1]);
 
     sf::RenderWindow window(sf::VideoMode(800, 600), "piv");
@@ -128,6 +126,5 @@ int main(int argc, char** argv)
         }
     }
 
-    //OIIO::ImageCache::destroy(cache);
     return EXIT_SUCCESS;
 }

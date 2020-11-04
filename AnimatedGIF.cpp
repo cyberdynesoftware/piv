@@ -5,6 +5,8 @@
 #define STBI_ONLY_GIF
 #include <stb/stb_image.h>
 
+#include <iostream>
+
 AnimatedGIF::AnimatedGIF()
 { }
 
@@ -27,14 +29,15 @@ AnimatedGIF::load(const char* filename)
     stbi__start_file(&s, f);
 
     int *delays;
-    int z = 0, comp = 0;
+    int numFrames = 0, comp = 0;
 
-    void *pixels = stbi__load_gif_main(&s, &delays, &size.x, &size.y, &z, &comp, STBI_rgb_alpha);
+    void *pixels = stbi__load_gif_main(&s, &delays, &size.x, &size.y, &numFrames, &comp, STBI_rgb_alpha);
 
     sf::Image image;
     int step = size.x * size.y * 4;
+    std::cout << "gif(kb): " << step * numFrames / 1000 << std::endl;
 
-    for (int i = 0; i < z; i++)
+    for (int i = 0; i < numFrames; i++)
     {
         image.create(size.x, size.y, (const sf::Uint8*) pixels + step * i);
 
@@ -79,5 +82,5 @@ AnimatedGIF::update(sf::Sprite& sprite, bool square)
     // TODO: only when dirty
     sf::Texture& texture = std::get<1>(*frameIter);
     sprite.setTexture(texture, true);
-    if (square) ImageData::square(sprite);
+    //if (square) ImageData::square(sprite);
 }

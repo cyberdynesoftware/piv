@@ -20,15 +20,15 @@ make
 
 Key | description
 --- | ---
-Q | quit
+Q | Quit
 F | Toggle fullscreen
 Arrow Up/Down & Mouse Wheel | Scroll Up/Down
 1-0 | Set columns to 1-10
 Left Mouse Click | View selected image in single image view
-Space | next image
-Backspace | previous image
-Mouse Wheel | zoom image
-Left Mouse Button | move image on screen
-Right Mouse Button | reset zoom and position
-O | Original size
-M & Mouse Extra Button 1 | Exit single image view
+Space | Next image
+Backspace | Previous image
+Mouse Wheel | Zoom image
+Left Mouse Button | Move image on screen
+Right Mouse Click | Reset zoom and position
+O | Original image size
+M & Extra Mouse Button 1 | Exit single image view
