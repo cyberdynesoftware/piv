@@ -1,6 +1,7 @@
 #include "ScrollView.h"
 #include <iostream>
 #include <set>
+#include <math.h>
 
 ScrollView::ScrollView(Folder& folder, sf::RenderWindow& window):
     folder(folder),

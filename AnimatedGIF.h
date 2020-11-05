@@ -10,16 +10,16 @@ class AnimatedGIF
 
         static bool test(const char*);
         void load(const char*);
-        const sf::Vector2i& getSize(void);
-        void update(sf::Sprite&, bool);
+
+        const sf::Time& delay(void);
+        void update(sf::Texture&);
+
+        sf::Vector2i size;
+        int frameCount = 0;
 
     private:
-        sf::Vector2i size;
-        sf::Clock clock;
-        sf::Time startTime;
-        sf::Time totalDelay;
-        std::vector<std::tuple<sf::Time, sf::Texture>> frames;
-        std::vector<std::tuple<sf::Time, sf::Texture>>::iterator frameIter;
+        std::vector<std::tuple<sf::Time, sf::Image>> frames;
+        std::vector<std::tuple<sf::Time, sf::Image>>::iterator frameIter;
 };
 
 #endif

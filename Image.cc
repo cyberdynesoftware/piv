@@ -1,5 +1,4 @@
 #include "Image.h"
-#include <OpenImageIO/imagebufalgo.h>
 #include <iostream>
 
 Image::Image(const std::string& path):
@@ -11,69 +10,25 @@ Image::Image(const std::string& path):
 void
 Image::init(const std::string& path)
 {
-    buffer.reset(path);
-
-    if (buffer.nsubimages() == 0)
-        errormsg = "Not an image: " + path;
+    if (AnimatedGIF::test(path.c_str()))
+    {
+        gif = std::make_unique<AnimatedGIF>();
+        gif->load(path.c_str());
+        gif->update(texture);
+        animateImage = true;
+        ready = true;
+        clock.restart();
+    }
     else
     {
-        animateImage = !(buffer.nsubimages() == 1);
-        readPixels();
-    }
-}
-
-void
-Image::readPixels()
-{
-    OIIO::ImageBuf buf;
-    if (buffer.nchannels() != 4)
-        buf = fixChannels(buffer);
-    else
-        buf = buffer;
-
-    sf::Uint8 *pixels = new sf::Uint8[buf.roi().width() * buf.roi().height() * 4];
-    bool ok = buf.get_pixels(buf.roi(), OIIO::TypeDesc::UINT8, pixels);
-    if (!ok || buf.has_error())
-    {
-        errormsg = "Error loading image: " + path;
-        return;
+        ready = texture.loadFromFile(path);
     }
 
-    texture.create(buf.roi().width(), buf.roi().height());
-    texture.update(pixels);
     texture.setSmooth(true);
     sprite.setTexture(texture, true);
 
-    delete[] pixels;
-    ready = true;
-    if (squareImage) square(imageSize);
+    if (squareImage) square(squareImageEdgeLength);
     if (enframe) fitTo(frame);
-    if (animateImage)
-    {
-        float fps = buffer.spec().get_float_attribute("FramesPerSecond");
-        delay = sf::seconds((fps == 0.f) ? .1f : 1.f / fps);
-    }
-    clock.restart();
-}
-
-OIIO::ImageBuf
-Image::fixChannels(OIIO::ImageBuf& buffer)
-{
-    if (buffer.nchannels() == 3)
-        return OIIO::ImageBufAlgo::channels(buffer, 4,
-                /* channelorder */ { 0, 1, 2, -1 /*use a float value*/ },
-                /* channelvalues */ { 0 /*ignore*/, 0 /*ignore*/, 0 /*ignore*/, 1.0 },
-                /* channelnames */ { "", "", "", "A" });
-    else if (buffer.nchannels() == 1)
-        return OIIO::ImageBufAlgo::channels(buffer, 4,
-                /* channelorder */ { 0, 0, 0, -1 /*use a float value*/ },
-                /* channelvalues */ { 0 /*ignore*/, 0 /*ignore*/, 0 /*ignore*/, 1.0 },
-                /* channelnames */ { "R", "G", "B", "A" });
-    else
-    {
-        errormsg = path + ": Incorrect number of channels: " + std::to_string(buffer.nchannels());
-        return buffer;
-    }
 }
 
 void
@@ -102,7 +57,7 @@ void
 Image::square(int targetSize)
 {
     squareImage = true;
-    imageSize = targetSize;
+    squareImageEdgeLength = targetSize;
 
     if (ready)
     {
@@ -124,14 +79,9 @@ Image::update()
 {
     if (!animateImage) return;
 
-    if (clock.getElapsedTime() > delay)
+    if (clock.getElapsedTime() > gif->delay())
     {
-        int index = buffer.subimage() + 1;
-        if (index == buffer.nsubimages())
-            index = 0;
-
-        buffer.read(index);
-        readPixels();
+        gif->update(texture);
 
         clock.restart();
     }

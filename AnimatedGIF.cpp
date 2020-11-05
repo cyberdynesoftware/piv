@@ -29,58 +29,40 @@ AnimatedGIF::load(const char* filename)
     stbi__start_file(&s, f);
 
     int *delays;
-    int numFrames = 0, comp = 0;
+    int comp = 0;
 
-    void *pixels = stbi__load_gif_main(&s, &delays, &size.x, &size.y, &numFrames, &comp, STBI_rgb_alpha);
+    void *pixels = stbi__load_gif_main(&s, &delays, &size.x, &size.y, &frameCount, &comp, STBI_rgb_alpha);
 
     sf::Image image;
     int step = size.x * size.y * 4;
-    std::cout << "gif(kb): " << step * numFrames / 1000 << std::endl;
+    std::cout << "gif(kb): " << step * frameCount / 1000 << std::endl;
 
-    for (int i = 0; i < numFrames; i++)
+    for (int i = 0; i < frameCount; i++)
     {
         image.create(size.x, size.y, (const sf::Uint8*) pixels + step * i);
-
-        sf::Texture texture;
-        texture.loadFromImage(image);
-        texture.setSmooth(true);
 
         int delay = delays[i];
         if (delay == 0 || delay == 10) delay = 100;
 
-        frames.push_back(std::tuple<sf::Time, sf::Texture>(sf::milliseconds(delay), texture));
+        frames.push_back(std::tuple<sf::Time, sf::Image>(sf::milliseconds(delay), image));
     }
 
     frameIter = frames.begin();
     
     stbi_image_free(pixels);
     fclose(f);
-
-    totalDelay = sf::Time::Zero;
-    startTime = clock.getElapsedTime();
 }
 
-const sf::Vector2i&
-AnimatedGIF::getSize()
+const sf::Time&
+AnimatedGIF::delay()
 {
-    return size;
+    return std::get<0>(*frameIter);
 }
 
 void
-AnimatedGIF::update(sf::Sprite& sprite, bool square)
+AnimatedGIF::update(sf::Texture& texture)
 {
-    sf::Time& delay = std::get<0>(*frameIter);
-
-    while (startTime + totalDelay + delay < clock.getElapsedTime())
-    {
-        frameIter++;
-        if (frameIter == frames.end()) frameIter = frames.begin();
-        totalDelay += delay;
-        delay = std::get<0>(*frameIter);
-    }
-
-    // TODO: only when dirty
-    sf::Texture& texture = std::get<1>(*frameIter);
-    sprite.setTexture(texture, true);
-    //if (square) ImageData::square(sprite);
+    texture.loadFromImage(std::get<1>(*frameIter));
+    frameIter++;
+    if (frameIter == frames.end()) frameIter = frames.begin();
 }

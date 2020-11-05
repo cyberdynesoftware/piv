@@ -14,7 +14,6 @@ make
 * [sfml](https://www.sfml-dev.org)
 * [boost](https://www.boost.org)
 * [stb_image](https://github.com/nothings/stb)
-* [OpenImageIO](https://github/OpenImageIO/oiio)
 
 ## Usage
 
