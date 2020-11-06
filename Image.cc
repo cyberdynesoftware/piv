@@ -10,10 +10,9 @@ Image::Image(const std::string& path):
 void
 Image::init(const std::string& path)
 {
-    if (AnimatedGIF::test(path.c_str()))
+    gif = std::make_unique<AnimatedGIF>(path.c_str());
+    if (gif->isGIF())
     {
-        gif = std::make_unique<AnimatedGIF>();
-        gif->load(path.c_str());
         gif->update(texture);
         animateImage = true;
         ready = true;
@@ -21,6 +20,7 @@ Image::init(const std::string& path)
     }
     else
     {
+        gif.reset();
         ready = texture.loadFromFile(path);
     }
 
@@ -79,10 +79,9 @@ Image::update()
 {
     if (!animateImage) return;
 
-    if (clock.getElapsedTime() > gif->delay())
+    if (clock.getElapsedTime() > gif->delay)
     {
         gif->update(texture);
-
         clock.restart();
     }
 }

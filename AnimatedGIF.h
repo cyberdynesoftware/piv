@@ -6,20 +6,20 @@
 class AnimatedGIF
 {
     public:
-        AnimatedGIF();
+        AnimatedGIF(const char*);
+        ~AnimatedGIF();
 
-        static bool test(const char*);
-        void load(const char*);
-
-        const sf::Time& delay(void);
+        bool isGIF(void);
         void update(sf::Texture&);
 
-        sf::Vector2i size;
-        int frameCount = 0;
+        sf::Time delay;
 
     private:
-        std::vector<std::tuple<sf::Time, sf::Image>> frames;
-        std::vector<std::tuple<sf::Time, sf::Image>>::iterator frameIter;
+        struct stbi_pimpl* pimpl;
+        char* fileBuffer;
+        int filesize = 0;
+
+        void loadFile(const char*);
 };
 
 #endif

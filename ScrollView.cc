@@ -1,7 +1,7 @@
 #include "ScrollView.h"
 #include <iostream>
 #include <set>
-#include <math.h>
+#include <cmath>
 
 ScrollView::ScrollView(Folder& folder, sf::RenderWindow& window):
     folder(folder),
@@ -111,10 +111,22 @@ ScrollView::initImages()
     {
         for (int i = 0; i < delta; i++)
         {
+            if (lastItem == folder.cend()) break;
+
             Image* image = new Image(*lastItem++);
             images.push_back(image);
+        }
 
-            if (lastItem == folder.cend()) break;
+        delta = imageCount - images.size();
+        rows = delta / numberOfColumns;
+        int remaining = rows * numberOfColumns;
+
+        for (int i = 0; i < remaining; i++)
+        {
+            if (firstItem == folder.cbegin()) break;
+
+            Image* image = new Image(*--firstItem);
+            images.push_front(image);
         }
     }
     else 
@@ -150,11 +162,11 @@ ScrollView::scrollDown()
 
         for (int i = 0; i < numberOfColumns; i++)
         {
+            if (lastItem == folder.cend()) break;
+
             Image* image = new Image(*lastItem++);
             image->square(imageSize());
             images.push_back(image);
-
-            if (lastItem == folder.cend()) break;
         }
     }
 }
@@ -176,11 +188,11 @@ ScrollView::scrollUp()
 
     for (int i = 0; i < numberOfColumns; i++)
     {
+        if (firstItem == folder.cbegin()) break;
+
         Image* image = new Image(*--firstItem);
         image->square(imageSize());
         images.push_front(image);
-
-        if (firstItem == folder.cbegin()) break;
     }
 }
 

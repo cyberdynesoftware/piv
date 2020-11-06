@@ -5,64 +5,82 @@
 #define STBI_ONLY_GIF
 #include <stb/stb_image.h>
 
+#include <fstream>
+#include <cerrno>
 #include <iostream>
 
-AnimatedGIF::AnimatedGIF()
-{ }
-
-bool
-AnimatedGIF::test(const char* filename)
+struct stbi_pimpl
 {
-    FILE *f = stbi__fopen(filename, "rb");
-    stbi__context s;
-    stbi__start_file(&s, f);
-    bool result = stbi__gif_test(&s);
-    fclose(f);
-    return result;
+    stbi__context context;
+    stbi__gif gif;
+    int comp = 0;
+};
+
+AnimatedGIF::AnimatedGIF(const char* filename)
+{
+    pimpl = new stbi_pimpl;
+    memset(&pimpl->gif, 0, sizeof(pimpl->gif));
+    loadFile(filename);
+    stbi__start_mem(&pimpl->context, (stbi_uc*)fileBuffer, filesize);
+}
+
+AnimatedGIF::~AnimatedGIF()
+{
+    STBI_FREE(pimpl->gif.out); 
+    STBI_FREE(pimpl->gif.history); 
+    STBI_FREE(pimpl->gif.background); 
+    delete pimpl;
+    delete[] fileBuffer;
 }
 
 void
-AnimatedGIF::load(const char* filename)
+AnimatedGIF::loadFile(const char* filename)
 {
-    FILE *f = stbi__fopen(filename, "rb");
-    stbi__context s;
-    stbi__start_file(&s, f);
-
-    int *delays;
-    int comp = 0;
-
-    void *pixels = stbi__load_gif_main(&s, &delays, &size.x, &size.y, &frameCount, &comp, STBI_rgb_alpha);
-
-    sf::Image image;
-    int step = size.x * size.y * 4;
-    std::cout << "gif(kb): " << step * frameCount / 1000 << std::endl;
-
-    for (int i = 0; i < frameCount; i++)
+    std::ifstream in(filename, std::ios::in | std::ios::binary);
+    if (in)
     {
-        image.create(size.x, size.y, (const sf::Uint8*) pixels + step * i);
-
-        int delay = delays[i];
-        if (delay == 0 || delay == 10) delay = 100;
-
-        frames.push_back(std::tuple<sf::Time, sf::Image>(sf::milliseconds(delay), image));
+        in.seekg(0, std::ios::end);
+        filesize = in.tellg();
+        fileBuffer = new char[filesize];
+        in.seekg(0, std::ios::beg);
+        in.read(fileBuffer, filesize);
+        in.close();
     }
-
-    frameIter = frames.begin();
-    
-    stbi_image_free(pixels);
-    fclose(f);
+    else std::cerr << "Error opening " << filename << std::endl;
 }
 
-const sf::Time&
-AnimatedGIF::delay()
+bool
+AnimatedGIF::isGIF()
 {
-    return std::get<0>(*frameIter);
+    return stbi__gif_test(&pimpl->context);
 }
 
 void
 AnimatedGIF::update(sf::Texture& texture)
 {
-    texture.loadFromImage(std::get<1>(*frameIter));
-    frameIter++;
-    if (frameIter == frames.end()) frameIter = frames.begin();
+    stbi_uc* pixels = stbi__gif_load_next(&pimpl->context, &pimpl->gif, &pimpl->comp, STBI_rgb_alpha, 0);
+
+    // returning the context signals all frames have been read
+    if (pixels == (stbi_uc*)&pimpl->context)
+    {
+        STBI_FREE(pimpl->gif.out); 
+        STBI_FREE(pimpl->gif.history); 
+        STBI_FREE(pimpl->gif.background); 
+        memset(&pimpl->gif, 0, sizeof(pimpl->gif));
+        stbi__start_mem(&pimpl->context, (const stbi_uc*)fileBuffer, filesize);
+        delay = sf::milliseconds(0);
+    }
+    else
+    {
+        unsigned int x = pimpl->gif.w;
+        unsigned int y = pimpl->gif.h;
+
+        if (texture.getSize().x != x || texture.getSize().y != y)
+            texture.create(x, y);
+
+        texture.update(pixels);
+        int temp_delay = pimpl->gif.delay;
+        if (temp_delay <= 10) temp_delay = 100;
+        delay = sf::milliseconds(temp_delay);
+    }
 }
