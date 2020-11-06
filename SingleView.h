@@ -16,6 +16,8 @@ class SingleView : public Stage
         void initImage(void);
         void resizeEvent(void);
 
+        static std::string filename(const std::string&);
+
     private:
         Folder& folder;
         Image* image;

@@ -17,7 +17,7 @@ make
 
 ## Usage
 
-Key | description
+Key | Description
 --- | ---
 Q | Quit
 F | Toggle fullscreen

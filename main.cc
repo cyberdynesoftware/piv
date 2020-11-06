@@ -65,6 +65,7 @@ int main(int argc, char** argv)
                             if (stage->instanceOf(Stage::SubType::SingleView))
                             {
                                 scrollView.scrollToCurrentImage();
+                                window.setTitle("piv");
                                 stage = &scrollView;
                             }
                             break;
@@ -109,6 +110,7 @@ int main(int argc, char** argv)
                             if (stage->instanceOf(Stage::SubType::SingleView))
                             {
                                 scrollView.scrollToCurrentImage();
+                                window.setTitle("piv");
                                 stage = &scrollView;
                             }
                             break;

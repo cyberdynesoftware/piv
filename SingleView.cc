@@ -28,7 +28,7 @@ SingleView::initImage()
     view.setCenter(window.getSize().x / 2, window.getSize().y / 2);
     window.setView(view);
 
-    window.setTitle(*folder.currentItem + " - piv");
+    window.setTitle(filename(*folder.currentItem) + " - piv");
 
     if (image != NULL) delete image;
     image = new Image(*folder.currentItem);
@@ -136,7 +136,7 @@ SingleView::draw()
 void
 SingleView::resizeEvent()
 {
-    window.setTitle(*folder.currentItem + " - piv");
+    window.setTitle(filename(*folder.currentItem) + " - piv");
     image->fitTo(window.getSize());
 }
 
@@ -169,4 +169,10 @@ SingleView::original(sf::Sprite& sprite)
     const sf::Vector2u& size = sprite.getTexture()->getSize();
     sprite.setOrigin(size.x / 2, size.y / 2);
     sprite.setPosition(window.getSize().x / 2, window.getSize().y / 2);
+}
+
+std::string
+SingleView::filename(const std::string& path)
+{
+    return path.substr(path.find_last_of('/') + 1);
 }
