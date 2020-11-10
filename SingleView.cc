@@ -7,7 +7,6 @@ SingleView::SingleView(Folder& folder, sf::RenderWindow& window):
 {
     arrow.loadFromSystem(sf::Cursor::Arrow);
     cross.loadFromSystem(sf::Cursor::Cross);
-    font.loadFromFile("font.ttf");
     text.setFont(font);
     text.setCharacterSize(15);
     text.setPosition(10, 10);
@@ -169,10 +168,4 @@ SingleView::original(sf::Sprite& sprite)
     const sf::Vector2u& size = sprite.getTexture()->getSize();
     sprite.setOrigin(size.x / 2, size.y / 2);
     sprite.setPosition(window.getSize().x / 2, window.getSize().y / 2);
-}
-
-std::string
-SingleView::filename(const std::string& path)
-{
-    return path.substr(path.find_last_of('/') + 1);
 }

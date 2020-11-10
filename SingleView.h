@@ -16,14 +16,11 @@ class SingleView : public Stage
         void initImage(void);
         void resizeEvent(void);
 
-        static std::string filename(const std::string&);
-
     private:
         Folder& folder;
         Image* image;
         sf::RenderWindow& window;
         sf::Text text;
-        sf::Font font;
         sf::Cursor arrow;
         sf::Cursor cross;
         sf::Vector2i previousMousePosition;

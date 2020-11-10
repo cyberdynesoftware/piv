@@ -22,6 +22,7 @@ Key | Description
 Q | Quit
 F | Toggle fullscreen
 Arrow Up/Down & Mouse Wheel | Scroll Up/Down
+I | Toggle info
 1-0 | Set columns to 1-10
 Left Mouse Click | View selected image in single image view
 Space | Next image

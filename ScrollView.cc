@@ -79,6 +79,9 @@ ScrollView::handle(sf::Event& event)
                     numberOfColumns = 10;
                     initImages();
                     break;
+                case sf::Keyboard::I:
+                    showInfo = (showInfo) ? false : true;
+                    break;
                 default:
                     break;
             }
@@ -201,20 +204,37 @@ ScrollView::draw()
 {
     int offset = heightOffset;
     int column = 0;
+    int size = imageSize();
 
     for (auto image : images)
     {
         if (image->ready)
         {
             image->update();
-            image->sprite.setPosition(imageSize() * column, offset);
+            image->sprite.setPosition(size * column, offset);
             window.draw(image->sprite);
+        }
+
+        if (showInfo)
+        {
+            sf::RectangleShape background(sf::Vector2f(size, 20));
+            background.setFillColor(sf::Color(0, 0, 0, 64));
+            background.setPosition(size * column, offset + size - 20);
+            window.draw(background);
+
+            sf::Text info;
+            info.setFont(font);
+            info.setFillColor(sf::Color::White);
+            info.setCharacterSize(16);
+            info.setPosition(size * column, offset + size - 20);
+            info.setString(filename(image->path));
+            window.draw(info);
         }
 
         column++;
         if (column == numberOfColumns)
         {
-            offset += imageSize();
+            offset += size;
             column = 0;
         }
     }

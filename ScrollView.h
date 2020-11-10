@@ -25,6 +25,7 @@ class ScrollView : public Stage
         std::deque<Image*> images;
         Folder::FolderIter firstItem;
         Folder::FolderIter lastItem;
+        bool showInfo = false;
 
         void initImages(void);
         void scrollDown(void);
