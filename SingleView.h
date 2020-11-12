@@ -18,12 +18,12 @@ class SingleView : public Stage
 
     private:
         Folder& folder;
-        Image* image;
         sf::RenderWindow& window;
-        sf::Text text;
+        Image* image = NULL;
         sf::Cursor arrow;
         sf::Cursor cross;
         sf::Vector2i previousMousePosition;
+        bool showInfo = false;
 
         void zoom(sf::Sprite&, float delta);
         sf::Vector2f mousePositionInSprite(sf::Sprite&);

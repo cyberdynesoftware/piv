@@ -14,6 +14,8 @@ class Folder
         FolderIter currentItem;
 
         int size(void);
+        static std::string filename(const std::string&);
+        static int fileSize(const std::string&);
 
     private:
         std::vector<std::string> files;

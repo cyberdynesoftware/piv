@@ -17,6 +17,7 @@ class Image
         bool ready = false;
         std::string errormsg;
         std::string path;
+        std::string info;
 
     private:
         std::unique_ptr<AnimatedGIF> gif;

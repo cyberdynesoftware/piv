@@ -17,11 +17,6 @@ class Stage
         virtual void draw(void) = 0;
         virtual void resizeEvent(void) = 0;
 
-
-        std::string filename(const std::string& path)
-        {
-            return path.substr(path.find_last_of('/') + 1);
-        }
-
+    protected:
         sf::Font font;
 };

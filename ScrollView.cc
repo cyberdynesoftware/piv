@@ -227,7 +227,7 @@ ScrollView::draw()
             info.setFillColor(sf::Color::White);
             info.setCharacterSize(16);
             info.setPosition(size * column, offset + size - 20);
-            info.setString(filename(image->path));
+            info.setString(Folder::filename(image->path));
             window.draw(info);
         }
 

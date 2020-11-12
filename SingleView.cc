@@ -7,11 +7,7 @@ SingleView::SingleView(Folder& folder, sf::RenderWindow& window):
 {
     arrow.loadFromSystem(sf::Cursor::Arrow);
     cross.loadFromSystem(sf::Cursor::Cross);
-    text.setFont(font);
-    text.setCharacterSize(15);
-    text.setPosition(10, 10);
     previousMousePosition = sf::Mouse::getPosition();
-    image = NULL;
 }
 
 bool
@@ -27,7 +23,7 @@ SingleView::initImage()
     view.setCenter(window.getSize().x / 2, window.getSize().y / 2);
     window.setView(view);
 
-    window.setTitle(filename(*folder.currentItem) + " - piv");
+    window.setTitle(Folder::filename(*folder.currentItem) + " - piv");
 
     if (image != NULL) delete image;
     image = new Image(*folder.currentItem);
@@ -53,6 +49,9 @@ SingleView::handle(sf::Event& event)
                     else
                         folder.currentItem = --folder.cend();
                     initImage();
+                    break;
+                case sf::Keyboard::I:
+                    showInfo = (showInfo) ? false : true;
                     break;
                 case sf::Keyboard::R:
                     //imageCache.random();
@@ -127,15 +126,38 @@ SingleView::draw()
     }
     else
     {
+        sf::Text text;
+        text.setFont(font);
+        text.setCharacterSize(15);
+        text.setPosition(10, 10);
         text.setString(image->errormsg);
+        window.draw(text);
+    }
+
+    if (showInfo)
+    {
+        sf::Text text;
+        text.setFont(font);
+        text.setFillColor(sf::Color::White);
+        text.setCharacterSize(16);
+        text.setPosition(0, 0);
+        text.setString(image->info);
+
+        sf::FloatRect bounds = text.getLocalBounds();
+        sf::Vector2f size(bounds.left * 2 + bounds.width, bounds.top * 2 + bounds.height);
+        sf::RectangleShape background(size);
+        background.setFillColor(sf::Color(0, 0, 0, 64));
+        background.setPosition(0, 0);
+        window.draw(background);
+
         window.draw(text);
     }
 }
 
-void
+    void
 SingleView::resizeEvent()
 {
-    window.setTitle(filename(*folder.currentItem) + " - piv");
+    window.setTitle(Folder::filename(*folder.currentItem) + " - piv");
     image->fitTo(window.getSize());
 }
 
