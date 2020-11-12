@@ -7,28 +7,56 @@ Image::Image(const std::string& path):
     future = std::async(std::launch::async, &Image::init, this, path);
 }
 
+Image::~Image()
+{
+    if (animatedImage) delete animatedImage;
+}
+
 void
 Image::init(const std::string& path)
 {
-    gif = std::make_unique<AnimatedGIF>(path.c_str());
+    if ((ready = initIfGIF(path) || initIfWebp(path) || texture.loadFromFile(path)))
+    {
+        texture.setSmooth(true);
+        sprite.setTexture(texture, true);
+
+        if (squareImage) square(squareImageEdgeLength);
+        if (enframe) fitTo(frame);
+    }
+}
+
+bool
+Image::initIfGIF(const std::string& path)
+{
+    AnimatedGIF* gif = new AnimatedGIF(path.c_str());
     if (gif->isGIF())
     {
+        animatedImage = gif;
         gif->update(texture);
-        animateImage = true;
-        ready = true;
         clock.restart();
+        return true;
     }
     else
     {
-        gif.reset();
-        ready = texture.loadFromFile(path);
+        delete gif;
+        return false;
+    }
+}
+
+bool
+Image::initIfWebp(const std::string& path)
+{
+    WebpImage* webp = new WebpImage(path.c_str());
+    if (webp->isWebp())
+    {
+        std::cout << "sí" << std::endl;
+    }
+    else
+    {
+        delete webp;
     }
 
-    texture.setSmooth(true);
-    sprite.setTexture(texture, true);
-
-    if (squareImage) square(squareImageEdgeLength);
-    if (enframe) fitTo(frame);
+    return false;
 }
 
 void
@@ -77,11 +105,9 @@ Image::square(int targetSize)
 void
 Image::update()
 {
-    if (!animateImage) return;
-
-    if (clock.getElapsedTime() > gif->delay)
+    if (animatedImage && animatedImage->animate && clock.getElapsedTime() > animatedImage->delay)
     {
-        gif->update(texture);
+        animatedImage->update(texture);
         clock.restart();
     }
 }
