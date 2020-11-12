@@ -1,12 +1,10 @@
 #include "AnimatedGIF.h"
-#include "ImageData.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ONLY_GIF
 #include <stb/stb_image.h>
 
 #include <fstream>
-#include <cerrno>
 #include <iostream>
 
 struct stbi_pimpl
@@ -22,6 +20,7 @@ AnimatedGIF::AnimatedGIF(const char* filename)
     memset(&pimpl->gif, 0, sizeof(pimpl->gif));
     loadFile(filename);
     stbi__start_mem(&pimpl->context, (stbi_uc*)fileBuffer, filesize);
+    animate = true;
 }
 
 AnimatedGIF::~AnimatedGIF()

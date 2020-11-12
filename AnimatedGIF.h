@@ -1,9 +1,10 @@
 #ifndef __ANIMATEDGIF_H__
 #define __ANIMATEDGIF_H__
 
+#include "AnimatedImage.h"
 #include <SFML/Graphics.hpp>
 
-class AnimatedGIF
+class AnimatedGIF : public AnimatedImage
 {
     public:
         AnimatedGIF(const char*);
@@ -11,8 +12,6 @@ class AnimatedGIF
 
         bool isGIF(void);
         void update(sf::Texture&);
-
-        sf::Time delay;
 
     private:
         struct stbi_pimpl* pimpl;

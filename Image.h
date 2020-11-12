@@ -2,12 +2,14 @@
 
 #include <SFML/Graphics.hpp>
 #include "AnimatedGIF.h"
+#include "WebpImage.h"
 #include <future>
 
 class Image
 {
     public:
         Image(const std::string&);
+        ~Image();
 
         void fitTo(const sf::Vector2u&);
         void square(int);
@@ -20,7 +22,6 @@ class Image
         std::string info;
 
     private:
-        std::unique_ptr<AnimatedGIF> gif;
         sf::Texture texture;
         sf::Clock clock;
         std::future<void> future;
@@ -28,8 +29,10 @@ class Image
         int squareImageEdgeLength;
         bool enframe = false;
         sf::Vector2u frame;
-        bool animateImage = false;
+        AnimatedImage* animatedImage = NULL;
         sf::Time delay;
 
         void init(const std::string&);
+        bool initIfGIF(const std::string&);
+        bool initIfWebp(const std::string&);
 };

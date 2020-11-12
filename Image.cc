@@ -8,24 +8,15 @@ Image::Image(const std::string& path):
     future = std::async(std::launch::async, &Image::init, this, path);
 }
 
+Image::~Image()
+{
+    if (animatedImage) delete animatedImage;
+}
+
 void
 Image::init(const std::string& path)
 {
-    gif = std::make_unique<AnimatedGIF>(path.c_str());
-    if (gif->isGIF())
-    {
-        gif->update(texture);
-        animateImage = true;
-        ready = true;
-        clock.restart();
-    }
-    else
-    {
-        gif.reset();
-        ready = texture.loadFromFile(path);
-    }
-
-    if (ready)
+    if ((ready = initIfGIF(path) || initIfWebp(path) || texture.loadFromFile(path)))
     {
         texture.setSmooth(true);
         sprite.setTexture(texture, true);
@@ -34,10 +25,44 @@ Image::init(const std::string& path)
         info.append("\n").append(std::to_string(sprite.getTexture()->getSize().x));
         info.append("x").append(std::to_string(sprite.getTexture()->getSize().y));
         info.append("\n").append(std::to_string(Folder::fileSize(path) / 1000)).append(" kB");
+
+        if (squareImage) square(squareImageEdgeLength);
+        if (enframe) fitTo(frame);
+    }
+}
+
+bool
+Image::initIfGIF(const std::string& path)
+{
+    AnimatedGIF* gif = new AnimatedGIF(path.c_str());
+    if (gif->isGIF())
+    {
+        animatedImage = gif;
+        gif->update(texture);
+        clock.restart();
+        return true;
+    }
+    else
+    {
+        delete gif;
+        return false;
+    }
+}
+
+bool
+Image::initIfWebp(const std::string& path)
+{
+    WebpImage* webp = new WebpImage(path.c_str());
+    if (webp->isWebp())
+    {
+        std::cout << "sí" << std::endl;
+    }
+    else
+    {
+        delete webp;
     }
 
-    if (squareImage) square(squareImageEdgeLength);
-    if (enframe) fitTo(frame);
+    return false;
 }
 
 void
@@ -86,11 +111,9 @@ Image::square(int targetSize)
 void
 Image::update()
 {
-    if (!animateImage) return;
-
-    if (clock.getElapsedTime() > gif->delay)
+    if (animatedImage && animatedImage->animate && clock.getElapsedTime() > animatedImage->delay)
     {
-        gif->update(texture);
+        animatedImage->update(texture);
         clock.restart();
     }
 }
