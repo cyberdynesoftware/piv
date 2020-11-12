@@ -17,7 +17,6 @@ class Image
 
         sf::Sprite sprite;
         bool ready = false;
-        std::string errormsg;
         std::string path;
         std::string info;
 

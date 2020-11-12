@@ -21,14 +21,18 @@ Image::init(const std::string& path)
         texture.setSmooth(true);
         sprite.setTexture(texture, true);
 
-        info = Folder::filename(path);
+        info.append("\n\"").append(Folder::filename(path)).append("\"");
         info.append("\n").append(std::to_string(sprite.getTexture()->getSize().x));
         info.append("x").append(std::to_string(sprite.getTexture()->getSize().y));
-        info.append("\n").append(std::to_string(Folder::fileSize(path) / 1000)).append(" kB");
 
         if (squareImage) square(squareImageEdgeLength);
         if (enframe) fitTo(frame);
     }
+    else
+    {
+        info.append("\nError loading \"").append(Folder::filename(path)).append("\"");
+    }
+    info.append("\n").append(std::to_string(Folder::fileSize(path) / 1000)).append(" kB");
 }
 
 bool

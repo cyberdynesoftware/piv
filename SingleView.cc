@@ -23,11 +23,16 @@ SingleView::initImage()
     view.setCenter(window.getSize().x / 2, window.getSize().y / 2);
     window.setView(view);
 
+    if (image != NULL) delete image;
+
     window.setTitle(Folder::filename(*folder.currentItem) + " - piv");
 
-    if (image != NULL) delete image;
     image = new Image(*folder.currentItem);
     image->fitTo(window.getSize());
+
+    image->info.append("[");
+    image->info.append(std::to_string(folder.currentItem - folder.cbegin() + 1));
+    image->info.append(" / ").append(std::to_string(folder.size())).append("]");
 }
 
 void
@@ -124,15 +129,6 @@ SingleView::draw()
         image->update();
         window.draw(image->sprite);
     }
-    else
-    {
-        sf::Text text;
-        text.setFont(font);
-        text.setCharacterSize(15);
-        text.setPosition(10, 10);
-        text.setString(image->errormsg);
-        window.draw(text);
-    }
 
     if (showInfo)
     {
@@ -154,7 +150,7 @@ SingleView::draw()
     }
 }
 
-    void
+void
 SingleView::resizeEvent()
 {
     window.setTitle(Folder::filename(*folder.currentItem) + " - piv");
