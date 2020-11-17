@@ -4,7 +4,7 @@ CPP = g++
 CPPFLAGS = -g -Wall -std=c++14
 
 all: $(OBJECTS)
-	$(CPP) $(OBJECTS) -o piv -pthread -lboost_filesystem -lwebp -lsfml-graphics -lsfml-window -lsfml-system
+	$(CPP) $(OBJECTS) -o piv -pthread -lboost_filesystem -lsfml-graphics -lsfml-window -lsfml-system -lwebp -lwebpdemux
 
 main.o: Stage.h SingleView.h ScrollView.h
 Folder.o: Folder.h

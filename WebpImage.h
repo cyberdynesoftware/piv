@@ -11,10 +11,13 @@ class WebpImage : public AnimatedImage
         ~WebpImage();
 
         bool isWebp(void);
+        void prepare(sf::Texture&);
         void update(sf::Texture&);
 
     private:
         WebPData data;
+        WebPAnimDecoder* decoder = nullptr;
+        int previousTimestamp;
 
         void loadFile(const char*);
 };

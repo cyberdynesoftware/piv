@@ -59,14 +59,16 @@ Image::initIfWebp(const std::string& path)
     WebpImage* webp = new WebpImage(path.c_str());
     if (webp->isWebp())
     {
-        std::cout << "sí" << std::endl;
+        webp->prepare(texture);
+        animatedImage = webp;
+        webp->update(texture);
+        return true;
     }
     else
     {
         delete webp;
+        return false;
     }
-
-    return false;
 }
 
 void
