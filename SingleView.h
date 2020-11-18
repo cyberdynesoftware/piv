@@ -28,4 +28,6 @@ class SingleView : public Stage
         void zoom(sf::Sprite&, float delta);
         sf::Vector2f mousePositionInSprite(sf::Sprite&);
         void original(sf::Sprite&);
+        void next(void);
+        void previous(void);
 };

@@ -44,16 +44,10 @@ SingleView::handle(sf::Event& event)
             switch (event.key.code)
             {
                 case sf::Keyboard::Space:
-                    if (++folder.currentItem == folder.cend())
-                        folder.currentItem = folder.cbegin();
-                    initImage();
+                    next();
                     break;
                 case sf::Keyboard::Backspace:
-                    if (folder.currentItem != folder.cbegin())
-                        folder.currentItem--;
-                    else
-                        folder.currentItem = --folder.cend();
-                    initImage();
+                    previous();
                     break;
                 case sf::Keyboard::I:
                     showInfo = (showInfo) ? false : true;
@@ -86,8 +80,14 @@ SingleView::handle(sf::Event& event)
                 case sf::Mouse::Button::Left:
                     window.setMouseCursor(cross);
                     break;
-                case sf::Mouse::Button::Right:
+                case sf::Mouse::Button::Middle:
                     image->fitTo(window.getSize());
+                    break;
+                case sf::Mouse::XButton1:
+                    next();
+                    break;
+                case sf::Mouse::XButton2:
+                    previous();
                     break;
                 default:
                     break;
@@ -99,6 +99,12 @@ SingleView::handle(sf::Event& event)
             {
                 case sf::Mouse::Button::Left:
                     window.setMouseCursor(arrow);
+
+                    if (sf::Mouse::getPosition().x == 0)
+                        previous();
+                    else if (sf::Mouse::getPosition().x == (int)window.getSize().x - 1)
+                        next();
+
                     break;
 
                 default:
@@ -119,6 +125,24 @@ SingleView::handle(sf::Event& event)
         default:
             break;
     }
+}
+
+void
+SingleView::next()
+{
+    if (++folder.currentItem == folder.cend())
+        folder.currentItem = folder.cbegin();
+    initImage();
+}
+
+void
+SingleView::previous()
+{
+    if (folder.currentItem != folder.cbegin())
+        folder.currentItem--;
+    else
+        folder.currentItem = --folder.cend();
+    initImage();
 }
 
 void

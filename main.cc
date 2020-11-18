@@ -106,7 +106,7 @@ int main(int argc, char** argv)
                             else stage->handle(event);
                             break;
 
-                        case sf::Mouse::Button::XButton1:
+                        case sf::Mouse::Button::Right:
                             if (stage->instanceOf(Stage::SubType::SingleView))
                             {
                                 scrollView.scrollToCurrentImage();
