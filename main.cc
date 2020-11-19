@@ -23,9 +23,9 @@ int main(int argc, char** argv)
     icon.loadFromFile("icon.png");
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
-    SingleView singleImageView(folder, window);
-    ScrollView multiImageView(folder, window);
-    Stage* imageView = &multiImageView;
+    SingleImageView singleImageView(folder, window);
+    MultiImageView multiImageView(folder, window);
+    ImageView* imageView = &multiImageView;
     //singleImageView.initImage();
 
     sf::Event event;

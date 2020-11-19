@@ -1,7 +1,7 @@
 #include "SingleImageView.h"
 #include <iostream>
 
-SingleView::SingleView(Folder& folder, sf::RenderWindow& window):
+SingleImageView::SingleImageView(Folder& folder, sf::RenderWindow& window):
     folder(folder),
     window(window)
 {
@@ -11,13 +11,13 @@ SingleView::SingleView(Folder& folder, sf::RenderWindow& window):
 }
 
 bool
-SingleView::instanceOf(const SubType& subType)
+SingleImageView::instanceOf(const SubType& subType)
 {
     return subType == SubType::SingleView;
 }
 
 void
-SingleView::initImage()
+SingleImageView::initImage()
 {
     sf::View view = window.getView();
     view.setCenter(window.getSize().x / 2, window.getSize().y / 2);
@@ -36,7 +36,7 @@ SingleView::initImage()
 }
 
 void
-SingleView::handle(sf::Event& event)
+SingleImageView::handle(sf::Event& event)
 {
     switch (event.type)
     {
@@ -128,7 +128,7 @@ SingleView::handle(sf::Event& event)
 }
 
 void
-SingleView::next()
+SingleImageView::next()
 {
     if (++folder.currentItem == folder.cend())
         folder.currentItem = folder.cbegin();
@@ -136,7 +136,7 @@ SingleView::next()
 }
 
 void
-SingleView::previous()
+SingleImageView::previous()
 {
     if (folder.currentItem != folder.cbegin())
         folder.currentItem--;
@@ -146,7 +146,7 @@ SingleView::previous()
 }
 
 void
-SingleView::draw()
+SingleImageView::draw()
 {
     if (image->ready)
     {
@@ -175,14 +175,14 @@ SingleView::draw()
 }
 
 void
-SingleView::resizeEvent()
+SingleImageView::resizeEvent()
 {
     window.setTitle(Folder::filename(*folder.currentItem) + " - piv");
     image->fitTo(window.getSize());
 }
 
 void
-SingleView::zoom(sf::Sprite& sprite, float delta)
+SingleImageView::zoom(sf::Sprite& sprite, float delta)
 {
     if (delta < 0)
     {
@@ -197,14 +197,14 @@ SingleView::zoom(sf::Sprite& sprite, float delta)
 }
 
 sf::Vector2f
-SingleView::mousePositionInSprite(sf::Sprite& sprite)
+SingleImageView::mousePositionInSprite(sf::Sprite& sprite)
 {
     return sf::Vector2f(sf::Mouse::getPosition(window).x - sprite.getGlobalBounds().left,
             sf::Mouse::getPosition(window).y - sprite.getGlobalBounds().top);
 }
 
 void
-SingleView::original(sf::Sprite& sprite)
+SingleImageView::original(sf::Sprite& sprite)
 {
     sprite.setScale(1.f, 1.f);
     const sf::Vector2u& size = sprite.getTexture()->getSize();

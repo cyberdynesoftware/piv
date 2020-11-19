@@ -5,10 +5,10 @@
 #include "Folder.h"
 #include <SFML/Graphics.hpp>
 
-class SingleView : public Stage
+class SingleImageView : public ImageView
 {
     public:
-        SingleView(Folder&, sf::RenderWindow&);
+        SingleImageView(Folder&, sf::RenderWindow&);
 
         bool instanceOf(const SubType&);
         void handle(sf::Event&);

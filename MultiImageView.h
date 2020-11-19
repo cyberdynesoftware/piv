@@ -5,10 +5,10 @@
 #include "Folder.h"
 #include <deque>
 
-class ScrollView : public Stage
+class MultiImageView : public ImageView
 {
     public:
-        ScrollView(Folder&, sf::RenderWindow&);
+        MultiImageView(Folder&, sf::RenderWindow&);
 
         bool instanceOf(const SubType&);
         void handle(sf::Event&);

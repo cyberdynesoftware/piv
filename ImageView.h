@@ -2,10 +2,10 @@
 
 #include <SFML/Graphics.hpp>
 
-class Stage
+class ImageView
 {
     public:
-        Stage()
+        ImageView()
         {
             font.loadFromFile("font.ttf");
         }

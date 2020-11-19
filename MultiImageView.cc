@@ -3,7 +3,7 @@
 #include <set>
 #include <cmath>
 
-ScrollView::ScrollView(Folder& folder, sf::RenderWindow& window):
+MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window):
     folder(folder),
     window(window)
 {
@@ -13,13 +13,13 @@ ScrollView::ScrollView(Folder& folder, sf::RenderWindow& window):
 }
 
 bool
-ScrollView::instanceOf(const SubType& subType)
+MultiImageView::instanceOf(const SubType& subType)
 {
     return subType == SubType::ScrollView;
 }
 
 void
-ScrollView::handle(sf::Event& event)
+MultiImageView::handle(sf::Event& event)
 {
     switch (event.type)
     {
@@ -93,7 +93,7 @@ ScrollView::handle(sf::Event& event)
 }
 
 void
-ScrollView::initImages()
+MultiImageView::initImages()
 {
     int index = std::distance(folder.cbegin(), firstItem);
     int row =  index / numberOfColumns;
@@ -147,7 +147,7 @@ ScrollView::initImages()
 }
 
 void
-ScrollView::scrollDown()
+MultiImageView::scrollDown()
 {
     if (lastItem == folder.cend())
     {
@@ -175,7 +175,7 @@ ScrollView::scrollDown()
 }
 
 void
-ScrollView::scrollUp()
+MultiImageView::scrollUp()
 {
     heightOffset = 0;
     if (firstItem == folder.cbegin()) return;
@@ -200,7 +200,7 @@ ScrollView::scrollUp()
 }
 
 void
-ScrollView::draw()
+MultiImageView::draw()
 {
     int offset = heightOffset;
     int column = 0;
@@ -241,13 +241,13 @@ ScrollView::draw()
 }
 
 void
-ScrollView::resizeEvent()
+MultiImageView::resizeEvent()
 {
     initImages();
 }
 
 void
-ScrollView::selectImage()
+MultiImageView::selectImage()
 {
     auto mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
     for (auto const& image: images)
@@ -256,7 +256,7 @@ ScrollView::selectImage()
 }
 
 void
-ScrollView::scrollToCurrentImage()
+MultiImageView::scrollToCurrentImage()
 {
     if (folder.currentItem < firstItem || folder.currentItem >= lastItem)
     {
@@ -272,7 +272,7 @@ ScrollView::scrollToCurrentImage()
 }
 
 int
-ScrollView::imageSize()
+MultiImageView::imageSize()
 {
     return window.getSize().x / numberOfColumns;
 }
