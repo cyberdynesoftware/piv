@@ -23,17 +23,17 @@ int main(int argc, char** argv)
     icon.loadFromFile("icon.png");
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
-    SingleView singleView(folder, window);
-    ScrollView scrollView(folder, window);
-    Stage* stage = &scrollView;
-    //singleView.initImage();
+    SingleView singleImageView(folder, window);
+    ScrollView multiImageView(folder, window);
+    Stage* imageView = &multiImageView;
+    //singleImageView.initImage();
 
     sf::Event event;
 
     while (window.isOpen())
     {
         window.clear();
-        stage->draw();
+        imageView->draw();
         window.display();
 
         while (window.pollEvent(event))
@@ -51,7 +51,7 @@ int main(int argc, char** argv)
                         view.setCenter(event.size.width / 2, event.size.height / 2);
                         window.setView(view);
                     }
-                    stage->resizeEvent();
+                    imageView->resizeEvent();
                     break;
 
                 case sf::Event::KeyPressed:
@@ -62,11 +62,11 @@ int main(int argc, char** argv)
                             break;
 
                         case sf::Keyboard::M:
-                            if (stage->instanceOf(Stage::SubType::SingleView))
+                            if (imageView == &singleImageView)
                             {
-                                scrollView.scrollToCurrentImage();
+                                multiImageView.scrollToCurrentImage();
                                 window.setTitle("piv");
-                                stage = &scrollView;
+                                imageView = &multiImageView;
                             }
                             break;
 
@@ -83,12 +83,12 @@ int main(int argc, char** argv)
                                     fullscreen = true;
                                 }
                                 window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
-                                stage->resizeEvent();
+                                imageView->resizeEvent();
                             }
                             break;
 
                         default:
-                            stage->handle(event);
+                            imageView->handle(event);
                             break;
                     }
                     break;
@@ -97,32 +97,32 @@ int main(int argc, char** argv)
                     switch (event.mouseButton.button)
                     {
                         case sf::Mouse::Button::Left:
-                            if (stage->instanceOf(Stage::SubType::ScrollView))
+                            if (imageView == &multiImageView)
                             {
-                                scrollView.selectImage();
-                                singleView.initImage();
-                                stage = &singleView;
+                                multiImageView.selectImage();
+                                singleImageView.initImage();
+                                imageView = &singleImageView;
                             }
-                            else stage->handle(event);
+                            else imageView->handle(event);
                             break;
 
                         case sf::Mouse::Button::Right:
-                            if (stage->instanceOf(Stage::SubType::SingleView))
+                            if (imageView == &singleImageView)
                             {
-                                scrollView.scrollToCurrentImage();
+                                multiImageView.scrollToCurrentImage();
                                 window.setTitle("piv");
-                                stage = &scrollView;
+                                imageView = &multiImageView;
                             }
                             break;
 
                         default:
-                            stage->handle(event);
+                            imageView->handle(event);
                             break;
                     }
                     break;
 
                 default:
-                    stage->handle(event);
+                    imageView->handle(event);
                     break;
             }
         }
