@@ -51,7 +51,9 @@ int main(int argc, char** argv)
                         view.setCenter(event.size.width / 2, event.size.height / 2);
                         window.setView(view);
                     }
-                    imageView->resizeEvent();
+                    multiImageView.resizeEvent();
+                    if (imageView == &singleImageView)
+                        singleImageView.resizeEvent();
                     break;
 
                 case sf::Event::KeyPressed:
@@ -71,20 +73,20 @@ int main(int argc, char** argv)
                             break;
 
                         case sf::Keyboard::F:
+                            if (fullscreen)
                             {
-                                if (fullscreen)
-                                {
-                                    window.create(sf::VideoMode(800, 600), "piv");
-                                    fullscreen = false;
-                                }
-                                else
-                                {
-                                    window.create(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
-                                    fullscreen = true;
-                                }
-                                window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
-                                imageView->resizeEvent();
+                                window.create(sf::VideoMode(800, 600), "piv");
+                                fullscreen = false;
                             }
+                            else
+                            {
+                                window.create(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
+                                fullscreen = true;
+                            }
+                            window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+                            multiImageView.resizeEvent();
+                            if (imageView == &singleImageView)
+                                singleImageView.resizeEvent();
                             break;
 
                         default:

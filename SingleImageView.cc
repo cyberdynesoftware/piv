@@ -10,23 +10,12 @@ SingleImageView::SingleImageView(Folder& folder, sf::RenderWindow& window):
     previousMousePosition = sf::Mouse::getPosition();
 }
 
-bool
-SingleImageView::instanceOf(const SubType& subType)
-{
-    return subType == SubType::SingleView;
-}
-
 void
 SingleImageView::initImage()
 {
-    sf::View view = window.getView();
-    view.setCenter(window.getSize().x / 2, window.getSize().y / 2);
-    window.setView(view);
-
-    if (image != NULL) delete image;
-
     window.setTitle(Folder::filename(*folder.currentItem) + " - piv");
 
+    if (image != nullptr) delete image;
     image = new Image(*folder.currentItem);
     image->fitTo(window.getSize());
 

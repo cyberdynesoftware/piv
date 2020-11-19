@@ -10,7 +10,6 @@ class MultiImageView : public ImageView
     public:
         MultiImageView(Folder&, sf::RenderWindow&);
 
-        bool instanceOf(const SubType&);
         void handle(sf::Event&);
         void draw(void);
         void resizeEvent(void);

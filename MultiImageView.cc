@@ -12,12 +12,6 @@ MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window):
     initImages();
 }
 
-bool
-MultiImageView::instanceOf(const SubType& subType)
-{
-    return subType == SubType::ScrollView;
-}
-
 void
 MultiImageView::handle(sf::Event& event)
 {

@@ -10,7 +10,6 @@ class SingleImageView : public ImageView
     public:
         SingleImageView(Folder&, sf::RenderWindow&);
 
-        bool instanceOf(const SubType&);
         void handle(sf::Event&);
         void draw(void);
         void initImage(void);
@@ -19,7 +18,7 @@ class SingleImageView : public ImageView
     private:
         Folder& folder;
         sf::RenderWindow& window;
-        Image* image = NULL;
+        Image* image = nullptr;
         sf::Cursor arrow;
         sf::Cursor cross;
         sf::Vector2i previousMousePosition;
