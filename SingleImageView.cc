@@ -1,4 +1,4 @@
-#include "SingleView.h"
+#include "SingleImageView.h"
 #include <iostream>
 
 SingleView::SingleView(Folder& folder, sf::RenderWindow& window):

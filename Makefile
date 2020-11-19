@@ -1,4 +1,4 @@
-OBJECTS = main.o Folder.o AnimatedGIF.o SingleView.o ScrollView.o Image.o WebpImage.o
+OBJECTS = main.o Folder.o AnimatedGIF.o SingleImageView.o MultiImageView.o Image.o WebpImage.o
 
 CPP = g++
 CPPFLAGS = -g -Wall -std=c++14
@@ -6,12 +6,12 @@ CPPFLAGS = -g -Wall -std=c++14
 all: $(OBJECTS)
 	$(CPP) $(OBJECTS) -o piv -pthread -lboost_filesystem -lsfml-graphics -lsfml-window -lsfml-system -lwebp -lwebpdemux
 
-main.o: Stage.h SingleView.h ScrollView.h
+main.o: ImageView.h SingleImageView.h MultiImageView.h Folder.h
 Folder.o: Folder.h
-SingleView.o: SingleView.h Stage.h Image.h
+SingleImageView.o: SingleImageView.h ImageView.h Image.h Folder.h
+MultiImageView.o: MultiImageView.h ImageView.h Image.h Folder.h
+Image.o: Image.h AnimatedGIF.h WebpImage.h AnimatedImage.h
 AnimatedGIF.o: AnimatedGIF.h AnimatedImage.h
-ScrollView.o: ScrollView.h Stage.h Image.h
-Image.o: Image.h AnimatedGIF.h
 WebpImage.o: WebpImage.h AnimatedImage.h
 
 clean:

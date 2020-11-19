@@ -1,6 +1,6 @@
-#include "Stage.h"
-#include "SingleView.h"
-#include "ScrollView.h"
+#include "ImageView.h"
+#include "SingleImageView.h"
+#include "MultiImageView.h"
 #include "Folder.h"
 
 #include <iostream>

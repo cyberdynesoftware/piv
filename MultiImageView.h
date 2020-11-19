@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Stage.h"
+#include "ImageView.h"
 #include "Image.h"
 #include "Folder.h"
 #include <deque>

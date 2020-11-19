@@ -1,4 +1,4 @@
-#include "ScrollView.h"
+#include "MultiImageView.h"
 #include <iostream>
 #include <set>
 #include <cmath>
