@@ -59,8 +59,8 @@ Image::initIfWebp(const std::string& path)
     WebpImage* webp = new WebpImage(path.c_str());
     if (webp->isWebp())
     {
-        webp->prepare(texture);
         animatedImage = webp;
+        webp->prepare(texture);
         webp->update(texture);
         return true;
     }
@@ -88,8 +88,6 @@ Image::fitTo(const sf::Vector2u& window)
 
         sprite.setOrigin(size.x / 2, size.y / 2);
         sprite.setPosition(window.x / 2, window.y / 2);
-
-        enframe = false;
     }
 }
 
