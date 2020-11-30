@@ -28,7 +28,7 @@ class Image
         int squareImageEdgeLength;
         bool enframe = false;
         sf::Vector2u frame;
-        AnimatedImage* animatedImage = NULL;
+        AnimatedImage* animatedImage = nullptr;
         sf::Time delay;
 
         void init(const std::string&);

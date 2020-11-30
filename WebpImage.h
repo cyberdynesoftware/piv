@@ -17,7 +17,7 @@ class WebpImage : public AnimatedImage
     private:
         WebPData data;
         WebPAnimDecoder* decoder = nullptr;
-        int previousTimestamp;
+        int previousTimestamp = 0;
 
         void loadFile(const char*);
 };
