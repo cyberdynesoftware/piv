@@ -23,6 +23,7 @@ class SingleImageView : public ImageView
         sf::Cursor cross;
         sf::Vector2i previousMousePosition;
         bool showInfo = false;
+        bool fullscreen = true;
 
         void zoom(sf::Sprite&, float delta);
         sf::Vector2f mousePositionInSprite(sf::Sprite&);

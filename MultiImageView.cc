@@ -28,10 +28,22 @@ MultiImageView::handle(sf::Event& event)
             switch (event.key.code)
             {
                 case sf::Keyboard::Up:
+                case sf::Keyboard::K:
                     scrollUp();
                     break;
                 case sf::Keyboard::Down:
+                case sf::Keyboard::J:
                     scrollDown();
+                    break;
+                case sf::Keyboard::PageDown:
+                    if (lastItem != folder.cend())
+                        scrollTo(++lastItem);
+                    break;
+                case sf::Keyboard::Home:
+                    scrollTo(folder.cbegin());
+                    break;
+                case sf::Keyboard::End:
+                    scrollTo(folder.cend());
                     break;
                 case sf::Keyboard::Num1:
                     numberOfColumns = 1;
@@ -263,6 +275,19 @@ MultiImageView::scrollToCurrentImage()
         lastItem = folder.currentItem;
         initImages();
     }
+}
+
+void
+MultiImageView::scrollTo(const Folder::FolderIter& item)
+{
+    for (Image* image: images)
+        delete image;
+
+    images.clear();
+
+    firstItem = item;
+    lastItem = item;
+    initImages();
 }
 
 int

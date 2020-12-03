@@ -30,7 +30,11 @@ F | Toggle fullscreen
 
 Key | Description
 --- | ---
-Arrow Up/Down & Mouse Wheel | Scroll Up/Down
+Arrow Up & K & Mouse Wheel | Scroll Up
+Arrow Down & J & Mouse Wheel | Scroll Down
+Page Down | Scroll Page Down
+Home | Scroll to beginning
+End | Scroll to end
 I | Show image info
 1-0 | Set columns to 1-10
 Left Mouse Click | View selected image in single image view
@@ -44,6 +48,6 @@ Backspace & Extra Mouse Button 2 | Previous image
 Mouse Wheel | Zoom image
 Left Mouse Button | Move image on screen
 Middle Mouse Click | Reset zoom and position
-O | Original image size
+O | Toggle Original image size / fit image to window
 I | Show image info
 M & Right Mouse Button | Return to multi image view

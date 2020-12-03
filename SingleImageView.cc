@@ -18,6 +18,7 @@ SingleImageView::initImage()
     if (image != nullptr) delete image;
     image = new Image(*folder.currentItem);
     image->fitTo(window.getSize());
+    fullscreen = true;
 
     image->info.append("[");
     image->info.append(std::to_string(folder.currentItem - folder.cbegin() + 1));
@@ -52,7 +53,15 @@ SingleImageView::handle(sf::Event& event)
                     //folder.trash();
                     break;
                 case sf::Keyboard::O:
-                    original(image->sprite);
+                    if (fullscreen)
+                    {
+                        original(image->sprite);
+                    }
+                    else
+                    {
+                        image->fitTo(window.getSize());
+                        fullscreen = true;
+                    }
                     break;
                 default:
                     break;
@@ -71,6 +80,7 @@ SingleImageView::handle(sf::Event& event)
                     break;
                 case sf::Mouse::Button::Middle:
                     image->fitTo(window.getSize());
+                    fullscreen = true;
                     break;
                 case sf::Mouse::XButton1:
                     next();
@@ -106,6 +116,7 @@ SingleImageView::handle(sf::Event& event)
             {
                 sf::Vector2i delta(sf::Mouse::getPosition() - previousMousePosition);
                 image->sprite.move(delta.x, delta.y);
+                fullscreen = false;
             }
 
             previousMousePosition = sf::Mouse::getPosition();
@@ -167,7 +178,8 @@ void
 SingleImageView::resizeEvent()
 {
     window.setTitle(Folder::filename(*folder.currentItem) + " - piv");
-    image->fitTo(window.getSize());
+    if (fullscreen)
+        image->fitTo(window.getSize());
 }
 
 void
@@ -183,6 +195,7 @@ SingleImageView::zoom(sf::Sprite& sprite, float delta)
         sprite.setPosition(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y);
         sprite.scale(1.05f, 1.05f);
     }
+    fullscreen = false;
 }
 
 sf::Vector2f
@@ -199,4 +212,5 @@ SingleImageView::original(sf::Sprite& sprite)
     const sf::Vector2u& size = sprite.getTexture()->getSize();
     sprite.setOrigin(size.x / 2, size.y / 2);
     sprite.setPosition(window.getSize().x / 2, window.getSize().y / 2);
+    fullscreen = false;
 }

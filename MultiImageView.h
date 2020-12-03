@@ -29,5 +29,6 @@ class MultiImageView : public ImageView
         void initImages(void);
         void scrollDown(void);
         void scrollUp(void);
+        void scrollTo(const Folder::FolderIter&);
         int imageSize(void);
 };
