@@ -16,10 +16,11 @@ Image::~Image()
 void
 Image::init(const std::string& path)
 {
-    if ((ready = initIfGIF(path) || initIfWebp(path) || texture.loadFromFile(path)))
+    if (initIfGIF(path) || initIfWebp(path) || texture.loadFromFile(path))
     {
         texture.setSmooth(true);
         sprite.setTexture(texture, true);
+        ready = true;
 
         info.append("\n\"").append(Folder::filename(path)).append("\"");
         info.append("\n").append(std::to_string(sprite.getTexture()->getSize().x));
