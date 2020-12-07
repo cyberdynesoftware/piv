@@ -13,7 +13,7 @@ class MultiImageView : public ImageView
         void handle(sf::Event&);
         void draw(void);
         void resizeEvent(void);
-        void selectImage(void);
+        bool selectImage(void);
         void scrollToCurrentImage(void);
 
     private:
