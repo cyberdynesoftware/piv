@@ -53,15 +53,7 @@ SingleImageView::handle(sf::Event& event)
                     //folder.trash();
                     break;
                 case sf::Keyboard::O:
-                    if (fullscreen)
-                    {
-                        original(image->sprite);
-                    }
-                    else
-                    {
-                        image->fitTo(window.getSize());
-                        fullscreen = true;
-                    }
+                    toggleFit(false);
                     break;
                 default:
                     break;
@@ -79,8 +71,7 @@ SingleImageView::handle(sf::Event& event)
                     window.setMouseCursor(cross);
                     break;
                 case sf::Mouse::Button::Middle:
-                    image->fitTo(window.getSize());
-                    fullscreen = true;
+                    toggleFit(true);
                     break;
                 case sf::Mouse::XButton1:
                     next();
@@ -199,18 +190,42 @@ SingleImageView::zoom(sf::Sprite& sprite, float delta)
 }
 
 sf::Vector2f
-SingleImageView::mousePositionInSprite(sf::Sprite& sprite)
+SingleImageView::mousePositionInSprite(const sf::Sprite& sprite)
 {
     return sf::Vector2f(sf::Mouse::getPosition(window).x - sprite.getGlobalBounds().left,
             sf::Mouse::getPosition(window).y - sprite.getGlobalBounds().top);
 }
 
 void
-SingleImageView::original(sf::Sprite& sprite)
+SingleImageView::original(sf::Sprite& sprite, bool setOriginToMousePosition)
 {
+    const sf::Vector2u& textureSize = sprite.getTexture()->getSize();
+
+    if (setOriginToMousePosition && (textureSize.x > window.getSize().x || textureSize.y > window.getSize().y))
+    {
+        sprite.setOrigin(mousePositionInSprite(sprite) / sprite.getScale().x);
+        sprite.setPosition(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y);
+    }
+    else
+    {
+        sprite.setOrigin(textureSize.x / 2, textureSize.y / 2);
+        sprite.setPosition(window.getSize().x / 2, window.getSize().y / 2);
+    }
+
     sprite.setScale(1.f, 1.f);
-    const sf::Vector2u& size = sprite.getTexture()->getSize();
-    sprite.setOrigin(size.x / 2, size.y / 2);
-    sprite.setPosition(window.getSize().x / 2, window.getSize().y / 2);
     fullscreen = false;
+}
+
+void
+SingleImageView::toggleFit(bool setOriginToMousePosition)
+{
+    if (fullscreen)
+    {
+        original(image->sprite, setOriginToMousePosition);
+    }
+    else
+    {
+        image->fitTo(window.getSize());
+        fullscreen = true;
+    }
 }

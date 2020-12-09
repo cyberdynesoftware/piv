@@ -26,8 +26,9 @@ class SingleImageView : public ImageView
         bool fullscreen = true;
 
         void zoom(sf::Sprite&, float delta);
-        sf::Vector2f mousePositionInSprite(sf::Sprite&);
-        void original(sf::Sprite&);
+        sf::Vector2f mousePositionInSprite(const sf::Sprite&);
+        void original(sf::Sprite&, bool);
+        void toggleFit(bool);
         void next(void);
         void previous(void);
 };
