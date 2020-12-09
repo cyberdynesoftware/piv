@@ -252,29 +252,24 @@ MultiImageView::resizeEvent()
     initImages();
 }
 
-void
+bool
 MultiImageView::selectImage()
 {
     auto mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
     for (auto const& image: images)
         if (image->sprite.getGlobalBounds().contains(mouse.x, mouse.y))
+        {
             folder.currentItem = std::find(folder.cbegin(), folder.cend(), image->path);
+            return true;
+        }
+    return false;
 }
 
 void
 MultiImageView::scrollToCurrentImage()
 {
     if (folder.currentItem < firstItem || folder.currentItem >= lastItem)
-    {
-        for (Image* image: images)
-            delete image;
-
-        images.clear();
-
-        firstItem = folder.currentItem;
-        lastItem = folder.currentItem;
-        initImages();
-    }
+        scrollTo(folder.currentItem);
 }
 
 void

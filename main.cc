@@ -99,9 +99,8 @@ int main(int argc, char** argv)
                     switch (event.mouseButton.button)
                     {
                         case sf::Mouse::Button::Left:
-                            if (imageView == &multiImageView)
+                            if (imageView == &multiImageView && multiImageView.selectImage())
                             {
-                                multiImageView.selectImage();
                                 singleImageView.initImage();
                                 imageView = &singleImageView;
                             }
