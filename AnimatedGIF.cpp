@@ -2,7 +2,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ONLY_GIF
-#include <stb/stb_image.h>
+#include "stb_image.h"
 
 #include <fstream>
 #include <iostream>
