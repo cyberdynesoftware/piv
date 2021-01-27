@@ -16,6 +16,7 @@ class Folder
         int size(void);
         static std::string filename(const std::string&);
         static int fileSize(const std::string&);
+        static bool fileExists(const std::string&);
 
     private:
         std::vector<std::string> files;

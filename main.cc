@@ -20,8 +20,11 @@ int main(int argc, char** argv)
     bool fullscreen = false;
 
     sf::Image icon;
-    if (icon.loadFromFile("icon.png"))
+    if (Folder::fileExists("icon.png"))
+    {
+        icon.loadFromFile("icon.png");
         window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+    }
 
     SingleImageView singleImageView(folder, window);
     MultiImageView multiImageView(folder, window);
@@ -83,7 +86,7 @@ int main(int argc, char** argv)
                                 window.create(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
                                 fullscreen = true;
                             }
-                            if (icon.getSize().x > 0)
+                            if (Folder::fileExists("icon.png"))
                                 window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
                             multiImageView.resizeEvent();
                             if (imageView == &singleImageView)

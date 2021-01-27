@@ -76,6 +76,13 @@ Folder::filename(const std::string& path)
 {
     return path.substr(path.find_last_of('/') + 1);
 }
+
+bool
+Folder::fileExists(const std::string& p)
+{
+    return exists(path(p));
+}
+
 /*
 const std::string&
 Folder::getCurrent()

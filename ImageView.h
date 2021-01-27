@@ -2,15 +2,19 @@
 
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include "Folder.h"
 
 class ImageView
 {
     public:
         ImageView()
         {
-            if (font.loadFromFile("/System/Library/Fonts/Supplemental/Arial.ttf"));
-            else if (font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"));
-            else std::cerr << "Warning: Could not find a font to load." << std::endl;
+            if (Folder::fileExists("/System/Library/Fonts/Supplemental/Arial.ttf"))
+                font.loadFromFile("/System/Library/Fonts/Supplemental/Arial.ttf");
+            else if (Folder::fileExists("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"))
+                font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf");
+            else
+                std::cerr << "Warning: Could not find a font to load." << std::endl;
         }
 
         virtual void handle(sf::Event&) = 0;
