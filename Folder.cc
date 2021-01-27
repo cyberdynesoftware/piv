@@ -20,11 +20,13 @@ Folder::Folder(const char* arg)
     {
         scanDirectory(current_path().string());
         currentItem = std::find(files.cbegin(), files.cend(), (current_path() / p).string());
+        imageSelected = true;
     }
     else
     {
         scanDirectory(p.parent_path().string());
         currentItem = std::find(files.cbegin(), files.cend(), p.string());
+        imageSelected = true;
     }
 
     srand(time(NULL));

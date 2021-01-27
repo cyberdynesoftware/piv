@@ -12,6 +12,7 @@ class Folder
         FolderIter cbegin(void);
         FolderIter cend(void);
         FolderIter currentItem;
+        bool imageSelected = false;
 
         int size(void);
         static std::string filename(const std::string&);
