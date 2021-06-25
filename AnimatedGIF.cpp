@@ -20,6 +20,8 @@ AnimatedGIF::AnimatedGIF(const char* filename)
     memset(&pimpl->gif, 0, sizeof(pimpl->gif));
     loadFile(filename);
     stbi__start_mem(&pimpl->context, (stbi_uc*)fileBuffer, filesize);
+    texture1.setSmooth(true);
+    texture2.setSmooth(true);
     animate = true;
 }
 
@@ -55,7 +57,31 @@ AnimatedGIF::isGIF()
 }
 
 void
-AnimatedGIF::update(sf::Texture& texture)
+AnimatedGIF::prepare(sf::Sprite& sprite)
+{
+    loadPixels(textureSelector ? &texture1 : &texture2);
+    sprite.setTexture(textureSelector ? texture1 : texture2, true);
+
+    textureSelector = !textureSelector;
+    future = std::async(std::launch::async, &AnimatedGIF::loadPixels, this,
+            textureSelector ? &texture1 : &texture2);
+}
+
+void
+AnimatedGIF::update(sf::Sprite& sprite)
+{
+    //if (future.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+    {
+        sprite.setTexture(textureSelector ? texture1 : texture2, false);
+
+        textureSelector = !textureSelector;
+        future = std::async(std::launch::async, &AnimatedGIF::loadPixels, this,
+                textureSelector ? &texture1 : &texture2);
+    }
+}
+
+void
+AnimatedGIF::loadPixels(sf::Texture* texture)
 {
     stbi_uc* pixels = stbi__gif_load_next(&pimpl->context, &pimpl->gif, &pimpl->comp, STBI_rgb_alpha, 0);
 
@@ -67,19 +93,15 @@ AnimatedGIF::update(sf::Texture& texture)
         STBI_FREE(pimpl->gif.background); 
         memset(&pimpl->gif, 0, sizeof(pimpl->gif));
         stbi__start_mem(&pimpl->context, (const stbi_uc*)fileBuffer, filesize);
-        delay = sf::milliseconds(0);
+        pixels = stbi__gif_load_next(&pimpl->context, &pimpl->gif, &pimpl->comp, STBI_rgb_alpha, 0);
     }
-    else
-    {
-        unsigned int x = pimpl->gif.w;
-        unsigned int y = pimpl->gif.h;
 
-        if (texture.getSize().x != x || texture.getSize().y != y)
-            texture.create(x, y);
+    unsigned int x = pimpl->gif.w;
+    unsigned int y = pimpl->gif.h;
+    
+    if (texture->getSize().x != x || texture->getSize().y != y)
+        texture->create(x, y);
 
-        texture.update(pixels);
-        int temp_delay = pimpl->gif.delay;
-        if (temp_delay <= 10) temp_delay = 100;
-        delay = sf::milliseconds(temp_delay);
-    }
+    texture->update(pixels);
+    delay = sf::milliseconds(pimpl->gif.delay <= 10 ? 100 : pimpl->gif.delay);
 }

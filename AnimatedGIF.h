@@ -3,6 +3,7 @@
 
 #include "AnimatedImage.h"
 #include <SFML/Graphics.hpp>
+#include <future>
 
 class AnimatedGIF : public AnimatedImage
 {
@@ -11,14 +12,20 @@ class AnimatedGIF : public AnimatedImage
         ~AnimatedGIF();
 
         bool isGIF(void);
-        void update(sf::Texture&);
+        void prepare(sf::Sprite&);
+        void update(sf::Sprite&);
 
     private:
         struct stbi_pimpl* pimpl;
         char* fileBuffer;
         int filesize = 0;
+        std::future<void> future;
+        sf::Texture texture1;
+        sf::Texture texture2;
+        bool textureSelector = false;
 
         void loadFile(const char*);
+        void loadPixels(sf::Texture*);
 };
 
 #endif

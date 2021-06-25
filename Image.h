@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "AnimatedGIF.h"
-#include "WebpImage.h"
+//#include "WebpImage.h"
 #include <future>
 
 class Image
@@ -34,4 +34,5 @@ class Image
         void init(const std::string&);
         bool initIfGIF(const std::string&);
         bool initIfWebp(const std::string&);
+        bool initJPeg(const std::string&);
 };

@@ -16,10 +16,8 @@ Image::~Image()
 void
 Image::init(const std::string& path)
 {
-    if (initIfGIF(path) || initIfWebp(path) || texture.loadFromFile(path))
+    if (initIfGIF(path) || /*initIfWebp(path) ||*/ initJPeg(path))
     {
-        texture.setSmooth(true);
-        sprite.setTexture(texture, true);
         ready = true;
 
         info.append("\n\"").append(Folder::filename(path)).append("\"");
@@ -43,7 +41,7 @@ Image::initIfGIF(const std::string& path)
     if (gif->isGIF())
     {
         animatedImage = gif;
-        gif->update(texture);
+        gif->prepare(sprite);
         clock.restart();
         return true;
     }
@@ -53,7 +51,7 @@ Image::initIfGIF(const std::string& path)
         return false;
     }
 }
-
+/*
 bool
 Image::initIfWebp(const std::string& path)
 {
@@ -68,6 +66,22 @@ Image::initIfWebp(const std::string& path)
     else
     {
         delete webp;
+        return false;
+    }
+}
+*/
+
+bool
+Image::initJPeg(const std::string& path)
+{
+    if (texture.loadFromFile(path))
+    {
+        texture.setSmooth(true);
+        sprite.setTexture(texture);
+        return true;
+    }
+    else
+    {
         return false;
     }
 }
@@ -118,7 +132,7 @@ Image::update()
 {
     if (animatedImage && animatedImage->animate && clock.getElapsedTime() > animatedImage->delay)
     {
-        animatedImage->update(texture);
+        animatedImage->update(sprite);
         clock.restart();
     }
 }
