@@ -41,7 +41,8 @@ Image::initIfGIF(const std::string& path)
     if (gif->isGIF())
     {
         animatedImage = gif;
-        gif->prepare(sprite);
+        gif->load();
+        gif->update(sprite);
         clock.restart();
         return true;
     }

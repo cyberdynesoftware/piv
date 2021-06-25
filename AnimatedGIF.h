@@ -1,9 +1,8 @@
-#ifndef __ANIMATEDGIF_H__
-#define __ANIMATEDGIF_H__
+#pragma once
 
 #include "AnimatedImage.h"
 #include <SFML/Graphics.hpp>
-#include <future>
+#include <vector>
 
 class AnimatedGIF : public AnimatedImage
 {
@@ -12,20 +11,18 @@ class AnimatedGIF : public AnimatedImage
         ~AnimatedGIF();
 
         bool isGIF(void);
-        void prepare(sf::Sprite&);
+        void load(void);
         void update(sf::Sprite&);
 
     private:
         struct stbi_pimpl* pimpl;
-        char* fileBuffer;
-        int filesize = 0;
-        std::future<void> future;
-        sf::Texture texture1;
-        sf::Texture texture2;
-        bool textureSelector = false;
 
-        void loadFile(const char*);
-        void loadPixels(sf::Texture*);
+        struct Frame 
+        {
+            sf::Time delay;
+            sf::Texture texture;
+        };
+
+        std::vector<Frame> frames;
+        std::vector<Frame>::iterator frameIter;
 };
-
-#endif
