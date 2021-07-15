@@ -1,6 +1,8 @@
 #include "Image.h"
 #include <iostream>
 #include "Folder.h"
+#include "AnimatedGIF.h"
+#include "WebpImage.h"
 
 Image::Image(const std::string& path):
     path(path)
@@ -16,7 +18,7 @@ Image::~Image()
 void
 Image::init(const std::string& path)
 {
-    if (initIfGIF(path) || /*initIfWebp(path) ||*/ initJPeg(path))
+    if (initIfGIF(path) || initIfWebp(path) || initJPeg(path))
     {
         ready = true;
 
@@ -42,7 +44,7 @@ Image::initIfGIF(const std::string& path)
     {
         animatedImage = gif;
         gif->load();
-        gif->update(sprite);
+        gif->update(sf::milliseconds(0), sprite);
         clock.restart();
         return true;
     }
@@ -52,7 +54,7 @@ Image::initIfGIF(const std::string& path)
         return false;
     }
 }
-/*
+
 bool
 Image::initIfWebp(const std::string& path)
 {
@@ -60,8 +62,8 @@ Image::initIfWebp(const std::string& path)
     if (webp->isWebp())
     {
         animatedImage = webp;
-        webp->prepare(texture);
-        webp->update(texture);
+        webp->prepare(sprite);
+        webp->update(sf::milliseconds(0), sprite);
         return true;
     }
     else
@@ -70,7 +72,6 @@ Image::initIfWebp(const std::string& path)
         return false;
     }
 }
-*/
 
 bool
 Image::initJPeg(const std::string& path)
@@ -133,7 +134,6 @@ Image::update()
 {
     if (animatedImage && animatedImage->animate && clock.getElapsedTime() > animatedImage->delay)
     {
-        animatedImage->update(sprite);
-        clock.restart();
+        animatedImage->update(clock.getElapsedTime(), sprite);
     }
 }

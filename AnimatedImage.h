@@ -7,8 +7,8 @@ class AnimatedImage
     public:
         virtual ~AnimatedImage(void) { }
 
-        virtual void update(sf::Sprite&) = 0;
+        virtual void update(sf::Time, sf::Sprite&) = 0;
         
         bool animate = false;
-        sf::Time delay;
+        sf::Time delay = sf::milliseconds(0);
 };

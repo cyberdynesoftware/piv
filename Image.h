@@ -1,9 +1,8 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "AnimatedGIF.h"
-//#include "WebpImage.h"
 #include <future>
+#include "AnimatedImage.h"
 
 class Image
 {

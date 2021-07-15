@@ -12,7 +12,7 @@ class AnimatedGIF : public AnimatedImage
 
         bool isGIF(void);
         void load(void);
-        void update(sf::Sprite&);
+        void update(sf::Time, sf::Sprite&);
 
     private:
         struct stbi_pimpl* pimpl;

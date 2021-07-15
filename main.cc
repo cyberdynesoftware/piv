@@ -16,7 +16,7 @@ int main(int argc, char** argv)
     Folder folder(argv[1]);
 
     sf::RenderWindow window(sf::VideoMode(800, 600), "piv");
-    window.setFramerateLimit(30);
+    window.setFramerateLimit(60);
     bool fullscreen = false;
 
     sf::Image icon;

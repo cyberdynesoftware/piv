@@ -68,10 +68,12 @@ AnimatedGIF::load()
 }
 
 void
-AnimatedGIF::update(sf::Sprite& sprite)
+AnimatedGIF::update(sf::Time time, sf::Sprite& sprite)
 {
-    sprite.setTexture(frameIter->texture, true);
-    delay = frameIter->delay;
+    while (delay < time)
+        delay += frameIter->delay;
+
+    sprite.setTexture(frameIter->texture, false);
 
     frameIter++;
     

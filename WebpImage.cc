@@ -39,7 +39,7 @@ WebpImage::isWebp()
 }
 
 void
-WebpImage::prepare(sf::Texture& texture)
+WebpImage::prepare(sf::Sprite& sprite)
 {
     WebPAnimDecoderOptions options;
     WebPAnimDecoderOptionsInit(&options);
@@ -51,25 +51,25 @@ WebpImage::prepare(sf::Texture& texture)
 
     animate = (info.frame_count > 1);
     texture.create(info.canvas_width, info.canvas_height);
+    sprite.setTexture(texture, true);
 }
 
 void
-WebpImage::update(sf::Texture& texture)
+WebpImage::update(sf::Time time, sf::Sprite& sprite)
 {
-    if (WebPAnimDecoderHasMoreFrames(decoder))
-    {
-        uint8_t* pixels;
-        int timestamp;
-        WebPAnimDecoderGetNext(decoder, &pixels, &timestamp);
-
-        texture.update(pixels);
-        delay = sf::milliseconds(timestamp - previousTimestamp);
-        previousTimestamp = timestamp;
-    }
-    else
+    if (!WebPAnimDecoderHasMoreFrames(decoder))
     {
         WebPAnimDecoderReset(decoder);
-        delay = sf::milliseconds(0);
         previousTimestamp = 0;
     }
+
+    uint8_t* pixels;
+    int timestamp;
+    WebPAnimDecoderGetNext(decoder, &pixels, &timestamp);
+
+    texture.update(pixels);
+
+    while (delay < time)
+        delay += sf::milliseconds(timestamp - previousTimestamp);
+    previousTimestamp = timestamp;
 }
