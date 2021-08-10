@@ -12,6 +12,7 @@ Image::Image(const std::string& path):
 
 Image::~Image()
 {
+    future.wait();
     if (animatedImage) delete animatedImage;
 }
 
