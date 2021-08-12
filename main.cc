@@ -87,11 +87,13 @@ int main(int argc, char** argv)
                             if (fullscreen)
                             {
                                 window.create(sf::VideoMode(800, 600), "piv");
+                                window.setFramerateLimit(60);
                                 fullscreen = false;
                             }
                             else
                             {
                                 window.create(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
+                                window.setFramerateLimit(60);
                                 fullscreen = true;
                             }
                             if (Folder::fileExists("icon.png"))
