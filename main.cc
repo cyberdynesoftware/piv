@@ -2,6 +2,7 @@
 #include "SingleImageView.h"
 #include "MultiImageView.h"
 #include "Folder.h"
+#include "Icon.h"
 
 #include <iostream>
 
@@ -20,12 +21,8 @@ int main(int argc, char** argv)
     window.setFramerateLimit(60);
     bool fullscreen = false;
 
-    sf::Image icon;
-    if (Folder::fileExists("icon.png"))
-    {
-        icon.loadFromFile("icon.png");
-        window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
-    }
+    sf::Image icon = Icon::createIcon();
+    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
     SingleImageView singleImageView(folder, window);
     MultiImageView multiImageView(folder, window);
@@ -56,11 +53,6 @@ int main(int argc, char** argv)
                     window.close();
                     break;
 
-                case sf::Event::Resized:
-                    std::cout << "resize event" << std::endl;
-                    multiImageView.resizeEvent();
-                    break;
-
                 case sf::Event::KeyPressed:
                     switch (event.key.code)
                     {
@@ -84,8 +76,7 @@ int main(int argc, char** argv)
                                 window.setPosition(sf::Vector2i(100, 100));
                                 window.setFramerateLimit(60);
                                 fullscreen = false;
-                                if (Folder::fileExists("icon.png"))
-                                    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+                                window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
                             }
                             else
                             {
@@ -93,7 +84,6 @@ int main(int argc, char** argv)
                                 window.setFramerateLimit(60);
                                 fullscreen = true;
                             }
-                            std::cout << "fullscreen toggle" << std::endl;
                             multiImageView.resizeEvent();
                             break;
 
