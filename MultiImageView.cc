@@ -38,21 +38,9 @@ MultiImageView::handle(sf::Event& event)
             {
                 case sf::Keyboard::Up:
                 case sf::Keyboard::K:
-                    scrollUp();
                     break;
                 case sf::Keyboard::Down:
                 case sf::Keyboard::J:
-                    scrollDown();
-                    break;
-                case sf::Keyboard::PageDown:
-                    if (lastItem != folder.cend())
-                        scrollTo(++lastItem);
-                    break;
-                case sf::Keyboard::Home:
-                    scrollTo(folder.cbegin());
-                    break;
-                case sf::Keyboard::End:
-                    scrollTo(folder.cend());
                     break;
                 case sf::Keyboard::I:
                     showInfo = (showInfo) ? false : true;
@@ -68,118 +56,11 @@ MultiImageView::handle(sf::Event& event)
 }
 
 void
-MultiImageView::initImages()
-{
-    int index = std::distance(folder.cbegin(), firstItem);
-    int row =  index / numberOfColumns;
-    int firstImage = row * numberOfColumns;
-    int indent = index - firstImage;
-
-    for (int i = 0; i < indent; i++)
-    {
-        Image* image = new Image(*--firstItem);
-        images.push_front(image);
-    }
-
-    int rows = std::ceil(1.f * window.getSize().y / targetImageWidth);
-    int imageCount = rows * numberOfColumns;
-    int delta = imageCount - images.size();
-
-    if (delta > 0)
-    {
-        for (int i = 0; i < delta; i++)
-        {
-            if (lastItem == folder.cend()) break;
-
-            Image* image = new Image(*lastItem++);
-            images.push_back(image);
-        }
-
-        delta = imageCount - images.size();
-        rows = delta / numberOfColumns;
-        int remaining = rows * numberOfColumns;
-
-        for (int i = 0; i < remaining; i++)
-        {
-            if (firstItem == folder.cbegin()) break;
-
-            Image* image = new Image(*--firstItem);
-            images.push_front(image);
-        }
-    }
-    else 
-    {
-        for (int i = 0; i < -delta; i++)
-        {
-            delete images.back();
-            images.pop_back();
-            lastItem--;
-        }
-    }
-
-    for (auto image : images)
-        image->square(targetImageWidth);
-}
-
-void
 MultiImageView::scroll(int delta)
 {
     sf::View view = window.getView();
     view.move(0, delta * -10);
     window.setView(view);
-}
-
-void
-MultiImageView::scrollDown()
-{
-    if (lastItem == folder.cend())
-    {
-        int rows = std::ceil(1.f * window.getSize().y / targetImageWidth);
-        heightOffset = window.getSize().y - rows * targetImageWidth;
-    }
-    else
-    {
-        for (int i = 0; i < numberOfColumns; i++)
-        {
-            delete images.front();
-            images.pop_front();
-            firstItem++;
-        }
-
-        for (int i = 0; i < numberOfColumns; i++)
-        {
-            if (lastItem == folder.cend()) break;
-
-            Image* image = new Image(*lastItem++);
-            image->square(targetImageWidth);
-            images.push_back(image);
-        }
-    }
-}
-
-void
-MultiImageView::scrollUp()
-{
-    heightOffset = 0;
-    if (firstItem == folder.cbegin()) return;
-
-    int removeCount = (lastItem == folder.cend()) ? folder.size() % numberOfColumns : numberOfColumns;
-
-    for (int i = 0; i < removeCount; i++)
-    {
-        delete images.back();
-        images.pop_back();
-        lastItem--;
-    }
-
-    for (int i = 0; i < numberOfColumns; i++)
-    {
-        if (firstItem == folder.cbegin()) break;
-
-        Image* image = new Image(*--firstItem);
-        image->square(targetImageWidth);
-        images.push_front(image);
-    }
 }
 
 void
@@ -254,7 +135,7 @@ MultiImageView::draw()
 }
 
 void
-MultiImageView::resizeEvent()
+MultiImageView::resize()
 {
     int newTargetImageWidth = window.getSize().x / numberOfColumns;
     float factor = (float) newTargetImageWidth / targetImageWidth;
@@ -275,42 +156,8 @@ MultiImageView::resizeEvent()
     viewPosition *= factor;
 
     sf::View view = window.getView();
-    //view.setSize(window.getSize().x, window.getSize().y);
     view.setCenter(view.getCenter().x, viewPosition);
     window.setView(view);
-}
-
-bool
-MultiImageView::selectImage()
-{
-    auto mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-    for (auto const& image: images)
-        if (image->sprite.getGlobalBounds().contains(mouse.x, mouse.y))
-        {
-            folder.currentItem = std::find(folder.cbegin(), folder.cend(), image->path);
-            return true;
-        }
-    return false;
-}
-
-void
-MultiImageView::scrollToCurrentImage()
-{
-    if (folder.currentItem < firstItem || folder.currentItem >= lastItem)
-        scrollTo(folder.currentItem);
-}
-
-void
-MultiImageView::scrollTo(const Folder::FolderIter& item)
-{
-    for (Image* image: images)
-        delete image;
-
-    images.clear();
-
-    firstItem = item;
-    lastItem = item;
-    initImages();
 }
 
 float

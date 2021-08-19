@@ -26,25 +26,14 @@ int main(int argc, char** argv)
     icon.loadFromMemory(icon_png, icon_png_len);
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
-    SingleImageView singleImageView(folder, window);
-    MultiImageView multiImageView(folder, window);
-    ImageView* imageView;
-    if (folder.imageSelected)
-    {
-        imageView = &singleImageView;
-        singleImageView.initImage();
-    }
-    else
-    {
-        imageView = &multiImageView;
-    }
+    MultiImageView imageView(folder, window);
 
     sf::Event event;
 
     while (window.isOpen())
     {
         window.clear();
-        imageView->draw();
+        imageView.draw();
         window.display();
 
         while (window.pollEvent(event))
@@ -58,17 +47,9 @@ int main(int argc, char** argv)
                 case sf::Event::KeyPressed:
                     switch (event.key.code)
                     {
+                        case sf::Keyboard::Escape:
                         case sf::Keyboard::Q:
                             window.close();
-                            break;
-
-                        case sf::Keyboard::M:
-                            if (imageView == &singleImageView)
-                            {
-                                multiImageView.scrollToCurrentImage();
-                                window.setTitle("piv");
-                                imageView = &multiImageView;
-                            }
                             break;
 
                         case sf::Keyboard::F:
@@ -86,44 +67,17 @@ int main(int argc, char** argv)
                                 window.setFramerateLimit(60);
                                 fullscreen = true;
                             }
-                            multiImageView.resizeEvent();
+                            imageView.resize();
                             break;
 
                         default:
-                            imageView->handle(event);
-                            break;
-                    }
-                    break;
-
-                case sf::Event::MouseButtonReleased:
-                    switch (event.mouseButton.button)
-                    {
-                        case sf::Mouse::Button::Left:
-                            if (imageView == &multiImageView && multiImageView.selectImage())
-                            {
-                                singleImageView.initImage();
-                                imageView = &singleImageView;
-                            }
-                            else imageView->handle(event);
-                            break;
-
-                        case sf::Mouse::Button::Right:
-                            if (imageView == &singleImageView)
-                            {
-                                multiImageView.scrollToCurrentImage();
-                                window.setTitle("piv");
-                                imageView = &multiImageView;
-                            }
-                            break;
-
-                        default:
-                            imageView->handle(event);
+                            imageView.handle(event);
                             break;
                     }
                     break;
 
                 default:
-                    imageView->handle(event);
+                    imageView.handle(event);
                     break;
             }
         }

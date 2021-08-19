@@ -13,19 +13,14 @@ class MultiImageView : public ImageView
 
         void handle(sf::Event&);
         void draw(void);
-        void resizeEvent(void);
-        bool selectImage(void);
-        void scrollToCurrentImage(void);
+        void resize(void);
 
     private:
         Folder& folder;
+        Folder::FolderIter folderIter;
         sf::RenderWindow& window;
         int numberOfColumns = 4;
-        int heightOffset = 0;
         std::deque<Image*> images;
-        Folder::FolderIter folderIter;
-        Folder::FolderIter firstItem;
-        Folder::FolderIter lastItem;
         bool showInfo = false;
         std::vector<unsigned int> columnOffsets;
         int scrollSpeed = 0;
@@ -33,10 +28,6 @@ class MultiImageView : public ImageView
         int targetImageWidth;
 
         void loadImageRow(void);
-        void initImages(void);
         void scroll(int);
-        void scrollDown(void);
-        void scrollUp(void);
-        void scrollTo(const Folder::FolderIter&);
         float viewBottom(void);
 };
