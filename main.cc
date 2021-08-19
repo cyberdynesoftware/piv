@@ -2,7 +2,7 @@
 #include "SingleImageView.h"
 #include "MultiImageView.h"
 #include "Folder.h"
-#include "Icon.h"
+#include "icon.h"
 
 #include <iostream>
 
@@ -21,7 +21,9 @@ int main(int argc, char** argv)
     window.setFramerateLimit(60);
     bool fullscreen = false;
 
-    sf::Image icon = Icon::createIcon();
+    //sf::Image icon = Icon::createIcon();
+    sf::Image icon;
+    icon.loadFromMemory(icon_png, icon_png_len);
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
     SingleImageView singleImageView(folder, window);
