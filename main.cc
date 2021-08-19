@@ -15,7 +15,8 @@ int main(int argc, char** argv)
 
     Folder folder(argv[1]);
 
-    sf::RenderWindow window(sf::VideoMode(800, 600), "piv");
+    sf::RenderWindow window(sf::VideoMode(800, 600), "piv", sf::Style::None);
+    window.setPosition(sf::Vector2i(100, 100));
     window.setFramerateLimit(60);
     bool fullscreen = false;
 
@@ -56,15 +57,8 @@ int main(int argc, char** argv)
                     break;
 
                 case sf::Event::Resized:
-                    {
-                        sf::View view = window.getView();
-                        view.setSize(event.size.width, event.size.height);
-                        view.setCenter(event.size.width / 2, event.size.height / 2);
-                        window.setView(view);
-                    }
+                    std::cout << "resize event" << std::endl;
                     multiImageView.resizeEvent();
-                    if (imageView == &singleImageView)
-                        singleImageView.resizeEvent();
                     break;
 
                 case sf::Event::KeyPressed:
@@ -86,9 +80,12 @@ int main(int argc, char** argv)
                         case sf::Keyboard::F:
                             if (fullscreen)
                             {
-                                window.create(sf::VideoMode(800, 600), "piv");
+                                window.create(sf::VideoMode(800, 600), "piv", sf::Style::None);
+                                window.setPosition(sf::Vector2i(100, 100));
                                 window.setFramerateLimit(60);
                                 fullscreen = false;
+                                if (Folder::fileExists("icon.png"))
+                                    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
                             }
                             else
                             {
@@ -96,11 +93,8 @@ int main(int argc, char** argv)
                                 window.setFramerateLimit(60);
                                 fullscreen = true;
                             }
-                            if (Folder::fileExists("icon.png"))
-                                window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+                            std::cout << "fullscreen toggle" << std::endl;
                             multiImageView.resizeEvent();
-                            if (imageView == &singleImageView)
-                                singleImageView.resizeEvent();
                             break;
 
                         default:

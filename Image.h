@@ -13,9 +13,12 @@ class Image
         void fitTo(const sf::Vector2u&);
         void square(int);
         void update(void);
+        void setPosition(const sf::Vector2f&);
 
         sf::Sprite sprite;
         bool ready = false;
+        bool hasPosition = false;
+        sf::Vector2f position;
         std::string path;
         std::string info;
 

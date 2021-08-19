@@ -138,3 +138,11 @@ Image::update()
         animatedImage->update(clock.getElapsedTime(), sprite);
     }
 }
+
+void
+Image::setPosition(const sf::Vector2f& p)
+{
+    position = p;
+    sprite.setPosition(p);
+    hasPosition = true;
+}

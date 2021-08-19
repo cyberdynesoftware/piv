@@ -4,6 +4,7 @@
 #include "Image.h"
 #include "Folder.h"
 #include <deque>
+#include <vector>
 
 class MultiImageView : public ImageView
 {
@@ -22,13 +23,20 @@ class MultiImageView : public ImageView
         int numberOfColumns = 4;
         int heightOffset = 0;
         std::deque<Image*> images;
+        Folder::FolderIter folderIter;
         Folder::FolderIter firstItem;
         Folder::FolderIter lastItem;
         bool showInfo = false;
+        std::vector<unsigned int> columnOffsets;
+        int scrollSpeed = 0;
+        float viewPosition;
+        int targetImageWidth;
 
+        void loadImageRow(void);
         void initImages(void);
+        void scroll(int);
         void scrollDown(void);
         void scrollUp(void);
         void scrollTo(const Folder::FolderIter&);
-        int imageSize(void);
+        float viewBottom(void);
 };
