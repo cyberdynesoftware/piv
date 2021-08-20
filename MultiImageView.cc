@@ -20,7 +20,13 @@ MultiImageView::loadImageRow()
     for (int i = 0; i < numberOfColumns; i++)
     {
         if (folderIter == folder.cend()) break;
-        images.push_back(new Image(*folderIter++));
+        Image* image = new Image(*folderIter++);
+        /*
+        image->info.append("[");
+        image->info.append(std::to_string(folderIter - folder.cbegin() + 1));
+        image->info.append(" / ").append(std::to_string(folder.size())).append("]");
+        */
+        images.push_back(image);
     }
 }
 
@@ -67,36 +73,20 @@ void
 MultiImageView::draw()
 {
     bool allImagesAreReady = true;
-    int minColumnOffset;
 
     for (auto image : images)
     {
-        int columnIndex = 0;
-        minColumnOffset = columnOffsets[columnIndex];
-        for (int i = 0; i < numberOfColumns; i++)
-        {
-            if (columnOffsets[i] < minColumnOffset)
-            {
-                minColumnOffset = columnOffsets[i];
-                columnIndex = i;
-            }
-        }
-
         if (image->ready)
         {
             if (!image->valid) continue;
 
+            if (!image->hasPosition) layout(image);
+
             image->update();
-            if (!image->hasPosition)
-            {
-                const sf::Vector2u& imageSize = image->sprite.getTexture()->getSize();
-                float scale = (float)targetImageWidth / imageSize.x;
-                image->sprite.setScale(scale, scale);
-                image->sprite.setOrigin(0, 0);
-                image->setPosition(sf::Vector2f(targetImageWidth * columnIndex, minColumnOffset));
-                columnOffsets[columnIndex] += imageSize.y * scale;
-            }
+
             window.draw(image->sprite);
+
+            if (showInfo) drawInfoBox(image);
         }
         else
         {
@@ -104,24 +94,9 @@ MultiImageView::draw()
             break;
         }
 
-        if (showInfo)
-        {
-            sf::RectangleShape background(sf::Vector2f(targetImageWidth, 20));
-            background.setFillColor(sf::Color(0, 0, 0, 64));
-            background.setPosition(image->position);
-            window.draw(background);
-
-            sf::Text info;
-            info.setFont(font);
-            info.setFillColor(sf::Color::White);
-            info.setCharacterSize(16);
-            info.setPosition(image->position);
-            info.setString(Folder::filename(image->path));
-            window.draw(info);
-        }
     }
 
-    if (allImagesAreReady && viewBottom() > minColumnOffset)
+    if (allImagesAreReady && viewBottom() > columnOffsets[minColumnIndex()])
         loadImageRow();
 
     if (scrollSpeed != 0)
@@ -166,4 +141,49 @@ float
 MultiImageView::viewBottom()
 {
     return window.getView().getCenter().y + window.getView().getSize().y;
+}
+
+int
+MultiImageView::minColumnIndex()
+{
+    int columnIndex = 0;
+    int minColumnOffset = columnOffsets[columnIndex];
+    for (int i = 0; i < numberOfColumns; i++)
+    {
+        if (columnOffsets[i] < minColumnOffset)
+        {
+            minColumnOffset = columnOffsets[i];
+            columnIndex = i;
+        }
+    }
+    return columnIndex;
+}
+
+void
+MultiImageView::layout(Image* image)
+{
+    const sf::Vector2u& imageSize = image->sprite.getTexture()->getSize();
+    float scale = (float)targetImageWidth / imageSize.x;
+    image->sprite.setScale(scale, scale);
+    image->sprite.setOrigin(0, 0);
+    int columnIndex = minColumnIndex();
+    image->setPosition(sf::Vector2f(targetImageWidth * columnIndex, columnOffsets[columnIndex]));
+    columnOffsets[columnIndex] += imageSize.y * scale;
+}
+
+void
+MultiImageView::drawInfoBox(Image* image)
+{
+    sf::RectangleShape background(sf::Vector2f(targetImageWidth, 30));
+    background.setFillColor(sf::Color(0, 0, 0, 64));
+    background.setPosition(image->position);
+    window.draw(background);
+
+    sf::Text info;
+    info.setFont(font);
+    info.setFillColor(sf::Color::White);
+    info.setCharacterSize(12);
+    info.setPosition(image->position);
+    info.setString(image->info);
+    window.draw(info);
 }

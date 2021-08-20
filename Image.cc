@@ -21,15 +21,11 @@ Image::init(const std::string& path)
 {
     if ((valid = (initIfGIF(path) || initIfWebp(path) || initJPeg(path))))
     {
-        info.append("\n\"").append(Folder::filename(path)).append("\"");
+        info.append(Folder::filename(path));
         info.append("\n").append(std::to_string(sprite.getTexture()->getSize().x));
         info.append("x").append(std::to_string(sprite.getTexture()->getSize().y));
+        info.append(", ").append(std::to_string(Folder::fileSize(path) / 1000)).append("kB");
     }
-    else
-    {
-        info.append("\nError loading \"").append(Folder::filename(path)).append("\"");
-    }
-    info.append("\n").append(std::to_string(Folder::fileSize(path) / 1000)).append(" kB");
 
     ready = true;
 }

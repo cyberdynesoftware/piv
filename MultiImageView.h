@@ -30,4 +30,7 @@ class MultiImageView : public ImageView
         void loadImageRow(void);
         void scroll(int);
         float viewBottom(void);
+        int minColumnIndex(void);
+        void layout(Image*);
+        void drawInfoBox(Image*);
 };
