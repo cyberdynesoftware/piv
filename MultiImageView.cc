@@ -226,17 +226,19 @@ MultiImageView::layout(Image* image)
 void
 MultiImageView::drawInfoBox(Image* image)
 {
-    sf::RectangleShape background(sf::Vector2f(targetImageWidth, 30));
-    background.setFillColor(sf::Color(0, 0, 0, 64));
-    background.setPosition(image->position);
-    window.draw(background);
-
     sf::Text info;
     info.setFont(font);
     info.setFillColor(sf::Color::White);
     info.setCharacterSize(12);
     info.setPosition(image->position);
     info.setString(image->info);
+    
+    sf::FloatRect bounds = info.getLocalBounds();
+    sf::RectangleShape background(sf::Vector2f(targetImageWidth, bounds.top * 2 + bounds.height));
+    background.setFillColor(sf::Color(0, 0, 0, 64));
+    background.setPosition(image->position);
+
+    window.draw(background);
     window.draw(info);
 }
 

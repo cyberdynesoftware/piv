@@ -17,9 +17,6 @@ class ImageView
                 std::cerr << "Warning: Could not find a font to load." << std::endl;
         }
 
-        virtual void handle(sf::Event&) = 0;
-        virtual void draw(void) = 0;
-
     protected:
         sf::Font font;
 };
