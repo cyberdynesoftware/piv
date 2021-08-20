@@ -13,7 +13,7 @@ class MultiImageView : public ImageView
 
         void handle(sf::Event&);
         void draw(void);
-        void resize(void);
+        void resize(bool);
 
     private:
         Folder& folder;

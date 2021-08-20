@@ -67,7 +67,7 @@ int main(int argc, char** argv)
                                 window.setFramerateLimit(60);
                                 fullscreen = true;
                             }
-                            imageView.resize();
+                            imageView.resize(false);
                             break;
 
                         default:

@@ -51,6 +51,46 @@ MultiImageView::handle(sf::Event& event)
                 case sf::Keyboard::I:
                     showInfo = (showInfo) ? false : true;
                     break;
+                case sf::Keyboard::Num1:
+                    numberOfColumns = 1;
+                    resize(true);
+                    break;
+                case sf::Keyboard::Num2:
+                    numberOfColumns = 2;
+                    resize(true);
+                    break;
+                case sf::Keyboard::Num3:
+                    numberOfColumns = 3;
+                    resize(true);
+                    break;
+                case sf::Keyboard::Num4:
+                    numberOfColumns = 4;
+                    resize(true);
+                    break;
+                case sf::Keyboard::Num5:
+                    numberOfColumns = 5;
+                    resize(true);
+                    break;
+                case sf::Keyboard::Num6:
+                    numberOfColumns = 6;
+                    resize(true);
+                    break;
+                case sf::Keyboard::Num7:
+                    numberOfColumns = 7;
+                    resize(true);
+                    break;
+                case sf::Keyboard::Num8:
+                    numberOfColumns = 8;
+                    resize(true);
+                    break;
+                case sf::Keyboard::Num9:
+                    numberOfColumns = 9;
+                    resize(true);
+                    break;
+                case sf::Keyboard::Num0:
+                    numberOfColumns = 10;
+                    resize(true);
+                    break;
                 default:
                     break;
             }
@@ -113,26 +153,37 @@ MultiImageView::draw()
 }
 
 void
-MultiImageView::resize()
+MultiImageView::resize(bool relayout)
 {
     int newTargetImageWidth = window.getSize().x / numberOfColumns;
     float factor = (float) newTargetImageWidth / targetImageWidth;
     targetImageWidth = newTargetImageWidth;
 
-    for (auto image : images)
+    if (relayout)
     {
-        if (image->hasPosition)
-        {
-            image->setPosition(image->sprite.getPosition() * factor);
-            image->sprite.scale(factor, factor);
-        }
+        columnOffsets.resize(numberOfColumns);
+        for (int i = 0; i < numberOfColumns; i++)
+            columnOffsets[i] = 0;
+
+        for (auto image : images)
+            layout(image);
     }
-    
-    for (int i = 0; i < numberOfColumns; i++)
-        columnOffsets[i] *= factor;
+    else
+    {
+        for (auto image : images)
+        {
+            if (image->hasPosition)
+            {
+                image->setPosition(image->sprite.getPosition() * factor);
+                image->sprite.scale(factor, factor);
+            }
+        }
+
+        for (int i = 0; i < numberOfColumns; i++)
+            columnOffsets[i] *= factor;
+    }
 
     viewPosition *= factor;
-
     sf::View view = window.getView();
     view.setCenter(view.getCenter().x, viewPosition);
     window.setView(view);
@@ -195,5 +246,5 @@ MultiImageView::visible(Image* image)
     float viewTop = window.getView().getCenter().y - window.getView().getSize().y;
 
     return (image->position.y + image->sprite.getTexture()->getSize().y > viewTop &&
-            image->position.x < viewBottom());
+            image->position.y < viewBottom());
 }
