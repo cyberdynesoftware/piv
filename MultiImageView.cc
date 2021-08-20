@@ -82,11 +82,12 @@ MultiImageView::draw()
 
             if (!image->hasPosition) layout(image);
 
-            image->update();
-
-            window.draw(image->sprite);
-
-            if (showInfo) drawInfoBox(image);
+            if (visible(image))
+            {
+                image->update();
+                window.draw(image->sprite);
+                if (showInfo) drawInfoBox(image);
+            }
         }
         else
         {
@@ -186,4 +187,13 @@ MultiImageView::drawInfoBox(Image* image)
     info.setPosition(image->position);
     info.setString(image->info);
     window.draw(info);
+}
+
+bool
+MultiImageView::visible(Image* image)
+{
+    float viewTop = window.getView().getCenter().y - window.getView().getSize().y;
+
+    return (image->position.y + image->sprite.getTexture()->getSize().y > viewTop &&
+            image->position.x < viewBottom());
 }

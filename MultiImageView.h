@@ -33,4 +33,5 @@ class MultiImageView : public ImageView
         int minColumnIndex(void);
         void layout(Image*);
         void drawInfoBox(Image*);
+        bool visible(Image*);
 };
