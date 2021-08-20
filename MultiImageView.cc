@@ -2,6 +2,7 @@
 #include <iostream>
 #include <set>
 #include <cmath>
+#include "font.h"
 
 MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window):
     folder(folder),
@@ -11,6 +12,7 @@ MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window):
     folderIter = folder.cbegin();
     targetImageWidth = window.getSize().x / numberOfColumns;
     viewPosition = window.getView().getCenter().y;
+    font.loadFromMemory(font_ttf, font_ttf_len);
     loadImageRow();
 }
 
@@ -229,7 +231,7 @@ MultiImageView::drawInfoBox(Image* image)
     sf::Text info;
     info.setFont(font);
     info.setFillColor(sf::Color::White);
-    info.setCharacterSize(12);
+    info.setCharacterSize(16);
     info.setPosition(image->position);
     info.setString(image->info);
     

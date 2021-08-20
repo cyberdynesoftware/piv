@@ -6,7 +6,7 @@
 #include <deque>
 #include <vector>
 
-class MultiImageView : public ImageView
+class MultiImageView
 {
     public:
         MultiImageView(Folder&, sf::RenderWindow&);
@@ -26,6 +26,7 @@ class MultiImageView : public ImageView
         int scrollSpeed = 0;
         float viewPosition;
         int targetImageWidth;
+        sf::Font font;
 
         void loadImageRow(void);
         void scroll(int);
