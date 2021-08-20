@@ -10,12 +10,11 @@ class Image
         Image(const std::string&);
         ~Image();
 
-        void fitTo(const sf::Vector2u&);
-        void square(int);
         void update(void);
         void setPosition(const sf::Vector2f&);
 
         sf::Sprite sprite;
+        bool valid;
         bool ready = false;
         bool hasPosition = false;
         sf::Vector2f position;
@@ -26,10 +25,6 @@ class Image
         sf::Texture texture;
         sf::Clock clock;
         std::future<void> future;
-        bool squareImage = false;
-        int squareImageEdgeLength;
-        bool enframe = false;
-        sf::Vector2u frame;
         AnimatedImage* animatedImage = nullptr;
         sf::Time delay;
 

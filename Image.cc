@@ -19,22 +19,19 @@ Image::~Image()
 void
 Image::init(const std::string& path)
 {
-    if (initIfGIF(path) || initIfWebp(path) || initJPeg(path))
+    if ((valid = (initIfGIF(path) || initIfWebp(path) || initJPeg(path))))
     {
-        ready = true;
-
         info.append("\n\"").append(Folder::filename(path)).append("\"");
         info.append("\n").append(std::to_string(sprite.getTexture()->getSize().x));
         info.append("x").append(std::to_string(sprite.getTexture()->getSize().y));
-
-        if (squareImage) square(squareImageEdgeLength);
-        if (enframe) fitTo(frame);
     }
     else
     {
         info.append("\nError loading \"").append(Folder::filename(path)).append("\"");
     }
     info.append("\n").append(std::to_string(Folder::fileSize(path) / 1000)).append(" kB");
+
+    ready = true;
 }
 
 bool
@@ -86,47 +83,6 @@ Image::initJPeg(const std::string& path)
     else
     {
         return false;
-    }
-}
-
-void
-Image::fitTo(const sf::Vector2u& window)
-{
-    enframe = true;
-    frame = window;
-
-    if (ready)
-    {
-        const sf::Vector2u& size = sprite.getTexture()->getSize();
-
-        float xScale = (float)window.x / size.x;
-        float yScale = (float)window.y / size.y;
-        float scale = (xScale < yScale) ? xScale : yScale;
-        sprite.setScale(scale, scale);
-
-        sprite.setOrigin(size.x / 2, size.y / 2);
-        sprite.setPosition(window.x / 2, window.y / 2);
-    }
-}
-
-void
-Image::square(int targetSize)
-{
-    squareImage = true;
-    squareImageEdgeLength = targetSize;
-
-    if (ready)
-    {
-        auto size = sprite.getTexture()->getSize();
-        auto offset = std::abs((int)size.x - (int)size.y) / 2;
-
-        if (size.x < size.y)
-            sprite.setTextureRect(sf::IntRect(0, offset, size.x, size.x));
-        else
-            sprite.setTextureRect(sf::IntRect(offset, 0, size.y, size.y));
-        
-        float factor = 1.f * targetSize / sprite.getLocalBounds().width;
-        sprite.setScale(factor, factor);
     }
 }
 

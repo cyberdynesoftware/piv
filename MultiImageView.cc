@@ -67,7 +67,7 @@ void
 MultiImageView::draw()
 {
     bool allImagesAreReady = true;
-    unsigned int minColumnOffset;
+    int minColumnOffset;
 
     for (auto image : images)
     {
@@ -84,6 +84,8 @@ MultiImageView::draw()
 
         if (image->ready)
         {
+            if (!image->valid) continue;
+
             image->update();
             if (!image->hasPosition)
             {

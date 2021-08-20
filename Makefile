@@ -1,4 +1,4 @@
-OBJECTS = main.o Folder.o AnimatedGIF.o SingleImageView.o MultiImageView.o Image.o WebpImage.o
+OBJECTS = main.o Folder.o AnimatedGIF.o MultiImageView.o Image.o WebpImage.o
 
 CPP = g++
 CPPFLAGS = -g -Wall -std=c++14

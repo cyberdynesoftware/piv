@@ -70,7 +70,8 @@ Folder::size()
 int
 Folder::fileSize(const std::string& p)
 {
-    return file_size(path(p));
+    boost::system::error_code ec;
+    return file_size(path(p), ec);
 }
 
 std::string
