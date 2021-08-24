@@ -21,6 +21,11 @@ make
 
 ## Usage
 
+Run with
+```
+piv path/to/image
+```
+
 Key | Description
 --- | ---
 <kbd>Q</kbd> <kbd>Esc</kbd> | Quit
