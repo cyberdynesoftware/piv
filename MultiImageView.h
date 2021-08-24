@@ -22,16 +22,15 @@ class MultiImageView
         std::deque<Image*> images;
         bool showInfo = false;
         std::vector<int> columnOffsets;
-        int maxScrollSpeed;
         int scrollSpeed = 0;
-        float viewPosition;
+        int bottom = 0;
+        float yViewPosition;
+        float yViewSize;
         int targetImageWidth;
         sf::Font font;
 
         void loadImageRow(void);
         void scrollView(int);
-        float viewTop(void);
-        float viewBottom(void);
         int minColumnIndex(void);
         void layout(Image*);
         void drawInfoBox(Image*);
