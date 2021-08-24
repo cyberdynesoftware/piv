@@ -21,6 +21,8 @@ make
 
 ## Usage
 
+Key | Description
+--- | ---
 <kbd>Q</kbd> <kbd>Esc</kbd> | Quit
 <kbd>F</kbd> | Toggle fullscreen
 Mouse Wheel | Scroll
