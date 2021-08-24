@@ -13,5 +13,8 @@ Image.o: Image.h AnimatedGIF.h WebpImage.h AnimatedImage.h
 AnimatedGIF.o: AnimatedGIF.h AnimatedImage.h
 WebpImage.o: WebpImage.h AnimatedImage.h
 
+install:
+	cp piv /usr/local/bin/
+
 clean:
 	rm *.o
