@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ImageView.h"
 #include "Image.h"
 #include "Folder.h"
 #include <deque>
@@ -23,13 +22,15 @@ class MultiImageView
         std::deque<Image*> images;
         bool showInfo = false;
         std::vector<int> columnOffsets;
+        int maxScrollSpeed;
         int scrollSpeed = 0;
         float viewPosition;
         int targetImageWidth;
         sf::Font font;
 
         void loadImageRow(void);
-        void scroll(int);
+        void scrollView(int);
+        float viewTop(void);
         float viewBottom(void);
         int minColumnIndex(void);
         void layout(Image*);

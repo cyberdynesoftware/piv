@@ -12,6 +12,7 @@ MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window):
     folderIter = folder.cbegin();
     targetImageWidth = window.getSize().x / numberOfColumns;
     viewPosition = window.getView().getCenter().y;
+    maxScrollSpeed = window.getView().getSize().y / 50;
     font.loadFromMemory(font_ttf, font_ttf_len);
     loadImageRow();
 }
@@ -22,13 +23,7 @@ MultiImageView::loadImageRow()
     for (int i = 0; i < numberOfColumns; i++)
     {
         if (folderIter == folder.cend()) break;
-        Image* image = new Image(*folderIter++);
-        /*
-        image->info.append("[");
-        image->info.append(std::to_string(folderIter - folder.cbegin() + 1));
-        image->info.append(" / ").append(std::to_string(folder.size())).append("]");
-        */
-        images.push_back(image);
+        images.push_back(new Image(*folderIter++));
     }
 }
 
@@ -38,7 +33,7 @@ MultiImageView::handle(sf::Event& event)
     switch (event.type)
     {
         case sf::Event::MouseWheelScrolled:
-            scrollSpeed = event.mouseWheelScroll.delta * -25;
+            scrollSpeed = -event.mouseWheelScroll.delta * maxScrollSpeed;
             break;
 
         case sf::Event::KeyPressed:
@@ -46,9 +41,19 @@ MultiImageView::handle(sf::Event& event)
             {
                 case sf::Keyboard::Up:
                 case sf::Keyboard::K:
+                    scrollSpeed = -maxScrollSpeed;
                     break;
                 case sf::Keyboard::Down:
                 case sf::Keyboard::J:
+                    scrollSpeed = maxScrollSpeed;
+                    break;
+                case sf::Keyboard::PageUp:
+                case sf::Keyboard::U:
+                    scrollSpeed = -maxScrollSpeed * 2;
+                    break;
+                case sf::Keyboard::PageDown:
+                case sf::Keyboard::D:
+                    scrollSpeed = maxScrollSpeed * 2;
                     break;
                 case sf::Keyboard::I:
                     showInfo = (showInfo) ? false : true;
@@ -104,11 +109,12 @@ MultiImageView::handle(sf::Event& event)
 }
 
 void
-MultiImageView::scroll(int delta)
+MultiImageView::scrollView(int delta)
 {
     sf::View view = window.getView();
-    view.move(0, delta * -10);
+    view.move(0, delta);
     window.setView(view);
+    viewPosition = view.getCenter().y;
 }
 
 void
@@ -142,13 +148,7 @@ MultiImageView::draw()
     if (allImagesAreReady && viewBottom() > columnOffsets[minColumnIndex()])
         loadImageRow();
 
-    if (scrollSpeed != 0)
-    {
-        sf::View view = window.getView();
-        view.move(0, scrollSpeed);
-        window.setView(view);
-        viewPosition = view.getCenter().y;
-    }
+    if (scrollSpeed != 0) scrollView(scrollSpeed);
 
     if (scrollSpeed > 0) scrollSpeed--;
     else if (scrollSpeed < 0) scrollSpeed++;
@@ -157,6 +157,7 @@ MultiImageView::draw()
 void
 MultiImageView::resize(bool relayout)
 {
+    maxScrollSpeed = window.getView().getSize().y / 50;
     int newTargetImageWidth = window.getSize().x / numberOfColumns;
     float factor = (float) newTargetImageWidth / targetImageWidth;
     targetImageWidth = newTargetImageWidth;
@@ -189,6 +190,12 @@ MultiImageView::resize(bool relayout)
     sf::View view = window.getView();
     view.setCenter(view.getCenter().x, viewPosition);
     window.setView(view);
+}
+
+float
+MultiImageView::viewTop()
+{
+    return window.getView().getCenter().y - window.getView().getSize().y;
 }
 
 float
@@ -247,8 +254,6 @@ MultiImageView::drawInfoBox(Image* image)
 bool
 MultiImageView::visible(Image* image)
 {
-    float viewTop = window.getView().getCenter().y - window.getView().getSize().y;
-
-    return (image->position.y + image->sprite.getTexture()->getSize().y > viewTop &&
+    return (image->position.y + image->sprite.getTexture()->getSize().y > viewTop() &&
             image->position.y < viewBottom());
 }

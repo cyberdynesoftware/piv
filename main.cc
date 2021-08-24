@@ -1,5 +1,3 @@
-#include "ImageView.h"
-#include "SingleImageView.h"
 #include "MultiImageView.h"
 #include "Folder.h"
 #include "icon.h"
@@ -19,9 +17,9 @@ int main(int argc, char** argv)
     sf::RenderWindow window(sf::VideoMode(800, 600), "piv", sf::Style::None);
     window.setPosition(sf::Vector2i(100, 100));
     window.setFramerateLimit(60);
+    window.setVerticalSyncEnabled(true);
     bool fullscreen = false;
 
-    //sf::Image icon = Icon::createIcon();
     sf::Image icon;
     icon.loadFromMemory(icon_png, icon_png_len);
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
@@ -58,6 +56,7 @@ int main(int argc, char** argv)
                                 window.create(sf::VideoMode(800, 600), "piv", sf::Style::None);
                                 window.setPosition(sf::Vector2i(100, 100));
                                 window.setFramerateLimit(60);
+                                window.setVerticalSyncEnabled(true);
                                 fullscreen = false;
                                 window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
                             }
@@ -65,6 +64,7 @@ int main(int argc, char** argv)
                             {
                                 window.create(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
                                 window.setFramerateLimit(60);
+                                window.setVerticalSyncEnabled(true);
                                 fullscreen = true;
                             }
                             imageView.resize(false);
