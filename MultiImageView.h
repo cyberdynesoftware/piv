@@ -28,6 +28,7 @@ class MultiImageView
         float yViewSize;
         int targetImageWidth;
         sf::Font font;
+        Image* selectedImage = NULL;
 
         void loadImageRow(void);
         void scrollView(int);
@@ -35,4 +36,5 @@ class MultiImageView
         void layout(Image*);
         void drawInfoBox(Image*);
         bool visible(Image*);
+        void selectImage(void);
 };

@@ -36,6 +36,32 @@ MultiImageView::handle(sf::Event& event)
             scrollSpeed = -event.mouseWheelScroll.delta * yViewSize / 50;
             break;
 
+        case sf::Event::MouseButtonReleased:
+            switch (event.mouseButton.button)
+            {
+                case sf::Mouse::Button::Left:
+                    if (selectedImage == NULL)
+                    {
+                        selectImage();
+                        selectedImage->centerOrigin();
+                        selectedImage->sprite.setPosition(window.getView().getCenter());
+                        selectedImage->sprite.scale(1.25f, 1.25f);
+                    }
+                    break;
+                case sf::Mouse::Button::Right:
+                    if (selectedImage != NULL)
+                    {
+                        selectedImage->sprite.setOrigin(0, 0);
+                        selectedImage->sprite.setPosition(selectedImage->position);
+                        selectedImage->sprite.scale(.8f, .8f);
+                        selectedImage = NULL;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            break;
+
         case sf::Event::KeyPressed:
             switch (event.key.code)
             {
@@ -111,17 +137,20 @@ MultiImageView::handle(sf::Event& event)
 void
 MultiImageView::scrollView(int delta)
 {
-    sf::View view = window.getView();
-    view.move(0, delta);
+    if (selectedImage == NULL)
+    {
+        sf::View view = window.getView();
+        view.move(0, delta);
 
-    if (view.getCenter().y - yViewSize / 2 < 0)
-        view.setCenter(view.getCenter().x, yViewSize / 2);
-    else if (folderIter == folder.cend() && 
-            view.getCenter().y + yViewSize / 2 > bottom)
-        view.setCenter(view.getCenter().x, bottom - yViewSize / 2);
+        if (view.getCenter().y - yViewSize / 2 < 0)
+            view.setCenter(view.getCenter().x, yViewSize / 2);
+        else if (folderIter == folder.cend() && 
+                view.getCenter().y + yViewSize / 2 > bottom)
+            view.setCenter(view.getCenter().x, bottom - yViewSize / 2);
 
-    window.setView(view);
-    yViewPosition = view.getCenter().y;
+        window.setView(view);
+        yViewPosition = view.getCenter().y;
+    }
 }
 
 void
@@ -135,13 +164,21 @@ MultiImageView::draw()
         {
             if (!image->valid) continue;
 
+            if (image == selectedImage) continue;
+
             if (!image->hasPosition) layout(image);
 
             if (visible(image))
             {
                 image->update();
+
+                if (selectedImage != NULL)
+                    image->sprite.setColor(sf::Color(255, 255, 255, 31));
+                else
+                    image->sprite.setColor(sf::Color::White);
+
                 window.draw(image->sprite);
-                if (showInfo) drawInfoBox(image);
+                if (showInfo && selectedImage != NULL) drawInfoBox(image);
             }
         }
         else
@@ -149,6 +186,12 @@ MultiImageView::draw()
             allImagesAreReady = false;
             break;
         }
+    }
+
+    if (selectedImage != NULL)
+    {
+        selectedImage->update();
+        window.draw(selectedImage->sprite);
     }
 
     if (allImagesAreReady && yViewPosition + yViewSize / 2 > columnOffsets[minColumnIndex()])
@@ -255,4 +298,21 @@ MultiImageView::visible(Image* image)
 {
     return (image->position.y + image->sprite.getTexture()->getSize().y > yViewPosition - yViewSize / 2 &&
             image->position.y < yViewPosition + yViewSize / 2);
+}
+
+void
+MultiImageView::selectImage()
+{
+    if (selectedImage == NULL)
+    {
+        auto mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+        for (auto image : images)
+        {
+            if (image->sprite.getGlobalBounds().contains(mouseCoords.x, mouseCoords.y))
+            {
+                selectedImage = image;
+                break;
+            }
+        }
+    }
 }

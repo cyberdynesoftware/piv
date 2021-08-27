@@ -98,3 +98,10 @@ Image::setPosition(const sf::Vector2f& p)
     sprite.setPosition(p);
     hasPosition = true;
 }
+
+void
+Image::centerOrigin()
+{
+    const auto& size = sprite.getTexture()->getSize();
+    sprite.setOrigin(size.x / 2, size.y / 2);
+}
