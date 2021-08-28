@@ -40,22 +40,11 @@ MultiImageView::handle(sf::Event& event)
             switch (event.mouseButton.button)
             {
                 case sf::Mouse::Button::Left:
-                    if (selectedImage == NULL)
-                    {
-                        selectImage();
-                        selectedImage->centerOrigin();
-                        selectedImage->sprite.setPosition(window.getView().getCenter());
-                        selectedImage->sprite.scale(1.25f, 1.25f);
-                    }
+                    if (selectImage())
+                        selectedImage->fitTo(window.getView());
                     break;
                 case sf::Mouse::Button::Right:
-                    if (selectedImage != NULL)
-                    {
-                        selectedImage->sprite.setOrigin(0, 0);
-                        selectedImage->sprite.setPosition(selectedImage->position);
-                        selectedImage->sprite.scale(.8f, .8f);
-                        selectedImage = NULL;
-                    }
+                    unselectImage();
                     break;
                 default:
                     break;
@@ -84,45 +73,38 @@ MultiImageView::handle(sf::Event& event)
                 case sf::Keyboard::I:
                     showInfo = (showInfo) ? false : true;
                     break;
+                case sf::Keyboard::M:
+                    unselectImage();
+                    break;
                 case sf::Keyboard::Num1:
-                    numberOfColumns = 1;
-                    resize(true);
+                    relayout(1);
                     break;
                 case sf::Keyboard::Num2:
-                    numberOfColumns = 2;
-                    resize(true);
+                    relayout(2);
                     break;
                 case sf::Keyboard::Num3:
-                    numberOfColumns = 3;
-                    resize(true);
+                    relayout(3);
                     break;
                 case sf::Keyboard::Num4:
-                    numberOfColumns = 4;
-                    resize(true);
+                    relayout(4);
                     break;
                 case sf::Keyboard::Num5:
-                    numberOfColumns = 5;
-                    resize(true);
+                    relayout(5);
                     break;
                 case sf::Keyboard::Num6:
-                    numberOfColumns = 6;
-                    resize(true);
+                    relayout(6);
                     break;
                 case sf::Keyboard::Num7:
-                    numberOfColumns = 7;
-                    resize(true);
+                    relayout(7);
                     break;
                 case sf::Keyboard::Num8:
-                    numberOfColumns = 8;
-                    resize(true);
+                    relayout(8);
                     break;
                 case sf::Keyboard::Num9:
-                    numberOfColumns = 9;
-                    resize(true);
+                    relayout(9);
                     break;
                 case sf::Keyboard::Num0:
-                    numberOfColumns = 10;
-                    resize(true);
+                    relayout(10);
                     break;
                 default:
                     break;
@@ -178,7 +160,7 @@ MultiImageView::draw()
                     image->sprite.setColor(sf::Color::White);
 
                 window.draw(image->sprite);
-                if (showInfo && selectedImage != NULL) drawInfoBox(image);
+                if (showInfo && selectedImage == NULL) drawInfoBox(image);
             }
         }
         else
@@ -192,6 +174,7 @@ MultiImageView::draw()
     {
         selectedImage->update();
         window.draw(selectedImage->sprite);
+        if (showInfo) drawInfoBox(selectedImage);
     }
 
     if (allImagesAreReady && yViewPosition + yViewSize / 2 > columnOffsets[minColumnIndex()])
@@ -204,15 +187,45 @@ MultiImageView::draw()
 }
 
 void
-MultiImageView::resize(bool relayout)
+MultiImageView::resize()
 {
-    yViewSize = window.getView().getSize().y;
     int newTargetImageWidth = window.getSize().x / numberOfColumns;
     float factor = (float) newTargetImageWidth / targetImageWidth;
     targetImageWidth = newTargetImageWidth;
 
-    if (relayout)
+    yViewSize = window.getView().getSize().y;
+    yViewPosition *= factor;
+
+    sf::View view = window.getView();
+    view.setCenter(view.getCenter().x, yViewPosition);
+    window.setView(view);
+
+    for (auto image : images)
     {
+        if (image->hasPosition)
+        {
+            image->setPosition(image->position * factor);
+            image->sprite.scale(factor, factor);
+            if (image == selectedImage)
+                selectedImage->fitTo(window.getView());
+        }
+    }
+
+    for (int i = 0; i < numberOfColumns; i++)
+        columnOffsets[i] *= factor;
+}
+
+void
+MultiImageView::relayout(int columns)
+{
+    if (selectedImage == NULL)
+    {
+        numberOfColumns = columns;
+
+        int newTargetImageWidth = window.getSize().x / numberOfColumns;
+        float factor = (float) newTargetImageWidth / targetImageWidth;
+        targetImageWidth = newTargetImageWidth;
+
         bottom = 0;
         columnOffsets.resize(numberOfColumns);
         for (int i = 0; i < numberOfColumns; i++)
@@ -221,26 +234,12 @@ MultiImageView::resize(bool relayout)
         for (auto image : images)
             if (image->hasPosition)
                 layout(image);
-    }
-    else
-    {
-        for (auto image : images)
-        {
-            if (image->hasPosition)
-            {
-                image->setPosition(image->sprite.getPosition() * factor);
-                image->sprite.scale(factor, factor);
-            }
-        }
 
-        for (int i = 0; i < numberOfColumns; i++)
-            columnOffsets[i] *= factor;
+        yViewPosition *= factor * factor;
+        sf::View view = window.getView();
+        view.setCenter(view.getCenter().x, yViewPosition);
+        window.setView(view);
     }
-
-    yViewPosition *= factor * factor;
-    sf::View view = window.getView();
-    view.setCenter(view.getCenter().x, yViewPosition);
-    window.setView(view);
 }
 
 int
@@ -257,6 +256,20 @@ MultiImageView::minColumnIndex()
         }
     }
     return columnIndex;
+}
+
+void
+MultiImageView::unselectImage()
+{
+    if (selectedImage != NULL)
+    {
+        const sf::Vector2u& imageSize = selectedImage->sprite.getTexture()->getSize();
+        float scale = (float)targetImageWidth / imageSize.x;
+        selectedImage->sprite.setScale(scale, scale);
+        selectedImage->sprite.setOrigin(0, 0);
+        selectedImage->sprite.setPosition(selectedImage->position);
+        selectedImage = NULL;
+    }
 }
 
 void
@@ -281,13 +294,13 @@ MultiImageView::drawInfoBox(Image* image)
     info.setFont(font);
     info.setFillColor(sf::Color::White);
     info.setCharacterSize(16);
-    info.setPosition(image->position);
+    info.setPosition(image->sprite.getPosition());
     info.setString(image->info);
     
     sf::FloatRect bounds = info.getLocalBounds();
     sf::RectangleShape background(sf::Vector2f(targetImageWidth, bounds.top * 2 + bounds.height));
     background.setFillColor(sf::Color(0, 0, 0, 64));
-    background.setPosition(image->position);
+    background.setPosition(image->sprite.getPosition());
 
     window.draw(background);
     window.draw(info);
@@ -300,7 +313,7 @@ MultiImageView::visible(Image* image)
             image->position.y < yViewPosition + yViewSize / 2);
 }
 
-void
+bool
 MultiImageView::selectImage()
 {
     if (selectedImage == NULL)
@@ -311,8 +324,9 @@ MultiImageView::selectImage()
             if (image->sprite.getGlobalBounds().contains(mouseCoords.x, mouseCoords.y))
             {
                 selectedImage = image;
-                break;
+                return true;
             }
         }
     }
+    return false;
 }

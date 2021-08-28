@@ -67,7 +67,7 @@ int main(int argc, char** argv)
                                 window.setVerticalSyncEnabled(true);
                                 fullscreen = true;
                             }
-                            imageView.resize(false);
+                            imageView.resize();
                             break;
 
                         default:

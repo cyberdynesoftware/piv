@@ -13,6 +13,7 @@ class Image
         void update(void);
         void setPosition(const sf::Vector2f&);
         void centerOrigin(void);
+        void fitTo(const sf::View&);
 
         sf::Sprite sprite;
         bool valid;

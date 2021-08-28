@@ -105,3 +105,19 @@ Image::centerOrigin()
     const auto& size = sprite.getTexture()->getSize();
     sprite.setOrigin(size.x / 2, size.y / 2);
 }
+
+void
+Image::fitTo(const sf::View& view)
+{
+    const auto& window = view.getSize();
+    const auto& size = sprite.getTexture()->getSize();
+
+    float xScale = (float)window.x / size.x;
+    float yScale = (float)window.y / size.y;
+    float scale = (xScale < yScale) ? xScale : yScale;
+    scale *= .98f;
+    sprite.setScale(scale, scale);
+
+    sprite.setOrigin(size.x / 2, size.y / 2);
+    sprite.setPosition(view.getCenter());
+}

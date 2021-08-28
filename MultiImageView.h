@@ -12,7 +12,7 @@ class MultiImageView
 
         void handle(sf::Event&);
         void draw(void);
-        void resize(bool);
+        void resize(void);
 
     private:
         Folder& folder;
@@ -36,5 +36,7 @@ class MultiImageView
         void layout(Image*);
         void drawInfoBox(Image*);
         bool visible(Image*);
-        void selectImage(void);
+        bool selectImage(void);
+        void unselectImage(void);
+        void relayout(int);
 };
