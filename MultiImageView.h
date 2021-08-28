@@ -32,6 +32,7 @@ class MultiImageView
 
         void loadImageRow(void);
         void scrollView(int);
+        void restrict(sf::View&);
         int minColumnIndex(void);
         void layout(Image*);
         void drawInfoBox(Image*);

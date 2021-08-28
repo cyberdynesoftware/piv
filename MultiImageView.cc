@@ -123,16 +123,20 @@ MultiImageView::scrollView(int delta)
     {
         sf::View view = window.getView();
         view.move(0, delta);
-
-        if (view.getCenter().y - yViewSize / 2 < 0)
-            view.setCenter(view.getCenter().x, yViewSize / 2);
-        else if (folderIter == folder.cend() && 
-                view.getCenter().y + yViewSize / 2 > bottom)
-            view.setCenter(view.getCenter().x, bottom - yViewSize / 2);
-
+        restrict(view);
         window.setView(view);
         yViewPosition = view.getCenter().y;
     }
+}
+
+void
+MultiImageView::restrict(sf::View& view)
+{
+    if (view.getCenter().y - view.getSize().y / 2 < 0)
+        view.setCenter(view.getCenter().x, view.getSize().y / 2);
+    else if (folderIter == folder.cend() && 
+            view.getCenter().y + view.getSize().y / 2 > bottom)
+        view.setCenter(view.getCenter().x, bottom - view.getSize().y / 2);
 }
 
 void
@@ -198,6 +202,7 @@ MultiImageView::resize()
 
     sf::View view = window.getView();
     view.setCenter(view.getCenter().x, yViewPosition);
+    restrict(view);
     window.setView(view);
 
     for (auto image : images)
@@ -238,6 +243,7 @@ MultiImageView::relayout(int columns)
         yViewPosition *= factor * factor;
         sf::View view = window.getView();
         view.setCenter(view.getCenter().x, yViewPosition);
+        restrict(view);
         window.setView(view);
     }
 }
@@ -294,13 +300,15 @@ MultiImageView::drawInfoBox(Image* image)
     info.setFont(font);
     info.setFillColor(sf::Color::White);
     info.setCharacterSize(16);
-    info.setPosition(image->sprite.getPosition());
     info.setString(image->info);
     
-    sf::FloatRect bounds = info.getLocalBounds();
-    sf::RectangleShape background(sf::Vector2f(targetImageWidth, bounds.top * 2 + bounds.height));
+    const auto& infoBounds = info.getLocalBounds();
+    const auto& imageBounds = image->sprite.getGlobalBounds();
+    sf::RectangleShape background(sf::Vector2f(imageBounds.width, infoBounds.top * 2 + infoBounds.height));
     background.setFillColor(sf::Color(0, 0, 0, 64));
-    background.setPosition(image->sprite.getPosition());
+
+    background.setPosition(imageBounds.left, imageBounds.top);
+    info.setPosition(imageBounds.left, imageBounds.top);
 
     window.draw(background);
     window.draw(info);
@@ -309,8 +317,9 @@ MultiImageView::drawInfoBox(Image* image)
 bool
 MultiImageView::visible(Image* image)
 {
-    return (image->position.y + image->sprite.getTexture()->getSize().y > yViewPosition - yViewSize / 2 &&
-            image->position.y < yViewPosition + yViewSize / 2);
+    const auto& bounds = image->sprite.getGlobalBounds();
+    return (bounds.top + bounds.height > yViewPosition - yViewSize / 2 &&
+            bounds.top < yViewPosition + yViewSize / 2);
 }
 
 bool
