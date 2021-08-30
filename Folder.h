@@ -8,10 +8,10 @@ class Folder
     public:
         Folder(const char* arg);
 
-        typedef std::vector<std::string>::const_iterator FolderIter;
-        FolderIter cbegin(void);
-        FolderIter cend(void);
-        FolderIter currentItem;
+        typedef std::vector<std::string>::const_iterator iter;
+        iter cbegin(void);
+        iter cend(void);
+        iter currentItem;
         bool imageSelected = false;
 
         int size(void);

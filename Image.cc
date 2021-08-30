@@ -1,13 +1,12 @@
 #include "Image.h"
 #include <iostream>
-#include "Folder.h"
 #include "AnimatedGIF.h"
 #include "WebpImage.h"
 
-Image::Image(const std::string& path):
-    path(path)
+Image::Image(const Folder::iter iter):
+    folderIter(iter)
 {
-    future = std::async(std::launch::async, &Image::init, this, path);
+    future = std::async(std::launch::async, &Image::init, this, *folderIter);
 }
 
 Image::~Image()

@@ -14,6 +14,7 @@ MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window):
     yViewPosition = window.getView().getCenter().y;
     yViewSize = window.getView().getSize().y;
     font.loadFromMemory(font_ttf, font_ttf_len);
+    progressBar.setFillColor(sf::Color(255, 255, 255, 128));
     loadImageRow();
 }
 
@@ -23,7 +24,7 @@ MultiImageView::loadImageRow()
     for (int i = 0; i < numberOfColumns; i++)
     {
         if (folderIter == folder.cend()) break;
-        images.push_back(new Image(*folderIter++));
+        images.push_back(new Image(folderIter++));
     }
 }
 
@@ -165,6 +166,8 @@ MultiImageView::draw()
 
                 window.draw(image->sprite);
                 if (showInfo && selectedImage == NULL) drawInfoBox(image);
+
+                lastVisibleImage = image;
             }
         }
         else
@@ -184,10 +187,16 @@ MultiImageView::draw()
     if (allImagesAreReady && yViewPosition + yViewSize / 2 > columnOffsets[minColumnIndex()])
         loadImageRow();
 
-    if (scrollSpeed != 0) scrollView(scrollSpeed);
+    if (scrollSpeed != 0)
+    {
+        scrollView(scrollSpeed);
 
-    if (scrollSpeed > 0) scrollSpeed--;
-    else if (scrollSpeed < 0) scrollSpeed++;
+        if (scrollSpeed > 0) scrollSpeed--;
+        else if (scrollSpeed < 0) scrollSpeed++;
+
+        drawProgressBar();
+    }
+
 }
 
 void
@@ -338,4 +347,13 @@ MultiImageView::selectImage()
         }
     }
     return false;
+}
+
+void
+MultiImageView::drawProgressBar()
+{
+    float progress = (float) std::distance(folder.cbegin(), lastVisibleImage->folderIter) / folder.size();
+    progressBar.setSize(sf::Vector2f(progressBarWidth, progress * yViewSize));
+    progressBar.setPosition(window.getView().getSize().x - progressBarWidth, yViewPosition - yViewSize / 2);
+    window.draw(progressBar);
 }

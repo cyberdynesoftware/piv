@@ -16,7 +16,7 @@ class MultiImageView
 
     private:
         Folder& folder;
-        Folder::FolderIter folderIter;
+        Folder::iter folderIter;
         sf::RenderWindow& window;
         int numberOfColumns = 4;
         std::deque<Image*> images;
@@ -29,6 +29,9 @@ class MultiImageView
         int targetImageWidth;
         sf::Font font;
         Image* selectedImage = NULL;
+        int progressBarWidth = 10;
+        sf::RectangleShape progressBar;
+        Image* lastVisibleImage;
 
         void loadImageRow(void);
         void scrollView(int);
@@ -40,4 +43,5 @@ class MultiImageView
         bool selectImage(void);
         void unselectImage(void);
         void relayout(int);
+        void drawProgressBar(void);
 };

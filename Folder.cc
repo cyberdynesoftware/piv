@@ -49,13 +49,13 @@ Folder::scanDirectory(const std::string& dir)
     std::sort(files.begin(), files.end());
 }
 
-Folder::FolderIter
+Folder::iter
 Folder::cbegin()
 {
     return files.cbegin();
 }
 
-Folder::FolderIter
+Folder::iter
 Folder::cend()
 {
     return files.cend();

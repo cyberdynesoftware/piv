@@ -3,11 +3,12 @@
 #include <SFML/Graphics.hpp>
 #include <future>
 #include "AnimatedImage.h"
+#include "Folder.h"
 
 class Image
 {
     public:
-        Image(const std::string&);
+        Image(const Folder::iter);
         ~Image();
 
         void update(void);
@@ -20,8 +21,8 @@ class Image
         bool ready = false;
         bool hasPosition = false;
         sf::Vector2f position;
-        std::string path;
         std::string info;
+        const Folder::iter folderIter;
 
     private:
         sf::Texture texture;
