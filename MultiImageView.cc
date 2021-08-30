@@ -57,19 +57,19 @@ MultiImageView::handle(sf::Event& event)
             {
                 case sf::Keyboard::Up:
                 case sf::Keyboard::K:
-                    scrollSpeed = -yViewSize / 50;
+                    scrollState = UP;
                     break;
                 case sf::Keyboard::Down:
                 case sf::Keyboard::J:
-                    scrollSpeed = yViewSize / 50;
+                    scrollState = DOWN;
                     break;
                 case sf::Keyboard::PageUp:
                 case sf::Keyboard::U:
-                    scrollSpeed = -yViewSize / 25;
+                    scrollState = UP_FAST;
                     break;
                 case sf::Keyboard::PageDown:
                 case sf::Keyboard::D:
-                    scrollSpeed = yViewSize / 25;
+                    scrollState = DOWN_FAST;
                     break;
                 case sf::Keyboard::I:
                     showInfo = (showInfo) ? false : true;
@@ -112,21 +112,62 @@ MultiImageView::handle(sf::Event& event)
             }
             break;
 
+        case sf::Event::KeyReleased:
+            switch (event.key.code)
+            {
+                case sf::Keyboard::Up:
+                case sf::Keyboard::K:
+                case sf::Keyboard::Down:
+                case sf::Keyboard::J:
+                case sf::Keyboard::PageUp:
+                case sf::Keyboard::U:
+                case sf::Keyboard::PageDown:
+                case sf::Keyboard::D:
+                    scrollState = NONE;
+                    break;
+                default:
+                    break;
+            }
+            break;
+
         default:
             break;
     }
 }
 
 void
-MultiImageView::scrollView(int delta)
+MultiImageView::scrollView()
 {
-    if (selectedImage == NULL)
+    switch (scrollState)
+    {
+        case UP:
+            scrollSpeed = -yViewSize / 50;
+            break;
+        case DOWN:
+            scrollSpeed = yViewSize / 50;
+            break;
+        case UP_FAST:
+            scrollSpeed = -yViewSize / 25;
+            break;
+        case DOWN_FAST:
+            scrollSpeed = yViewSize / 25;
+            break;
+        default:
+            break;
+    }
+
+    if (scrollSpeed != 0 && selectedImage == NULL)
     {
         sf::View view = window.getView();
-        view.move(0, delta);
+        view.move(0, scrollSpeed);
         restrict(view);
         window.setView(view);
         yViewPosition = view.getCenter().y;
+
+        if (scrollSpeed > 0) scrollSpeed--;
+        else if (scrollSpeed < 0) scrollSpeed++;
+
+        drawProgressBar();
     }
 }
 
@@ -187,16 +228,7 @@ MultiImageView::draw()
     if (allImagesAreReady && yViewPosition + yViewSize / 2 > columnOffsets[minColumnIndex()])
         loadImageRow();
 
-    if (scrollSpeed != 0)
-    {
-        scrollView(scrollSpeed);
-
-        if (scrollSpeed > 0) scrollSpeed--;
-        else if (scrollSpeed < 0) scrollSpeed++;
-
-        drawProgressBar();
-    }
-
+    scrollView();
 }
 
 void

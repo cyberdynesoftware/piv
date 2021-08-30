@@ -32,9 +32,11 @@ class MultiImageView
         int progressBarWidth = 10;
         sf::RectangleShape progressBar;
         Image* lastVisibleImage;
+        enum scrollStates { NONE, UP, UP_FAST, DOWN, DOWN_FAST };
+        scrollStates scrollState = NONE;
 
         void loadImageRow(void);
-        void scrollView(int);
+        void scrollView();
         void restrict(sf::View&);
         int minColumnIndex(void);
         void layout(Image*);
