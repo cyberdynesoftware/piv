@@ -24,16 +24,14 @@ class MultiImageView
         std::vector<int> columnOffsets;
         int scrollSpeed = 0;
         int bottom = 0;
-        float yViewPosition;
-        float yViewSize;
+        float viewPosition;
+        float viewHeight;
         int targetImageWidth;
         sf::Font font;
-        Image* selectedImage = NULL;
+        Image* elevatedImage = NULL;
         int progressBarWidth = 10;
         sf::RectangleShape progressBar;
         Image* lastVisibleImage;
-        enum scrollStates { NONE, UP, UP_FAST, DOWN, DOWN_FAST };
-        scrollStates scrollState = NONE;
 
         void loadImageRow(void);
         void scrollView();
@@ -41,9 +39,9 @@ class MultiImageView
         int minColumnIndex(void);
         void layout(Image*);
         void drawInfoBox(Image*);
-        bool visible(Image*);
-        bool selectImage(void);
-        void unselectImage(void);
-        void relayout(int);
+        bool isVisible(Image*);
+        void pickImage(void);
+        void unpickImage(void);
+        void relayoutImages(int);
         void drawProgressBar(void);
 };
