@@ -23,6 +23,7 @@ class Image
         sf::Vector2f position;
         std::string info;
         const Folder::iter folderIter;
+        bool selected = false;
 
     private:
         sf::Texture texture;

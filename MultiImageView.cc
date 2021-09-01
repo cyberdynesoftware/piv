@@ -60,6 +60,25 @@ MultiImageView::handle(sf::Event& event)
                 case sf::Keyboard::M:
                     unpickImage();
                     break;
+                case sf::Keyboard::A:
+                    if (elevatedImage != NULL)
+                        elevatedImage->selected = true;
+                    break;
+                case sf::Keyboard::S:
+                    if (elevatedImage == NULL)
+                        showSelection = !showSelection;
+                    break;
+                case sf::Keyboard::C:
+                    if (elevatedImage == NULL)
+                    {
+                        for (auto image : images)
+                            image->selected = false;
+
+                        showSelection = false;
+                    }
+                    else
+                        elevatedImage->selected = false;
+                    break;
                 case sf::Keyboard::Num1:
                     relayoutImages(1);
                     break;
@@ -211,6 +230,8 @@ MultiImageView::draw()
             if (!image->valid) continue;
 
             if (image == elevatedImage) continue;
+
+            if (showSelection && !image->selected) continue;
 
             if (!image->hasPosition)
                 layout(image);

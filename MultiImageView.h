@@ -32,6 +32,7 @@ class MultiImageView
         int progressBarWidth = 10;
         sf::RectangleShape progressBar;
         Image* lastVisibleImage;
+        bool showSelection = false;
 
         void loadImageRow(void);
         void scrollView();
