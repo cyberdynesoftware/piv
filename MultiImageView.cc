@@ -37,14 +37,33 @@ MultiImageView::handle(sf::Event& event)
             scrollSpeed = -event.mouseWheelScroll.delta * viewHeight / 50;
             break;
 
+        case sf::Event::MouseButtonPressed:
+            switch (event.mouseButton.button)
+            {
+                case sf::Mouse::Button::XButton1:
+                    scrollState = DOWN;
+                    break;
+                case sf::Mouse::Button::XButton2:
+                    scrollState = UP;
+                    break;
+                default:
+                    break;
+            }
+            break;
+
         case sf::Event::MouseButtonReleased:
             switch (event.mouseButton.button)
             {
                 case sf::Mouse::Button::Left:
+                    scrollState = NONE;
                     pickImage();
                     break;
                 case sf::Mouse::Button::Right:
                     unpickImage();
+                    break;
+                case sf::Mouse::Button::XButton1:
+                case sf::Mouse::Button::XButton2:
+                    scrollState = NONE;
                     break;
                 default:
                     break;
@@ -54,6 +73,22 @@ MultiImageView::handle(sf::Event& event)
         case sf::Event::KeyPressed:
             switch (event.key.code)
             {
+                case sf::Keyboard::Up:
+                case sf::Keyboard::K:
+                    scrollState = UP;
+                    break;
+                case sf::Keyboard::Down:
+                case sf::Keyboard::J:
+                    scrollState = DOWN;
+                    break;
+                case sf::Keyboard::PageUp:
+                case sf::Keyboard::U:
+                    scrollState = UP_FAST;
+                    break;
+                case sf::Keyboard::PageDown:
+                case sf::Keyboard::D:
+                    scrollState = DOWN_FAST;
+                    break;
                 case sf::Keyboard::I:
                     showInfo = (showInfo) ? false : true;
                     break;
@@ -78,6 +113,12 @@ MultiImageView::handle(sf::Event& event)
                     }
                     else
                         elevatedImage->selected = false;
+                    break;
+                case sf::Keyboard::Space:
+                    scrollState = (scrollState == NONE) ? AUTO_SCROLL : NONE;
+                    break;
+                case sf::Keyboard::Home:
+                case sf::Keyboard::G:
                     break;
                 case sf::Keyboard::Num1:
                     relayoutImages(1);
@@ -108,6 +149,24 @@ MultiImageView::handle(sf::Event& event)
                     break;
                 case sf::Keyboard::Num0:
                     relayoutImages(10);
+                    break;
+                default:
+                    break;
+            }
+            break;
+
+        case sf::Event::KeyReleased:
+            switch (event.key.code)
+            {
+                case sf::Keyboard::Up:
+                case sf::Keyboard::K:
+                case sf::Keyboard::Down:
+                case sf::Keyboard::J:
+                case sf::Keyboard::PageUp:
+                case sf::Keyboard::U:
+                case sf::Keyboard::PageDown:
+                case sf::Keyboard::D:
+                    scrollState = NONE;
                     break;
                 default:
                     break;
@@ -302,18 +361,26 @@ MultiImageView::scrollView()
 {
     if (elevatedImage == NULL)
     {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) ||
-                    sf::Keyboard::isKeyPressed(sf::Keyboard::K))
+        switch (scrollState)
+        {
+            case UP:
                 scrollSpeed = -viewHeight / 50;
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) ||
-                    sf::Keyboard::isKeyPressed(sf::Keyboard::J))
+                break;
+            case DOWN:
                 scrollSpeed = viewHeight / 50;
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::PageUp) ||
-                    sf::Keyboard::isKeyPressed(sf::Keyboard::U))
+                break;
+            case UP_FAST:
                 scrollSpeed = -viewHeight / 25;
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::PageDown) ||
-                    sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+                break;
+            case DOWN_FAST:
                 scrollSpeed = viewHeight / 25;
+                break;
+            case AUTO_SCROLL:
+                scrollSpeed = viewHeight / 200;
+                break;
+            default:
+                break;
+        }
 
         if (scrollSpeed != 0)
         {
