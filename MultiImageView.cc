@@ -34,7 +34,7 @@ MultiImageView::handle(sf::Event& event)
     switch (event.type)
     {
         case sf::Event::MouseWheelScrolled:
-            scrollSpeed = -event.mouseWheelScroll.delta * viewHeight / 50;
+            setViewPosition(viewPosition - event.mouseWheelScroll.delta * viewHeight / 100);
             break;
 
         case sf::Event::MouseButtonPressed:
@@ -119,6 +119,8 @@ MultiImageView::handle(sf::Event& event)
                     break;
                 case sf::Keyboard::Home:
                 case sf::Keyboard::G:
+                    setViewPosition(window.getView().getSize().y / 2);
+                    scrollSpeed = 0;
                     break;
                 case sf::Keyboard::Num1:
                     relayoutImages(1);
@@ -179,6 +181,21 @@ MultiImageView::handle(sf::Event& event)
 }
 
 void
+MultiImageView::setViewPosition(int centerY)
+{
+    sf::View view = window.getView();
+    view.setCenter(view.getCenter().x, centerY);
+
+    if (view.getCenter().y - view.getSize().y / 2 < 0)
+        view.setCenter(view.getCenter().x, view.getSize().y / 2);
+    else if (folderIter == folder.cend() && view.getCenter().y + view.getSize().y / 2 > bottom)
+        view.setCenter(view.getCenter().x, bottom - view.getSize().y / 2);
+
+    window.setView(view);
+    viewPosition = view.getCenter().y;
+}
+
+void
 MultiImageView::pickImage()
 {
     if (elevatedImage == NULL)
@@ -215,6 +232,8 @@ MultiImageView::unpickImage()
         for (auto image : images)
             if (image != elevatedImage && isVisible(image))
                 image->sprite.setColor(sf::Color::White);
+
+        scrollSpeed = 0;
     }
 }
 
@@ -238,11 +257,7 @@ MultiImageView::relayoutImages(int columns)
             if (image->hasPosition)
                 layout(image);
 
-        viewPosition *= factor * factor;
-        sf::View view = window.getView();
-        view.setCenter(view.getCenter().x, viewPosition);
-        restrict(view);
-        window.setView(view);
+        setViewPosition(viewPosition * factor * factor);
     }
 }
 
@@ -376,7 +391,7 @@ MultiImageView::scrollView()
                 scrollSpeed = viewHeight / 25;
                 break;
             case AUTO_SCROLL:
-                scrollSpeed = viewHeight / 200;
+                scrollSpeed = viewHeight / 400;
                 break;
             default:
                 break;
@@ -384,11 +399,7 @@ MultiImageView::scrollView()
 
         if (scrollSpeed != 0)
         {
-            sf::View view = window.getView();
-            view.move(0, scrollSpeed);
-            restrict(view);
-            window.setView(view);
-            viewPosition = view.getCenter().y;
+            setViewPosition(viewPosition + scrollSpeed);
 
             if (scrollSpeed > 0) scrollSpeed--;
             else if (scrollSpeed < 0) scrollSpeed++;
@@ -396,16 +407,6 @@ MultiImageView::scrollView()
             drawProgressBar();
         }
     }
-}
-
-void
-MultiImageView::restrict(sf::View& view)
-{
-    if (view.getCenter().y - view.getSize().y / 2 < 0)
-        view.setCenter(view.getCenter().x, view.getSize().y / 2);
-    else if (folderIter == folder.cend() && 
-            view.getCenter().y + view.getSize().y / 2 > bottom)
-        view.setCenter(view.getCenter().x, bottom - view.getSize().y / 2);
 }
 
 void
@@ -425,12 +426,7 @@ MultiImageView::resize()
     targetImageWidth = newTargetImageWidth;
 
     viewHeight = window.getView().getSize().y;
-    viewPosition *= factor;
-
-    sf::View view = window.getView();
-    view.setCenter(view.getCenter().x, viewPosition);
-    restrict(view);
-    window.setView(view);
+    setViewPosition(viewPosition * factor);
 
     for (auto image : images)
     {
