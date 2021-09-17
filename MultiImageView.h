@@ -35,6 +35,7 @@ class MultiImageView
         enum SCROLL_STATES { NONE, UP, UP_FAST, DOWN, DOWN_FAST, AUTO_SCROLL };
         SCROLL_STATES scrollState = NONE;
         bool showSelection = false;
+        float lastViewPosition;
 
         void loadImageRow(void);
         void scrollView();
@@ -47,4 +48,5 @@ class MultiImageView
         void relayoutImages(int);
         void drawProgressBar(void);
         void setViewPosition(int);
+        void drawSelectedIcon(Image*);
 };

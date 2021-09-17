@@ -11,7 +11,7 @@ MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window):
 {
     folderIter = folder.cbegin();
     targetImageWidth = window.getSize().x / numberOfColumns;
-    viewPosition = window.getView().getCenter().y;
+    viewPosition = lastViewPosition = window.getView().getCenter().y;
     viewHeight = window.getView().getSize().y;
     font.loadFromMemory(font_ttf, font_ttf_len);
     progressBar.setFillColor(sf::Color(255, 255, 255, 128));
@@ -101,7 +101,21 @@ MultiImageView::handle(sf::Event& event)
                     break;
                 case sf::Keyboard::S:
                     if (elevatedImage == NULL)
+                    {
                         showSelection = !showSelection;
+
+                        if (showSelection)
+                        {
+                            lastViewPosition = viewPosition;
+                            relayoutImages(numberOfColumns);
+                            setViewPosition(window.getView().getSize().y / 2);
+                        }
+                        else
+                        {
+                            relayoutImages(numberOfColumns);
+                            setViewPosition(lastViewPosition);
+                        }
+                    }
                     break;
                 case sf::Keyboard::C:
                     if (elevatedImage == NULL)
@@ -110,9 +124,12 @@ MultiImageView::handle(sf::Event& event)
                             image->selected = false;
 
                         showSelection = false;
+                        relayoutImages(numberOfColumns);
                     }
                     else
+                    {
                         elevatedImage->selected = false;
+                    }
                     break;
                 case sf::Keyboard::Space:
                     scrollState = (scrollState == NONE) ? AUTO_SCROLL : NONE;
@@ -186,7 +203,7 @@ MultiImageView::setViewPosition(int centerY)
     sf::View view = window.getView();
     view.setCenter(view.getCenter().x, centerY);
 
-    if (view.getCenter().y - view.getSize().y / 2 < 0)
+    if (view.getCenter().y - view.getSize().y / 2 < 0 || bottom < view.getSize().y)
         view.setCenter(view.getCenter().x, view.getSize().y / 2);
     else if (folderIter == folder.cend() && view.getCenter().y + view.getSize().y / 2 > bottom)
         view.setCenter(view.getCenter().x, bottom - view.getSize().y / 2);
@@ -200,20 +217,24 @@ MultiImageView::pickImage()
 {
     if (elevatedImage == NULL)
     {
+        bool imageFound = false;
         auto mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
         for (auto image : images)
         {
+            if (showSelection && !image->selected) continue;
             if (image->sprite.getGlobalBounds().contains(mouseCoords.x, mouseCoords.y))
             {
                 elevatedImage = image;
                 elevatedImage->fitTo(window.getView());
+                imageFound = true;
                 break;
             }
         }
 
-        for (auto image : images)
-            if (image != elevatedImage && isVisible(image))
-                image->sprite.setColor(sf::Color(255, 255, 255, 31));
+        if (imageFound)
+            for (auto image : images)
+                if (image != elevatedImage && isVisible(image))
+                    image->sprite.setColor(sf::Color(255, 255, 255, 31));
     }
 }
 
@@ -255,8 +276,10 @@ MultiImageView::relayoutImages(int columns)
 
         for (auto image : images)
             if (image->hasPosition)
-                layout(image);
+                if (!showSelection || image->selected)
+                    layout(image);
 
+        lastViewPosition *= factor * factor;
         setViewPosition(viewPosition * factor * factor);
     }
 }
@@ -319,6 +342,9 @@ MultiImageView::draw()
                 if (showInfo && elevatedImage == NULL)
                     drawInfoBox(image);
 
+                if (!showSelection && elevatedImage == NULL && image->selected)
+                    drawSelectedIcon(image);
+
                 lastVisibleImage = image;
             }
         }
@@ -334,6 +360,7 @@ MultiImageView::draw()
         elevatedImage->update();
         window.draw(elevatedImage->sprite);
         if (showInfo) drawInfoBox(elevatedImage);
+        if (!showSelection && elevatedImage->selected) drawSelectedIcon(elevatedImage);
     }
 
     if (allImagesAreReady && viewPosition + viewHeight / 2 > columnOffsets[minColumnIndex()])
@@ -369,6 +396,21 @@ MultiImageView::drawInfoBox(Image* image)
 
     window.draw(background);
     window.draw(info);
+}
+
+void
+MultiImageView::drawSelectedIcon(Image* image)
+{
+    sf::CircleShape circle;
+    circle.setRadius(4);
+    circle.setFillColor(sf::Color::Yellow);
+    circle.setOutlineColor(sf::Color::Black);
+    circle.setOutlineThickness(3);
+
+    const auto& imageBounds = image->sprite.getGlobalBounds();
+    circle.setPosition(imageBounds.left + imageBounds.width - 16, imageBounds.top + 8);
+
+    window.draw(circle);
 }
 
 void
@@ -427,6 +469,7 @@ MultiImageView::resize()
 
     viewHeight = window.getView().getSize().y;
     setViewPosition(viewPosition * factor);
+    lastViewPosition *= factor;
 
     for (auto image : images)
     {
