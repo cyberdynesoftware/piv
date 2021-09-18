@@ -3,6 +3,7 @@
 #include <set>
 #include <cmath>
 #include "font.h"
+#include "Help.h"
 
 MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window):
     folder(folder),
@@ -139,6 +140,9 @@ MultiImageView::handle(sf::Event& event)
                     setViewPosition(window.getView().getSize().y / 2);
                     scrollSpeed = 0;
                     break;
+                case sf::Keyboard::H:
+                    showHelp = true;
+                    break;
                 case sf::Keyboard::Num1:
                     relayoutImages(1);
                     break;
@@ -186,6 +190,9 @@ MultiImageView::handle(sf::Event& event)
                 case sf::Keyboard::PageDown:
                 case sf::Keyboard::D:
                     scrollState = NONE;
+                    break;
+                case sf::Keyboard::H:
+                    showHelp = false;
                     break;
                 default:
                     break;
@@ -366,6 +373,9 @@ MultiImageView::draw()
     if (allImagesAreReady && viewPosition + viewHeight / 2 > columnOffsets[minColumnIndex()])
         loadImageRow();
 
+    if (showHelp)
+        drawHelpText();
+
     scrollView();
 }
 
@@ -383,7 +393,7 @@ MultiImageView::drawInfoBox(Image* image)
     sf::Text info;
     info.setFont(font);
     info.setFillColor(sf::Color::White);
-    info.setCharacterSize(16);
+    info.setCharacterSize(15);
     info.setString(image->info);
     
     const auto& infoBounds = info.getLocalBounds();
@@ -484,4 +494,31 @@ MultiImageView::resize()
 
     for (int i = 0; i < numberOfColumns; i++)
         columnOffsets[i] *= factor;
+}
+
+void
+MultiImageView::drawHelpText()
+{
+    std::string help = Help::general();
+    if (elevatedImage != NULL)
+        help.append(Help::singleImage());
+    else
+        help.append(Help::allImages());
+
+    sf::Text text;
+    text.setFont(font);
+    text.setFillColor(sf::Color::White);
+    text.setCharacterSize(18);
+    text.setString(help);
+    text.setPosition(100, 100);
+    text.setOrigin(text.getLocalBounds().width / 2, text.getLocalBounds().height / 2);
+    text.setPosition(window.getView().getCenter());
+
+    sf::RectangleShape background(sf::Vector2f(text.getLocalBounds().width + 50, text.getLocalBounds().height + 20));
+    background.setFillColor(sf::Color(0, 0, 0, 192));
+    background.setOrigin(background.getLocalBounds().width / 2, background.getLocalBounds().height / 2);
+    background.setPosition(window.getView().getCenter());
+
+    window.draw(background);
+    window.draw(text);
 }

@@ -8,7 +8,7 @@ all: $(OBJECTS)
 
 main.o: SingleImageView.h MultiImageView.h Folder.h icon.h
 Folder.o: Folder.h
-MultiImageView.o: MultiImageView.h Image.h Folder.h font.h
+MultiImageView.o: MultiImageView.h Image.h Folder.h font.h Help.h
 Image.o: Image.h AnimatedGIF.h WebpImage.h AnimatedImage.h
 AnimatedGIF.o: AnimatedGIF.h AnimatedImage.h
 WebpImage.o: WebpImage.h AnimatedImage.h

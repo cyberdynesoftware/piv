@@ -36,6 +36,7 @@ class MultiImageView
         SCROLL_STATES scrollState = NONE;
         bool showSelection = false;
         float lastViewPosition;
+        bool showHelp = false;
 
         void loadImageRow(void);
         void scrollView();
@@ -49,4 +50,5 @@ class MultiImageView
         void drawProgressBar(void);
         void setViewPosition(int);
         void drawSelectedIcon(Image*);
+        void drawHelpText(void);
 };
