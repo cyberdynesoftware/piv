@@ -8,7 +8,7 @@
 class Image
 {
     public:
-        Image(const Folder::iter);
+        Image(const std::string&);
         ~Image();
 
         void update(void);
@@ -22,7 +22,7 @@ class Image
         bool hasPosition = false;
         sf::Vector2f position;
         std::string info;
-        const Folder::iter folderIter;
+        std::string path;
         bool selected = false;
 
     private:

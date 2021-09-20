@@ -25,7 +25,7 @@ MultiImageView::loadImageRow()
     for (int i = 0; i < numberOfColumns; i++)
     {
         if (folderIter == folder.cend()) break;
-        images.push_back(new Image(folderIter++));
+        images.push_back(new Image(*folderIter++));
     }
 }
 
@@ -147,23 +147,26 @@ MultiImageView::handle(sf::Event& event)
                     if (showSelection && elevatedImage == NULL)
                         for (auto image : images)
                             if (image->selected)
-                                folder.copyToSelection(image->folderIter);
+                                folder.copyToSelection(image->path);
                     break;
                 case::sf::Keyboard::X:
                     if (showSelection && elevatedImage == NULL)
                     {
+                        std::deque<Image*> temp;
                         for (auto image : images)
                             if (image->selected)
-                                folder.moveToSelection(image->folderIter);
+                            {
+                                folder.moveToSelection(image->path);
+                                delete image;
+                            }
+                            else
+                                temp.push_back(image);
 
-                        images.clear();
                         folder.scan();
-                        folderIter = folder.cbegin();
-                        loadImageRow();
-                        bottom = 0;
-                        for (int i = 0; i < numberOfColumns; i++)
-                            columnOffsets[i] = 0;
+                        folderIter = std::find(folder.cbegin(), folder.cend(), images.back()->path);
+                        images = temp;
                         showSelection = false;
+                        relayoutImages(numberOfColumns);
                         setViewPosition(window.getView().getSize().y / 2);
                     }
                     break;
@@ -394,7 +397,7 @@ MultiImageView::draw()
         if (!showSelection && elevatedImage->selected) drawSelectedIcon(elevatedImage);
     }
 
-    if (allImagesAreReady && viewPosition + viewHeight / 2 > columnOffsets[minColumnIndex()])
+    if (allImagesAreReady && viewPosition + viewHeight / 2 > columnOffsets[minColumnIndex()] && !showSelection)
         loadImageRow();
 
     if (showHelp)
@@ -489,7 +492,9 @@ MultiImageView::scrollView()
 void
 MultiImageView::drawProgressBar()
 {
-    float progress = (float) std::distance(folder.cbegin(), lastVisibleImage->folderIter) / folder.size();
+    int index = std::find(folder.cbegin(), folder.cend(), lastVisibleImage->path) - folder.cbegin();
+    //float progress = (float) std::distance(folder.cbegin(), lastVisibleImage->folderIter) / folder.size();
+    float progress = (float) index / folder.size();
     progressBar.setSize(sf::Vector2f(progressBarWidth, progress * viewHeight));
     progressBar.setPosition(window.getView().getSize().x - progressBarWidth, viewPosition - viewHeight / 2);
     window.draw(progressBar);
@@ -528,9 +533,15 @@ MultiImageView::drawHelpText()
 {
     std::string help = Help::general();
     if (elevatedImage != NULL)
+    {
         help.append(Help::singleImage());
+    }
     else
+    {
         help.append(Help::allImages());
+        if (showSelection)
+            help.append(Help::selectedImages());
+    }
 
     sf::Text text;
     text.setFont(font);

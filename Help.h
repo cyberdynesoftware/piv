@@ -54,4 +54,15 @@ class Help
             result.append(line);
             return result;
         }
+
+        static const std::string selectedImages(void)
+        {
+            std::string result;
+            char line[100];
+            snprintf(line, 100, "%-25s%s\n", "Y", "Copy selected images to 'piv-selected'");
+            result.append(line);
+            snprintf(line, 100, "%-25s%s\n", "X", "Move selected images to 'piv-selected'");
+            result.append(line);
+            return result;
+        }
 };

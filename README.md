@@ -29,6 +29,6 @@ piv path/to/image
 
 Key | Description
 --- | ---
-<kbd>Q</kbd> <kbd>Esc</kbd> | Quit
+<kbd>Esc</kbd> <kbd>Q</kbd> | Quit
 <kbd>F</kbd> | Toggle fullscreen
 <kbd>H</kbd> | Display help

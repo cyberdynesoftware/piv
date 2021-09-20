@@ -98,21 +98,21 @@ Folder::fileExists(const std::string& p)
 }
 
 void
-Folder::copyToSelection(iter item)
+Folder::copyToSelection(std::string& item)
 {
     if (!exists(selectedFolder))
         create_directory(selectedFolder);
 
     boost::system::error_code ec;
-    copy_file(path(*item), path(selectedFolder) / path(*item).filename(), ec);
+    copy_file(path(item), path(selectedFolder) / path(item).filename(), ec);
 }
 
 void
-Folder::moveToSelection(iter item)
+Folder::moveToSelection(std::string& item)
 {
     if (!exists(selectedFolder))
         create_directory(selectedFolder);
 
     boost::system::error_code ec;
-    rename(path(*item), path(selectedFolder) / path(*item).filename(), ec);
+    rename(path(item), path(selectedFolder) / path(item).filename(), ec);
 }
