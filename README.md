@@ -5,6 +5,7 @@
 * Images occupy 100% of the window. No decorations, no fuss.
 * Images are layouted in columns. The number of columns can be adjusted on the
   fly.
+* Copy or move images to a selection folder.
 
 ## Build
 
@@ -30,10 +31,4 @@ Key | Description
 --- | ---
 <kbd>Q</kbd> <kbd>Esc</kbd> | Quit
 <kbd>F</kbd> | Toggle fullscreen
-Mouse Wheel | Scroll
-<kbd>Up</kbd> <kbd>K</kbd> | Scroll up
-<kbd>Down</kbd> <kbd>J</kbd> | Scroll down
-<kbd>PgUp</kbd> <kbd>U</kbd> | Scroll up fast
-<kbd>PgDn</kbd> <kbd>D</kbd> | Scroll down fast
-<kbd>I</kbd> | Toggle info
-<kbd>1</kbd> - <kbd>0</kbd> | Set columns to 1-10
+<kbd>H</kbd> | Display help

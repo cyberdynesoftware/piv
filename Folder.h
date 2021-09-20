@@ -9,18 +9,23 @@ class Folder
         Folder(const char* arg);
 
         typedef std::vector<std::string>::const_iterator iter;
-        iter cbegin(void);
-        iter cend(void);
         iter currentItem;
         bool imageSelected = false;
 
+        iter cbegin(void);
+        iter cend(void);
         int size(void);
+        bool selectedFolderExistsNotEmpty(void);
+        void copyToSelection(iter);
+        void moveToSelection(iter);
+        void scan(void);
+
         static std::string filename(const std::string&);
         static int fileSize(const std::string&);
         static bool fileExists(const std::string&);
 
     private:
+        std::string folderPath;
+        std::string selectedFolder;
         std::vector<std::string> files;
-
-        void scanDirectory(const std::string& p);
 };

@@ -143,6 +143,30 @@ MultiImageView::handle(sf::Event& event)
                 case sf::Keyboard::H:
                     showHelp = true;
                     break;
+                case::sf::Keyboard::Y:
+                    if (showSelection && elevatedImage == NULL)
+                        for (auto image : images)
+                            if (image->selected)
+                                folder.copyToSelection(image->folderIter);
+                    break;
+                case::sf::Keyboard::X:
+                    if (showSelection && elevatedImage == NULL)
+                    {
+                        for (auto image : images)
+                            if (image->selected)
+                                folder.moveToSelection(image->folderIter);
+
+                        images.clear();
+                        folder.scan();
+                        folderIter = folder.cbegin();
+                        loadImageRow();
+                        bottom = 0;
+                        for (int i = 0; i < numberOfColumns; i++)
+                            columnOffsets[i] = 0;
+                        showSelection = false;
+                        setViewPosition(window.getView().getSize().y / 2);
+                    }
+                    break;
                 case sf::Keyboard::Num1:
                     relayoutImages(1);
                     break;
@@ -377,6 +401,7 @@ MultiImageView::draw()
         drawHelpText();
 
     scrollView();
+    selectedFolderWarning();
 }
 
 bool
@@ -494,6 +519,8 @@ MultiImageView::resize()
 
     for (int i = 0; i < numberOfColumns; i++)
         columnOffsets[i] *= factor;
+
+    bottom *= factor;
 }
 
 void
@@ -510,7 +537,6 @@ MultiImageView::drawHelpText()
     text.setFillColor(sf::Color::White);
     text.setCharacterSize(18);
     text.setString(help);
-    text.setPosition(100, 100);
     text.setOrigin(text.getLocalBounds().width / 2, text.getLocalBounds().height / 2);
     text.setPosition(window.getView().getCenter());
 
@@ -521,4 +547,25 @@ MultiImageView::drawHelpText()
 
     window.draw(background);
     window.draw(text);
+}
+
+void
+MultiImageView::selectedFolderWarning()
+{
+    if (selectedFolderWarningCounter++ < 400 && folder.selectedFolderExistsNotEmpty())
+    {
+        sf::Text text;
+        text.setFont(font);
+        text.setFillColor(sf::Color::Red);
+        text.setCharacterSize(20);
+        text.setString("Warning: 'piv-selected' exists and is not empty.");
+        text.setPosition(20, viewPosition - viewHeight / 2 + 10);
+
+        sf::RectangleShape background(sf::Vector2f(window.getView().getSize().x, text.getLocalBounds().height + 30));
+        background.setFillColor(sf::Color(0, 0, 0, 192));
+        background.setPosition(0, viewPosition - viewHeight / 2);
+
+        window.draw(background);
+        window.draw(text);
+    }
 }

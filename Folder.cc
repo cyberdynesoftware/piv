@@ -13,29 +13,34 @@ Folder::Folder(const char* arg)
 
     if (is_directory(status(p)))
     {
-        scanDirectory(p.string());
+        folderPath = p.string();
+        scan();
         currentItem = files.cbegin();
     }
     else if (p.parent_path().empty())
     {
-        scanDirectory(current_path().string());
+        folderPath = current_path().string();
+        scan();
         currentItem = std::find(files.cbegin(), files.cend(), (current_path() / p).string());
         imageSelected = true;
     }
     else
     {
-        scanDirectory(p.parent_path().string());
+        folderPath = p.parent_path().string();
+        scan();
         currentItem = std::find(files.cbegin(), files.cend(), p.string());
         imageSelected = true;
     }
 
+    selectedFolder = (folderPath / "piv-selected").string();
     srand(time(NULL));
 }
 
 void
-Folder::scanDirectory(const std::string& dir)
+Folder::scan()
 {
-    path p(dir);
+    path p(folderPath);
+    files.clear();
 
     for (directory_iterator dir_iter(p); dir_iter != directory_iterator(); dir_iter++)
         files.push_back(dir_iter->path().string());
@@ -47,6 +52,12 @@ Folder::scanDirectory(const std::string& dir)
     }
 
     std::sort(files.begin(), files.end());
+}
+
+bool
+Folder::selectedFolderExistsNotEmpty()
+{
+    return exists(path(selectedFolder)) && !is_empty(path(selectedFolder));
 }
 
 Folder::iter
@@ -86,61 +97,22 @@ Folder::fileExists(const std::string& p)
     return exists(path(p));
 }
 
-/*
-const std::string&
-Folder::getCurrent()
+void
+Folder::copyToSelection(iter item)
 {
-    return file_iter->string();
+    if (!exists(selectedFolder))
+        create_directory(selectedFolder);
+
+    boost::system::error_code ec;
+    copy_file(path(*item), path(selectedFolder) / path(*item).filename(), ec);
 }
 
 void
-Folder::next()
+Folder::moveToSelection(iter item)
 {
-    if (++file_iter == files.cend())
-        file_iter = files.cbegin();
-}
+    if (!exists(selectedFolder))
+        create_directory(selectedFolder);
 
-void
-Folder::previous()
-{
-    if (file_iter == files.cbegin())
-        file_iter = files.cend();
-    file_iter--;
+    boost::system::error_code ec;
+    rename(path(*item), path(selectedFolder) / path(*item).filename(), ec);
 }
-
-void
-Folder::random()
-{
-    file_iter = files.cbegin();
-    std::advance(file_iter, rand() % files.size());
-}
-
-void
-Folder::select()
-{
-    try
-    {
-        path selected = file_iter->parent_path();
-        selected /= "selected";
-        create_directory(selected);
-        selected /= file_iter->filename();
-        copy_file(*file_iter, selected);
-    }
-    catch (const boost::system::system_error &error)
-    {
-        if (error.code() != boost::system::errc::file_exists)
-            throw;
-    }
-}
-
-void
-Folder::trash()
-{
-    path selected = file_iter->parent_path();
-    selected /= ".trashed";
-    create_directory(selected);
-    selected /= file_iter->filename();
-    rename(*file_iter, selected);
-    file_iter = files.erase(file_iter);
-}
-*/

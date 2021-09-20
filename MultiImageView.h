@@ -37,6 +37,7 @@ class MultiImageView
         bool showSelection = false;
         float lastViewPosition;
         bool showHelp = false;
+        int selectedFolderWarningCounter = 0;
 
         void loadImageRow(void);
         void scrollView();
@@ -51,4 +52,5 @@ class MultiImageView
         void setViewPosition(int);
         void drawSelectedIcon(Image*);
         void drawHelpText(void);
+        void selectedFolderWarning(void);
 };
