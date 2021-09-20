@@ -53,4 +53,5 @@ class MultiImageView
         void drawSelectedIcon(Image*);
         void drawHelpText(void);
         void selectedFolderWarning(void);
+        Image* findImageUnderMouse(void);
 };

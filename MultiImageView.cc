@@ -66,6 +66,13 @@ MultiImageView::handle(sf::Event& event)
                 case sf::Mouse::Button::XButton2:
                     scrollState = NONE;
                     break;
+                case sf::Mouse::Button::Middle:
+                    if (elevatedImage == NULL)
+                    {
+                        Image* image = findImageUnderMouse();
+                        image->selected = !image->selected;
+                    }
+                    break;
                 default:
                     break;
             }
@@ -251,25 +258,32 @@ MultiImageView::pickImage()
 {
     if (elevatedImage == NULL)
     {
-        bool imageFound = false;
-        auto mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-        for (auto image : images)
-        {
-            if (showSelection && !image->selected) continue;
-            if (image->sprite.getGlobalBounds().contains(mouseCoords.x, mouseCoords.y))
-            {
-                elevatedImage = image;
-                elevatedImage->fitTo(window.getView());
-                imageFound = true;
-                break;
-            }
-        }
+        elevatedImage = findImageUnderMouse();
 
-        if (imageFound)
+        if (elevatedImage != NULL)
+        {
+            elevatedImage->fitTo(window.getView());
+
             for (auto image : images)
                 if (image != elevatedImage && isVisible(image))
                     image->sprite.setColor(sf::Color(255, 255, 255, 31));
+        }
     }
+}
+
+Image*
+MultiImageView::findImageUnderMouse()
+{
+    auto mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
+    for (auto image : images)
+    {
+        if (showSelection && !image->selected) continue;
+        if (image->sprite.getGlobalBounds().contains(mouseCoords.x, mouseCoords.y))
+            return image;
+    }
+
+    return NULL;
 }
 
 void

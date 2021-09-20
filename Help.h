@@ -39,6 +39,8 @@ class Help
             result.append(line);
             snprintf(line, 100, "%-25s%s\n", "C", "Clear all selected images");
             result.append(line);
+            snprintf(line, 100, "%-25s%s\n", "Mouse middle", "(Un)select image under mouse");
+            result.append(line);
             return result;
         }
 
