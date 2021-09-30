@@ -46,7 +46,6 @@ int main(int argc, char** argv)
                     switch (event.key.code)
                     {
                         case sf::Keyboard::Escape:
-                        case sf::Keyboard::Q:
                             window.close();
                             break;
 

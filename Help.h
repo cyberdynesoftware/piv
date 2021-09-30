@@ -6,7 +6,7 @@ class Help
         {
             std::string result;
             char line[100];
-            snprintf(line, 100, "%-25s%s\n", "ESC, Q", "Quit");
+            snprintf(line, 100, "%-25s%s\n", "Esc", "Quit");
             result.append(line);
             snprintf(line, 100, "%-25s%s\n", "F", "Toggle fullscreen");
             result.append(line);
