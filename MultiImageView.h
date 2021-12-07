@@ -29,7 +29,7 @@ class MultiImageView
         int targetImageWidth;
         sf::Font font;
         Image* elevatedImage = NULL;
-        int progressBarWidth = 12;
+        int progressBarWidth = 15;
         sf::RectangleShape progressBar;
         Image* lastVisibleImage;
         enum SCROLL_STATES { NONE, UP, UP_FAST, DOWN, DOWN_FAST, AUTO_SCROLL };
@@ -38,6 +38,7 @@ class MultiImageView
         float lastViewPosition;
         bool showHelp = false;
         int selectedFolderWarningCounter = 0;
+        sf::RectangleShape highlightBackground;
 
         void loadImageRow(void);
         void scrollView();

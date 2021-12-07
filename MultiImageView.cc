@@ -16,6 +16,9 @@ MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window):
     viewHeight = window.getView().getSize().y;
     font.loadFromMemory(font_ttf, font_ttf_len);
     progressBar.setFillColor(sf::Color(255, 255, 255, 128));
+    highlightBackground.setFillColor(sf::Color(0, 0, 0, 224));
+    highlightBackground.setSize(window.getView().getSize());
+    highlightBackground.setOrigin(window.getView().getSize() / 2.f);
     loadImageRow();
 }
 
@@ -261,13 +264,7 @@ MultiImageView::pickImage()
         elevatedImage = findImageUnderMouse();
 
         if (elevatedImage != NULL)
-        {
             elevatedImage->fitTo(window.getView());
-
-            for (auto image : images)
-                if (image != elevatedImage && isVisible(image))
-                    image->sprite.setColor(sf::Color(255, 255, 255, 31));
-        }
     }
 }
 
@@ -297,10 +294,6 @@ MultiImageView::unpickImage()
         elevatedImage->sprite.setOrigin(0, 0);
         elevatedImage->sprite.setPosition(elevatedImage->position);
         elevatedImage = NULL;
-
-        for (auto image : images)
-            if (image != elevatedImage && isVisible(image))
-                image->sprite.setColor(sf::Color::White);
 
         scrollSpeed = 0;
     }
@@ -405,6 +398,8 @@ MultiImageView::draw()
 
     if (elevatedImage != NULL)
     {
+        highlightBackground.setPosition(window.getView().getCenter());
+        window.draw(highlightBackground);
         elevatedImage->update();
         window.draw(elevatedImage->sprite);
         if (showInfo) drawInfoBox(elevatedImage);
@@ -512,11 +507,34 @@ MultiImageView::drawProgressBar()
     progressBar.setSize(sf::Vector2f(progressBarWidth, progress * viewHeight));
     progressBar.setPosition(window.getView().getSize().x - progressBarWidth, viewPosition - viewHeight / 2);
     window.draw(progressBar);
+
+    sf::Text text;
+    text.setFont(font);
+    text.setFillColor(sf::Color::Black);
+    text.setCharacterSize(15);
+    text.setString(std::to_string(index) + " / " + std::to_string(folder.size()));
+    text.setOrigin(text.getLocalBounds().width / 2, text.getLocalBounds().height / 2);
+
+    sf::RectangleShape background(sf::Vector2f(text.getLocalBounds().width + 20, text.getLocalBounds().height + 20));
+    background.setFillColor(sf::Color(255, 255, 255, 128));
+    background.setOutlineColor(sf::Color::Black);
+    background.setOutlineThickness(1.f);
+    background.setOrigin(background.getLocalBounds().width / 2, background.getLocalBounds().height / 2);
+    float x = window.getView().getSize().x - progressBarWidth - background.getSize().x / 2.f - 5;
+    float y = viewPosition - viewHeight / 2.f + progress * viewHeight;
+    background.setPosition(x, y);
+    text.setPosition(x - text.getLocalBounds().left, y - text.getLocalBounds().top);
+
+    window.draw(background);
+    window.draw(text);
 }
 
 void
 MultiImageView::resize()
 {
+    highlightBackground.setSize(window.getView().getSize());
+    highlightBackground.setOrigin(window.getView().getSize() / 2.f);
+
     int newTargetImageWidth = window.getSize().x / numberOfColumns;
     float factor = (float) newTargetImageWidth / targetImageWidth;
     targetImageWidth = newTargetImageWidth;
