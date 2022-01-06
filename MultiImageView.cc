@@ -311,6 +311,7 @@ MultiImageView::relayoutImages(int columns)
         targetImageWidth = newTargetImageWidth;
 
         bottom = 0;
+        columnIndex = 0;
         columnOffsets.resize(numberOfColumns);
         for (int i = 0; i < numberOfColumns; i++)
             columnOffsets[i] = 0;
@@ -330,14 +331,40 @@ MultiImageView::layout(Image* image)
 {
     const sf::Vector2u& imageSize = image->sprite.getTexture()->getSize();
     float scale = (float)targetImageWidth / imageSize.x;
+    int imageHeight = imageSize.y * scale;
     image->sprite.setScale(scale, scale);
     image->sprite.setOrigin(0, 0);
-    int columnIndex = minColumnIndex();
-    image->setPosition(sf::Vector2f(targetImageWidth * columnIndex, columnOffsets[columnIndex]));
-    columnOffsets[columnIndex] += imageSize.y * scale;
 
-    if (image->position.y + imageSize.y * scale > bottom)
-        bottom = image->position.y + imageSize.y * scale;
+    if (columnIndex == 0)
+    {
+        for (int i = 1; i < numberOfColumns; i++)
+            if (columnOffsets[i] + imageHeight < columnOffsets[0])
+            {
+                columnIndex = i;
+                break;
+            }
+    }
+    else
+    {
+        int columnIndexSave = columnIndex;
+        while (columnOffsets[columnIndex] > columnOffsets[columnIndexSave - 1])
+        {
+            columnIndex++;
+            if (columnIndex == numberOfColumns)
+            {
+                columnIndex = 0;
+                break;
+            }
+        }
+    }
+
+    image->setPosition(sf::Vector2f(targetImageWidth * columnIndex, columnOffsets[columnIndex]));
+    columnOffsets[columnIndex] += imageHeight;
+    columnIndex++;
+    columnIndex = columnIndex % numberOfColumns;
+
+    if (image->position.y + imageHeight > bottom)
+        bottom = image->position.y + imageHeight;
 }
 
 int

@@ -22,6 +22,7 @@ class MultiImageView
         std::deque<Image*> images;
         bool showInfo = false;
         std::vector<int> columnOffsets;
+        int columnIndex = 0;
         int scrollSpeed = 0;
         int bottom = 0;
         float viewPosition;
