@@ -20,6 +20,7 @@ class MultiImageView
         sf::RenderWindow& window;
         int numberOfColumns = 4;
         std::deque<Image*> images;
+        std::deque<Image*>::iterator imageIter;
         bool showInfo = false;
         std::vector<int> columnOffsets;
         int columnIndex = 0;
@@ -56,4 +57,6 @@ class MultiImageView
         void drawHelpText(void);
         void selectedFolderWarning(void);
         Image* findImageUnderMouse(void);
+        void nextImage(void);
+        void previousImage(void);
 };

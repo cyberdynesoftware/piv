@@ -45,10 +45,16 @@ MultiImageView::handle(sf::Event& event)
             switch (event.mouseButton.button)
             {
                 case sf::Mouse::Button::XButton1:
-                    scrollState = DOWN;
+                    if (elevatedImage == NULL)
+                        scrollState = DOWN;
+                    else
+                        nextImage();
                     break;
                 case sf::Mouse::Button::XButton2:
-                    scrollState = UP;
+                    if (elevatedImage == NULL)
+                        scrollState = UP;
+                    else
+                        previousImage();
                     break;
                 default:
                     break;
@@ -143,7 +149,14 @@ MultiImageView::handle(sf::Event& event)
                     }
                     break;
                 case sf::Keyboard::Space:
-                    scrollState = (scrollState == NONE) ? AUTO_SCROLL : NONE;
+                    if (elevatedImage == NULL)
+                        scrollState = (scrollState == NONE) ? AUTO_SCROLL : NONE;
+                    else
+                        nextImage();
+                    break;
+                case sf::Keyboard::Backspace:
+                    if (elevatedImage != NULL)
+                        previousImage();
                     break;
                 case sf::Keyboard::Home:
                 case sf::Keyboard::G:
@@ -265,6 +278,8 @@ MultiImageView::pickImage()
 
         if (elevatedImage != NULL)
             elevatedImage->fitTo(window.getView());
+
+        imageIter = std::find(images.begin(), images.end(), elevatedImage);
     }
 }
 
@@ -284,6 +299,17 @@ MultiImageView::findImageUnderMouse()
 }
 
 void
+MultiImageView::nextImage()
+{
+    if (imageIter != images.end() && ++imageIter != images.end())
+    {
+        unpickImage();
+        elevatedImage = *imageIter;
+        elevatedImage->fitTo(window.getView());
+    }
+}
+
+void
 MultiImageView::unpickImage()
 {
     if (elevatedImage != NULL)
@@ -296,6 +322,18 @@ MultiImageView::unpickImage()
         elevatedImage = NULL;
 
         scrollSpeed = 0;
+    }
+}
+
+void
+MultiImageView::previousImage()
+{
+    if (imageIter != images.begin())
+    {
+        unpickImage();
+        imageIter--;
+        elevatedImage = *imageIter;
+        elevatedImage->fitTo(window.getView());
     }
 }
 
