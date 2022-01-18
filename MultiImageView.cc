@@ -38,7 +38,8 @@ MultiImageView::handle(sf::Event& event)
     switch (event.type)
     {
         case sf::Event::MouseWheelScrolled:
-            setViewPosition(viewPosition - event.mouseWheelScroll.delta * viewHeight / 100);
+            if (elevatedImage == NULL)
+                setViewPosition(viewPosition - event.mouseWheelScroll.delta * viewHeight / 100);
             break;
 
         case sf::Event::MouseButtonPressed:
@@ -166,13 +167,22 @@ MultiImageView::handle(sf::Event& event)
                 case sf::Keyboard::H:
                     showHelp = true;
                     break;
-                case::sf::Keyboard::Y:
+                case sf::Keyboard::O:
+                    if (elevatedImage != NULL)
+                    {
+                        if (elevatedImage->sprite.getScale().x == 1.f)
+                            elevatedImage->fitTo(window.getView());
+                        else
+                            elevatedImage->sprite.setScale(1.f, 1.f);
+                    }
+                    break;
+                case sf::Keyboard::Y:
                     if (showSelection && elevatedImage == NULL)
                         for (auto image : images)
                             if (image->selected)
                                 folder.copyToSelection(image->path);
                     break;
-                case::sf::Keyboard::X:
+                case sf::Keyboard::X:
                     if (showSelection && elevatedImage == NULL)
                     {
                         std::deque<Image*> temp;

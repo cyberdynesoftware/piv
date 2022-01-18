@@ -58,6 +58,8 @@ class Help
             result.append(line);
             snprintf(line, 100, "%-25s%s\n", "C", "Remove image from selection");
             result.append(line);
+            snprintf(line, 100, "%-25s%s\n", "O", "Toggle image original size");
+            result.append(line);
             return result;
         }
 
