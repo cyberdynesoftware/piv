@@ -41,6 +41,7 @@ class MultiImageView
         bool showHelp = false;
         int selectedFolderWarningCounter = 0;
         sf::RectangleShape highlightBackground;
+        sf::Vector2i previousMousePosition;
 
         void loadImageRow(void);
         void scrollView();
@@ -59,4 +60,5 @@ class MultiImageView
         Image* findImageUnderMouse(void);
         void nextImage(void);
         void previousImage(void);
+        void zoom(float);
 };

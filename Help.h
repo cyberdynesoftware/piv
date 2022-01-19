@@ -50,6 +50,10 @@ class Help
             char line[100];
             snprintf(line, 100, "%-25s%s\n", "M, Mouse right", "Go back");
             result.append(line);
+            snprintf(line, 100, "%-25s%s\n", "Mouse left", "Move image");
+            result.append(line);
+            snprintf(line, 100, "%-25s%s\n", "Mouse wheel", "Zoom image");
+            result.append(line);
             snprintf(line, 100, "%-25s%s\n", "Space, Mouse extra1", "Next image");
             result.append(line);
             snprintf(line, 100, "%-25s%s\n", "Backspace, Mouse extra2", "Previous image");

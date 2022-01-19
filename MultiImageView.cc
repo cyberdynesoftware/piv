@@ -20,6 +20,7 @@ MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window):
     highlightBackground.setSize(window.getView().getSize());
     highlightBackground.setOrigin(window.getView().getSize() / 2.f);
     loadImageRow();
+    previousMousePosition = sf::Mouse::getPosition();
 }
 
 void
@@ -40,6 +41,8 @@ MultiImageView::handle(sf::Event& event)
         case sf::Event::MouseWheelScrolled:
             if (elevatedImage == NULL)
                 setViewPosition(viewPosition - event.mouseWheelScroll.delta * viewHeight / 100);
+            else
+                zoom(event.mouseWheelScroll.delta);
             break;
 
         case sf::Event::MouseButtonPressed:
@@ -86,6 +89,16 @@ MultiImageView::handle(sf::Event& event)
                 default:
                     break;
             }
+            break;
+
+        case sf::Event::MouseMoved:
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && elevatedImage != NULL)
+            {
+                sf::Vector2i delta(sf::Mouse::getPosition() - previousMousePosition);
+                elevatedImage->sprite.move(delta.x, delta.y);
+            }
+
+            previousMousePosition = sf::Mouse::getPosition();
             break;
 
         case sf::Event::KeyPressed:
@@ -685,5 +698,24 @@ MultiImageView::selectedFolderWarning()
 
         window.draw(background);
         window.draw(text);
+    }
+}
+
+void
+MultiImageView::zoom(float delta)
+{
+    if (delta < 0)
+    {
+        elevatedImage->sprite.scale(0.95f, 0.95f);
+    }
+    else if (delta > 0)
+    {
+        sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+        sf::Vector2f mousePositionInSprite(mousePosition.x - elevatedImage->sprite.getGlobalBounds().left,
+                mousePosition.y - elevatedImage->sprite.getGlobalBounds().top);
+
+        elevatedImage->sprite.setOrigin(mousePositionInSprite / elevatedImage->sprite.getScale().x);
+        elevatedImage->sprite.setPosition(mousePosition);
+        elevatedImage->sprite.scale(1.05f, 1.05f);
     }
 }
