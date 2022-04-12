@@ -80,11 +80,7 @@ MultiImageView::handle(sf::Event& event)
                     scrollState = NONE;
                     break;
                 case sf::Mouse::Button::Middle:
-                    if (elevatedImage == NULL)
-                    {
-                        Image* image = findImageUnderMouse();
-                        image->selected = !image->selected;
-                    }
+                    selectImage();
                     break;
                 default:
                     break;
@@ -127,8 +123,7 @@ MultiImageView::handle(sf::Event& event)
                     unpickImage();
                     break;
                 case sf::Keyboard::A:
-                    if (elevatedImage != NULL)
-                        elevatedImage->selected = true;
+                    selectImage();
                     break;
                 case sf::Keyboard::S:
                     if (elevatedImage == NULL)
@@ -156,10 +151,6 @@ MultiImageView::handle(sf::Event& event)
 
                         showSelection = false;
                         relayoutImages(numberOfColumns);
-                    }
-                    else
-                    {
-                        elevatedImage->selected = false;
                     }
                     break;
                 case sf::Keyboard::Space:
@@ -322,6 +313,20 @@ MultiImageView::findImageUnderMouse()
 }
 
 void
+MultiImageView::selectImage()
+{
+    if (elevatedImage == NULL)
+    {
+        Image* image = findImageUnderMouse();
+        image->selected = !image->selected;
+    }
+    else
+    {
+        elevatedImage->selected = !elevatedImage->selected;
+    }
+}
+
+void
 MultiImageView::nextImage()
 {
     if (imageIter != images.end() && ++imageIter != images.end())
@@ -396,25 +401,28 @@ MultiImageView::layout(Image* image)
     image->sprite.setScale(scale, scale);
     image->sprite.setOrigin(0, 0);
 
-    if (columnIndex == 0)
+    if (columnIndex != minColumnIndex())
     {
-        for (int i = 1; i < numberOfColumns; i++)
-            if (columnOffsets[i] + imageHeight < columnOffsets[0])
-            {
-                columnIndex = i;
-                break;
-            }
-    }
-    else
-    {
-        int columnIndexSave = columnIndex;
-        while (columnOffsets[columnIndex] > columnOffsets[columnIndexSave - 1])
+        if (columnIndex == 0)
         {
-            columnIndex++;
-            if (columnIndex == numberOfColumns)
+            for (int i = 1; i < numberOfColumns; i++)
+                if (columnOffsets[i] + imageHeight < columnOffsets[0])
+                {
+                    columnIndex = i;
+                    break;
+                }
+        }
+        else
+        {
+            int columnIndexSave = columnIndex;
+            while (columnOffsets[columnIndex] > columnOffsets[columnIndexSave - 1])
             {
-                columnIndex = 0;
-                break;
+                columnIndex++;
+                if (columnIndex == numberOfColumns)
+                {
+                    columnIndex = 0;
+                    break;
+                }
             }
         }
     }

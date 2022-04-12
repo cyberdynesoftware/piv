@@ -39,7 +39,7 @@ class Help
             result.append(line);
             snprintf(line, 100, "%-25s%s\n", "C", "Clear all selected images");
             result.append(line);
-            snprintf(line, 100, "%-25s%s\n", "Mouse middle", "(Un)select image under mouse");
+            snprintf(line, 100, "%-25s%s\n", "A, Mouse middle", "(Un)select image under mouse");
             result.append(line);
             return result;
         }
@@ -58,9 +58,7 @@ class Help
             result.append(line);
             snprintf(line, 100, "%-25s%s\n", "Backspace, Mouse extra2", "Previous image");
             result.append(line);
-            snprintf(line, 100, "%-25s%s\n", "A", "Add image to selection");
-            result.append(line);
-            snprintf(line, 100, "%-25s%s\n", "C", "Remove image from selection");
+            snprintf(line, 100, "%-25s%s\n", "A, Mouse middle", "(Un)select image");
             result.append(line);
             snprintf(line, 100, "%-25s%s\n", "O", "Toggle image original size");
             result.append(line);

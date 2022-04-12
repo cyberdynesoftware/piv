@@ -58,6 +58,7 @@ class MultiImageView
         void drawHelpText(void);
         void selectedFolderWarning(void);
         Image* findImageUnderMouse(void);
+        void selectImage(void);
         void nextImage(void);
         void previousImage(void);
         void zoom(float);
