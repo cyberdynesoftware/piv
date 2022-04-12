@@ -323,18 +323,21 @@ MultiImageView::selectImage()
     else
     {
         elevatedImage->selected = !elevatedImage->selected;
+        nextImage();
     }
 }
 
 void
 MultiImageView::nextImage()
 {
-    if (imageIter != images.end() && ++imageIter != images.end())
-    {
-        unpickImage();
-        elevatedImage = *imageIter;
-        elevatedImage->fitTo(window.getView());
-    }
+    while (++imageIter != images.end())
+        if ((*imageIter)->valid)
+        {
+            unpickImage();
+            elevatedImage = *imageIter;
+            elevatedImage->fitTo(window.getView());
+            break;
+        }
 }
 
 void
@@ -356,13 +359,14 @@ MultiImageView::unpickImage()
 void
 MultiImageView::previousImage()
 {
-    if (imageIter != images.begin())
-    {
-        unpickImage();
-        imageIter--;
-        elevatedImage = *imageIter;
-        elevatedImage->fitTo(window.getView());
-    }
+    while (imageIter != images.begin())
+        if ((*(--imageIter))->valid)
+        {
+            unpickImage();
+            elevatedImage = *imageIter;
+            elevatedImage->fitTo(window.getView());
+            break;
+        }
 }
 
 void

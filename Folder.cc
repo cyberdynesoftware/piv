@@ -43,7 +43,8 @@ Folder::scan()
     files.clear();
 
     for (directory_iterator dir_iter(p); dir_iter != directory_iterator(); dir_iter++)
-        files.push_back(dir_iter->path().string());
+        if (!is_directory(dir_iter->path()))
+            files.push_back(dir_iter->path().string());
 
     if (files.empty())
     {
