@@ -277,7 +277,7 @@ MultiImageView::setViewPosition(int centerY)
 
     if (view.getCenter().y - view.getSize().y / 2 < 0 || bottom < view.getSize().y)
         view.setCenter(view.getCenter().x, view.getSize().y / 2);
-    else if (folderIter == folder.cend() && view.getCenter().y + view.getSize().y / 2 > bottom)
+    else if ((folderIter == folder.cend() || showSelection) && view.getCenter().y + view.getSize().y / 2 > bottom)
         view.setCenter(view.getCenter().x, bottom - view.getSize().y / 2);
 
     window.setView(view);
@@ -603,8 +603,20 @@ void
 MultiImageView::drawProgressBar()
 {
     int index = std::find(folder.cbegin(), folder.cend(), lastVisibleImage->path) - folder.cbegin();
-    //float progress = (float) std::distance(folder.cbegin(), lastVisibleImage->folderIter) / folder.size();
-    float progress = (float) index / folder.size();
+    int max = 0;
+
+    if (showSelection)
+    {
+        for (auto image : images)
+            if (image->selected)
+                max++;
+    }
+    else
+    {
+        max = folder.size();
+    }
+
+    float progress = (float) index / max;
     progressBar.setSize(sf::Vector2f(progressBarWidth, progress * viewHeight));
     progressBar.setPosition(window.getView().getSize().x - progressBarWidth, viewPosition - viewHeight / 2);
     window.draw(progressBar);
@@ -613,7 +625,7 @@ MultiImageView::drawProgressBar()
     text.setFont(font);
     text.setFillColor(sf::Color::Black);
     text.setCharacterSize(15);
-    text.setString(std::to_string(index) + " / " + std::to_string(folder.size()));
+    text.setString(std::to_string(index) + " / " + std::to_string(max));
     text.setOrigin(text.getLocalBounds().width / 2, text.getLocalBounds().height / 2);
 
     sf::RectangleShape background(sf::Vector2f(text.getLocalBounds().width + 20, text.getLocalBounds().height + 20));
