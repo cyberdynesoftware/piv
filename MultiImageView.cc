@@ -200,11 +200,12 @@ MultiImageView::handle(sf::Event& event)
                                 temp.push_back(image);
 
                         folder.scan();
-                        folderIter = std::find(folder.cbegin(), folder.cend(), images.back()->path);
                         images = temp;
+                        folderIter = std::find(folder.cbegin(), folder.cend(), images.back()->path);
+                        folderIter++;
                         showSelection = false;
                         relayoutImages(numberOfColumns);
-                        setViewPosition(window.getView().getSize().y / 2);
+                        setViewPosition(lastViewPosition);
                     }
                     break;
                 case sf::Keyboard::Num1:
@@ -330,7 +331,7 @@ MultiImageView::selectImage()
 void
 MultiImageView::nextImage()
 {
-    while (++imageIter != images.end())
+    while (imageIter != images.end() && ++imageIter != images.end())
         if ((*imageIter)->valid)
         {
             unpickImage();
