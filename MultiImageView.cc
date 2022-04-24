@@ -449,26 +449,17 @@ MultiImageView::draw()
         if (image->ready)
         {
             if (!image->valid) continue;
-
             if (image == elevatedImage) continue;
-
             if (showSelection && !image->selected) continue;
-
-            if (!image->hasPosition)
-                layout(image);
+            if (!image->hasPosition) layout(image);
 
             if (isVisible(image))
             {
                 image->update();
-
                 window.draw(image->sprite);
-
-                if (showInfo && elevatedImage == NULL)
-                    drawInfoBox(image);
-
-                if (!showSelection && elevatedImage == NULL && image->selected)
-                    drawSelectedIcon(image);
-
+                if (!showSelection  && image->selected) highlight(image);
+                if (showInfo) drawInfoBox(image);
+                if (!showSelection  && image->selected) drawSelectedIcon(image);
                 lastVisibleImage = image;
             }
         }
@@ -486,7 +477,7 @@ MultiImageView::draw()
         elevatedImage->update();
         window.draw(elevatedImage->sprite);
         if (showInfo) drawInfoBox(elevatedImage);
-        if (!showSelection && elevatedImage->selected) drawSelectedIcon(elevatedImage);
+        if (!showSelection  && elevatedImage->selected) drawSelectedIcon(elevatedImage);
     }
 
     if (allImagesAreReady && viewPosition + viewHeight / 2 > columnOffsets[minColumnIndex()] && !showSelection)
@@ -529,17 +520,26 @@ MultiImageView::drawInfoBox(Image* image)
 }
 
 void
+MultiImageView::highlight(Image* image)
+{
+    const auto& imageBounds = image->sprite.getGlobalBounds();
+    sf::RectangleShape highlight(sf::Vector2f(imageBounds.width, imageBounds.height));
+    highlight.setPosition(imageBounds.left, imageBounds.top);
+    highlight.setFillColor(sf::Color(255, 255, 255, 96));
+    window.draw(highlight);
+}
+
+void
 MultiImageView::drawSelectedIcon(Image* image)
 {
     sf::CircleShape circle;
-    circle.setRadius(4);
-    circle.setFillColor(sf::Color::Yellow);
+    circle.setRadius(6);
+    circle.setFillColor(sf::Color::Cyan);
     circle.setOutlineColor(sf::Color::Black);
-    circle.setOutlineThickness(3);
+    circle.setOutlineThickness(2);
 
     const auto& imageBounds = image->sprite.getGlobalBounds();
-    circle.setPosition(imageBounds.left + imageBounds.width - 16, imageBounds.top + 8);
-
+    circle.setPosition(imageBounds.left + imageBounds.width - 20, imageBounds.top + 8);
     window.draw(circle);
 }
 
@@ -563,7 +563,8 @@ MultiImageView::scrollView()
                 scrollSpeed = viewHeight / 25;
                 break;
             case AUTO_SCROLL:
-                scrollSpeed = viewHeight / 400;
+                scrollSpeed = viewHeight / 800;
+                if (scrollSpeed == 0) scrollSpeed = 1;
                 break;
             default:
                 break;

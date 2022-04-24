@@ -15,7 +15,7 @@ int main(int argc, char** argv)
     Folder folder(argv[1]);
 
     sf::RenderWindow window(sf::VideoMode(800, 600), "piv", sf::Style::None);
-    window.setPosition(sf::Vector2i(100, 100));
+    window.setPosition(sf::Vector2i(80, 60));
     window.setFramerateLimit(60);
     window.setVerticalSyncEnabled(true);
     bool fullscreen = false;
