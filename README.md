@@ -17,7 +17,6 @@ make
 ### Dependencies
 
 * [sfml](https://www.sfml-dev.org)
-* [boost](https://www.boost.org)
 * [libwebp](https://developers.google.com/speed/webp)
 
 ## Usage

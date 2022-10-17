@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <stdlib.h>
 #include <time.h>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
-using namespace boost::filesystem;
+using namespace std::filesystem;
 
 Folder::Folder(const char* arg)
 {
@@ -32,7 +32,7 @@ Folder::Folder(const char* arg)
         imageSelected = true;
     }
 
-    selectedFolder = (folderPath / "piv-selected").string();
+    selectedFolder = path(folderPath).append("piv-selected").string();
     srand(time(NULL));
 }
 
@@ -82,7 +82,7 @@ Folder::size()
 int
 Folder::fileSize(const std::string& p)
 {
-    boost::system::error_code ec;
+    std::error_code ec;
     return file_size(path(p), ec);
 }
 
@@ -104,7 +104,7 @@ Folder::copyToSelection(std::string& item)
     if (!exists(selectedFolder))
         create_directory(selectedFolder);
 
-    boost::system::error_code ec;
+    std::error_code ec;
     copy_file(path(item), path(selectedFolder) / path(item).filename(), ec);
 }
 
@@ -114,6 +114,6 @@ Folder::moveToSelection(std::string& item)
     if (!exists(selectedFolder))
         create_directory(selectedFolder);
 
-    boost::system::error_code ec;
+    std::error_code ec;
     rename(path(item), path(selectedFolder) / path(item).filename(), ec);
 }

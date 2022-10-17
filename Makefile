@@ -1,10 +1,10 @@
 OBJECTS = main.o Folder.o AnimatedGIF.o MultiImageView.o Image.o WebpImage.o
 
 CPP = g++
-CPPFLAGS = -g -Wall -std=c++14
+CPPFLAGS = -g -Wall -std=c++17
 
 all: $(OBJECTS)
-	$(CPP) $(OBJECTS) -o piv -pthread -lboost_filesystem -lsfml-graphics -lsfml-window -lsfml-system -lwebp -lwebpdemux
+	$(CPP) $(OBJECTS) -o piv -pthread -lsfml-graphics -lsfml-window -lsfml-system -lwebp -lwebpdemux
 
 main.o: SingleImageView.h MultiImageView.h Folder.h icon.h
 Folder.o: Folder.h

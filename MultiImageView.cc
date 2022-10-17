@@ -407,9 +407,9 @@ MultiImageView::layout(Image* image)
     image->sprite.setOrigin(0, 0);
 
     for (int i = columnIndex + 1; i < numberOfColumns + columnIndex; i++) {
-        int foo = (i < numberOfColumns) ? imageHeight / 2 : 0;
+        int halfImageHeight = (i < numberOfColumns) ? imageHeight / 2 : -imageHeight / 2;
         int index = i % numberOfColumns;
-        if (columnOffsets[index] + foo <= columnOffsets[columnIndex])
+        if (columnOffsets[index] + halfImageHeight <= columnOffsets[columnIndex])
         {
             columnIndex = index;
             break;
