@@ -19,6 +19,7 @@ class Folder
         void copyToSelection(std::string&);
         void moveToSelection(std::string&);
         void scan(void);
+        void sortCaseInsensitive(void);
 
         static std::string filename(const std::string&);
         static int fileSize(const std::string&);

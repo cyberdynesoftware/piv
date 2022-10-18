@@ -52,7 +52,20 @@ Folder::scan()
         exit(1);
     }
 
-    std::sort(files.begin(), files.end());
+    //std::sort(files.begin(), files.end());
+    sortCaseInsensitive();
+}
+
+void
+Folder::sortCaseInsensitive()
+{
+    sort(files.begin(), files.end(), [] (const std::string& lhs, const std::string& rhs)
+            {
+            return lexicographical_compare(lhs.cbegin(), lhs.cend(), rhs.cbegin(), rhs.cend(),
+                    [] (const char& lhs, const char& rhs) 
+                    { return tolower(lhs) < tolower(rhs); } );
+            }
+        );
 }
 
 bool
