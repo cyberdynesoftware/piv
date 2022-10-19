@@ -20,6 +20,7 @@ class Folder
         void moveToSelection(std::string&);
         void scan(void);
         void sortCaseInsensitive(void);
+        void sortByModTime(bool);
 
         static std::string filename(const std::string&);
         static int fileSize(const std::string&);

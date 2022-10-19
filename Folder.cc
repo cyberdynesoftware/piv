@@ -53,7 +53,8 @@ Folder::scan()
     }
 
     //std::sort(files.begin(), files.end());
-    sortCaseInsensitive();
+    //sortCaseInsensitive();
+    sortByModTime(false);
 }
 
 void
@@ -64,6 +65,16 @@ Folder::sortCaseInsensitive()
             return lexicographical_compare(lhs.cbegin(), lhs.cend(), rhs.cbegin(), rhs.cend(),
                     [] (const char& lhs, const char& rhs) 
                     { return tolower(lhs) < tolower(rhs); } );
+            }
+        );
+}
+
+void
+Folder::sortByModTime(bool desc)
+{
+    sort(files.begin(), files.end(), [desc] (const std::string& lhs, const std::string& rhs)
+            {
+            return (last_write_time(path(lhs)) < last_write_time(path(rhs)) != desc);
             }
         );
 }
