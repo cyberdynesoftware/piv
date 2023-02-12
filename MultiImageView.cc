@@ -551,13 +551,13 @@ MultiImageView::scrollView()
         switch (scrollState)
         {
             case UP:
-                scrollSpeed = -viewHeight / 50;
+                scrollSpeed = viewHeight / -50;
                 break;
             case DOWN:
                 scrollSpeed = viewHeight / 50;
                 break;
             case UP_FAST:
-                scrollSpeed = -viewHeight / 25;
+                scrollSpeed = viewHeight / -25;
                 break;
             case DOWN_FAST:
                 scrollSpeed = viewHeight / 25;
@@ -574,8 +574,9 @@ MultiImageView::scrollView()
         {
             setViewPosition(viewPosition + scrollSpeed);
 
-            if (scrollSpeed > 0) scrollSpeed--;
-            else if (scrollSpeed < 0) scrollSpeed++;
+            //if (scrollSpeed > 0) scrollSpeed--;
+            //else if (scrollSpeed < 0) scrollSpeed++;
+            scrollSpeed = scrollSpeed / 2;
 
             drawProgressBar();
         }
