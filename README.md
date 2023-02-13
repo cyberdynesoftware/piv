@@ -11,7 +11,8 @@
 
 Enter the cloned folder and run
 ```
-make
+cmake -B build
+cmake --build build
 ```
 
 ### Dependencies
