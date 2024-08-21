@@ -53,8 +53,8 @@ Folder::scan()
     }
 
     //std::sort(files.begin(), files.end());
-    //sortCaseInsensitive();
-    sortByModTime(false);
+    sortCaseInsensitive();
+    //sortByModTime(true);
 }
 
 void

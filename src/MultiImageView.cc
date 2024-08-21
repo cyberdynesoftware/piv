@@ -34,7 +34,7 @@ MultiImageView::loadImageRow()
 }
 
 void
-MultiImageView::handle(sf::Event& event)
+MultiImageView::handle(const sf::Event& event)
 {
     switch (event.type)
     {
