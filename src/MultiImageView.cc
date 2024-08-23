@@ -1,9 +1,8 @@
 #include "MultiImageView.h"
+#include "Help.h"
 #include <iostream>
 #include <set>
 #include <cmath>
-#include "font.h"
-#include "Help.h"
 
 MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window):
     folder(folder),
@@ -14,8 +13,6 @@ MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window):
     targetImageWidth = window.getSize().x / numberOfColumns;
     viewPosition = lastViewPosition = window.getView().getCenter().y;
     viewHeight = window.getView().getSize().y;
-    font.loadFromMemory(font_ttf, font_ttf_len);
-    progressBar.setFillColor(sf::Color(255, 255, 255, 128));
     highlightBackground.setFillColor(sf::Color(0, 0, 0, 224));
     highlightBackground.setSize(window.getView().getSize());
     highlightBackground.setOrigin(window.getView().getSize() / 2.f);
@@ -117,7 +114,7 @@ MultiImageView::handle(const sf::Event& event)
                     scrollState = DOWN_FAST;
                     break;
                 case sf::Keyboard::I:
-                    showInfo = (showInfo) ? false : true;
+                    gui.showInfo = (gui.showInfo) ? false : true;
                     break;
                 case sf::Keyboard::M:
                     unpickImage();
@@ -169,7 +166,7 @@ MultiImageView::handle(const sf::Event& event)
                     scrollSpeed = 0;
                     break;
                 case sf::Keyboard::H:
-                    showHelp = true;
+                    gui.showHelp = true;
                     break;
                 case sf::Keyboard::O:
                     if (elevatedImage != NULL)
@@ -257,7 +254,7 @@ MultiImageView::handle(const sf::Event& event)
                     scrollState = NONE;
                     break;
                 case sf::Keyboard::H:
-                    showHelp = false;
+                    gui.showHelp = false;
                     break;
                 default:
                     break;
@@ -458,8 +455,8 @@ MultiImageView::draw()
                 image->update();
                 window.draw(image->sprite);
                 if (!showSelection  && image->selected) highlight(image);
-                if (showInfo) drawInfoBox(image);
-                if (!showSelection  && image->selected) drawSelectedIcon(image);
+                gui.drawInfoBox(window, image);
+                if (!showSelection  && image->selected) gui.drawSelectedIcon(window, image);
                 lastVisibleImage = image;
             }
         }
@@ -476,18 +473,19 @@ MultiImageView::draw()
         window.draw(highlightBackground);
         elevatedImage->update();
         window.draw(elevatedImage->sprite);
-        if (showInfo) drawInfoBox(elevatedImage);
-        if (!showSelection  && elevatedImage->selected) drawSelectedIcon(elevatedImage);
+        gui.drawInfoBox(window, elevatedImage);
+        if (!showSelection  && elevatedImage->selected) gui.drawSelectedIcon(window, elevatedImage);
     }
 
     if (allImagesAreReady && viewPosition + viewHeight / 2 > columnOffsets[minColumnIndex()] && !showSelection)
         loadImageRow();
 
-    if (showHelp)
-        drawHelpText();
+    gui.drawHelpText(window, generateHelpText());
 
     scrollView();
-    selectedFolderWarning();
+
+    if (folder.selectedFolderExistsNotEmpty())
+        gui.selectedFolderWarning(window);
 }
 
 bool
@@ -499,27 +497,6 @@ MultiImageView::isVisible(Image* image)
 }
 
 void
-MultiImageView::drawInfoBox(Image* image)
-{
-    sf::Text info;
-    info.setFont(font);
-    info.setFillColor(sf::Color::White);
-    info.setCharacterSize(15);
-    info.setString(image->info);
-    
-    const auto& infoBounds = info.getLocalBounds();
-    const auto& imageBounds = image->sprite.getGlobalBounds();
-    sf::RectangleShape background(sf::Vector2f(imageBounds.width, infoBounds.top * 2 + infoBounds.height));
-    background.setFillColor(sf::Color(0, 0, 0, 64));
-
-    background.setPosition(imageBounds.left, imageBounds.top);
-    info.setPosition(imageBounds.left, imageBounds.top);
-
-    window.draw(background);
-    window.draw(info);
-}
-
-void
 MultiImageView::highlight(Image* image)
 {
     const auto& imageBounds = image->sprite.getGlobalBounds();
@@ -527,20 +504,6 @@ MultiImageView::highlight(Image* image)
     highlight.setPosition(imageBounds.left, imageBounds.top);
     highlight.setFillColor(sf::Color(255, 255, 255, 96));
     window.draw(highlight);
-}
-
-void
-MultiImageView::drawSelectedIcon(Image* image)
-{
-    sf::CircleShape circle;
-    circle.setRadius(6);
-    circle.setFillColor(sf::Color::Cyan);
-    circle.setOutlineColor(sf::Color::Black);
-    circle.setOutlineThickness(2);
-
-    const auto& imageBounds = image->sprite.getGlobalBounds();
-    circle.setPosition(imageBounds.left + imageBounds.width - 20, imageBounds.top + 8);
-    window.draw(circle);
 }
 
 void
@@ -578,13 +541,13 @@ MultiImageView::scrollView()
             //else if (scrollSpeed < 0) scrollSpeed++;
             scrollSpeed = scrollSpeed / 2;
 
-            drawProgressBar();
+            calcProgress();
         }
     }
 }
 
-void
-MultiImageView::drawProgressBar()
+float
+MultiImageView::calcProgress()
 {
     int index = std::find(folder.cbegin(), folder.cend(), lastVisibleImage->path) - folder.cbegin();
     int max = 0;
@@ -600,30 +563,11 @@ MultiImageView::drawProgressBar()
         max = folder.size();
     }
 
-    float progress = (float) index / max;
-    progressBar.setSize(sf::Vector2f(progressBarWidth, progress * viewHeight));
-    progressBar.setPosition(window.getView().getSize().x - progressBarWidth, viewPosition - viewHeight / 2);
-    window.draw(progressBar);
+    auto progress =  (float) index / max;
+    auto msg = std::to_string(index) + " / " + std::to_string(max);
+    gui.drawProgressBar(window, progress, msg);
 
-    sf::Text text;
-    text.setFont(font);
-    text.setFillColor(sf::Color::Black);
-    text.setCharacterSize(15);
-    text.setString(std::to_string(index) + " / " + std::to_string(max));
-    text.setOrigin(text.getLocalBounds().width / 2, text.getLocalBounds().height / 2);
-
-    sf::RectangleShape background(sf::Vector2f(text.getLocalBounds().width + 20, text.getLocalBounds().height + 20));
-    background.setFillColor(sf::Color(255, 255, 255, 128));
-    background.setOutlineColor(sf::Color::Black);
-    background.setOutlineThickness(1.f);
-    background.setOrigin(background.getLocalBounds().width / 2, background.getLocalBounds().height / 2);
-    float x = window.getView().getSize().x - progressBarWidth - background.getSize().x / 2.f - 5;
-    float y = viewPosition - viewHeight / 2.f + progress * viewHeight;
-    background.setPosition(x, y);
-    text.setPosition(x - text.getLocalBounds().left, y - text.getLocalBounds().top);
-
-    window.draw(background);
-    window.draw(text);
+    return 1.f;
 }
 
 void
@@ -657,10 +601,11 @@ MultiImageView::resize()
     bottom *= factor;
 }
 
-void
-MultiImageView::drawHelpText()
+std::string
+MultiImageView::generateHelpText()
 {
     std::string help = Help::general();
+
     if (elevatedImage != NULL)
     {
         help.append(Help::singleImage());
@@ -672,42 +617,7 @@ MultiImageView::drawHelpText()
             help.append(Help::selectedImages());
     }
 
-    sf::Text text;
-    text.setFont(font);
-    text.setFillColor(sf::Color::White);
-    text.setCharacterSize(18);
-    text.setString(help);
-    text.setOrigin(text.getLocalBounds().width / 2, text.getLocalBounds().height / 2);
-    text.setPosition(window.getView().getCenter());
-
-    sf::RectangleShape background(sf::Vector2f(text.getLocalBounds().width + 50, text.getLocalBounds().height + 20));
-    background.setFillColor(sf::Color(0, 0, 0, 192));
-    background.setOrigin(background.getLocalBounds().width / 2, background.getLocalBounds().height / 2);
-    background.setPosition(window.getView().getCenter());
-
-    window.draw(background);
-    window.draw(text);
-}
-
-void
-MultiImageView::selectedFolderWarning()
-{
-    if (selectedFolderWarningCounter++ < 400 && folder.selectedFolderExistsNotEmpty())
-    {
-        sf::Text text;
-        text.setFont(font);
-        text.setFillColor(sf::Color::Red);
-        text.setCharacterSize(20);
-        text.setString("Warning: 'piv-selected' exists and is not empty.");
-        text.setPosition(20, viewPosition - viewHeight / 2 + 10);
-
-        sf::RectangleShape background(sf::Vector2f(window.getView().getSize().x, text.getLocalBounds().height + 30));
-        background.setFillColor(sf::Color(0, 0, 0, 192));
-        background.setPosition(0, viewPosition - viewHeight / 2);
-
-        window.draw(background);
-        window.draw(text);
-    }
+    return help;
 }
 
 void
