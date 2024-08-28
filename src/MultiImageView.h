@@ -19,6 +19,7 @@ class MultiImageView
         GUI gui;
         Folder& folder;
         Folder::iter folderIter;
+        sf::View view;
         sf::RenderWindow& window;
         int numberOfColumns = 4;
         std::deque<Image*> images;

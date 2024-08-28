@@ -7,15 +7,6 @@
 
 class CoreLoop : WindowManager
 {
-    private:
-        sf::RenderWindow window;
-        sf::Image icon;
-        bool fullscreen = false;
-
-        Folder folder;
-        MultiImageView imageView;
-        InputEvent inputEvent;
-
     public:
         CoreLoop(char* path);
 
@@ -23,4 +14,18 @@ class CoreLoop : WindowManager
         virtual void toggleFullscreen(void);
 
         void runCoreLoop(void);
+
+    private:
+        void setupFullscreen(void);
+        void setupWindow(void);
+        sf::Vector2i windowPos(void);
+
+        sf::RenderWindow window;
+        sf::Image icon;
+        bool fullscreen = false;
+        const sf::VideoMode windowMode = sf::VideoMode(1280, 720);
+
+        Folder folder;
+        MultiImageView imageView;
+        InputEvent inputEvent;
 };

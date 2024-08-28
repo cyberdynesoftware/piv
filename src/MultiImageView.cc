@@ -7,6 +7,7 @@
 MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window):
     folder(folder),
     window(window),
+    gui(window),
     columnOffsets(numberOfColumns, 0)
 {
     folderIter = folder.cbegin();
@@ -18,6 +19,14 @@ MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window):
     highlightBackground.setOrigin(window.getView().getSize() / 2.f);
     loadImageRow();
     previousMousePosition = sf::Mouse::getPosition();
+    view = window.getView();
+
+    if (folder.selectedFolderExistsNotEmpty())
+    {
+        gui.showSelectedFolderWarning = true;
+    }
+
+    gui.helpMsg(generateHelpText());
 }
 
 void
@@ -138,6 +147,8 @@ MultiImageView::handle(const sf::Event& event)
                             relayoutImages(numberOfColumns);
                             setViewPosition(lastViewPosition);
                         }
+
+                        gui.helpMsg(generateHelpText());
                     }
                     break;
                 case sf::Keyboard::C:
@@ -269,7 +280,7 @@ MultiImageView::handle(const sf::Event& event)
 void
 MultiImageView::setViewPosition(int centerY)
 {
-    sf::View view = window.getView();
+    //sf::View view = window.getView();
     view.setCenter(view.getCenter().x, centerY);
 
     if (view.getCenter().y - view.getSize().y / 2 < 0 || bottom < view.getSize().y)
@@ -277,7 +288,7 @@ MultiImageView::setViewPosition(int centerY)
     else if ((folderIter == folder.cend() || showSelection) && view.getCenter().y + view.getSize().y / 2 > bottom)
         view.setCenter(view.getCenter().x, bottom - view.getSize().y / 2);
 
-    window.setView(view);
+    //window.setView(view);
     viewPosition = view.getCenter().y;
 }
 
@@ -292,6 +303,8 @@ MultiImageView::pickImage()
             elevatedImage->fitTo(window.getView());
 
         imageIter = std::find(images.begin(), images.end(), elevatedImage);
+
+        gui.helpMsg(generateHelpText());
     }
 }
 
@@ -351,6 +364,8 @@ MultiImageView::unpickImage()
         elevatedImage = NULL;
 
         scrollSpeed = 0;
+
+        gui.helpMsg(generateHelpText());
     }
 }
 
@@ -441,6 +456,8 @@ MultiImageView::draw()
 {
     bool allImagesAreReady = true;
 
+    window.setView(view);
+
     for (auto image : images)
     {
         if (image->ready)
@@ -455,8 +472,8 @@ MultiImageView::draw()
                 image->update();
                 window.draw(image->sprite);
                 if (!showSelection  && image->selected) highlight(image);
-                gui.drawInfoBox(window, image);
-                if (!showSelection  && image->selected) gui.drawSelectedIcon(window, image);
+                gui.drawInfoBox(image);
+                if (!showSelection  && image->selected) gui.drawSelectedIcon(image);
                 lastVisibleImage = image;
             }
         }
@@ -473,19 +490,17 @@ MultiImageView::draw()
         window.draw(highlightBackground);
         elevatedImage->update();
         window.draw(elevatedImage->sprite);
-        gui.drawInfoBox(window, elevatedImage);
-        if (!showSelection  && elevatedImage->selected) gui.drawSelectedIcon(window, elevatedImage);
+        gui.drawInfoBox(elevatedImage);
+        if (!showSelection  && elevatedImage->selected) gui.drawSelectedIcon(elevatedImage);
     }
 
     if (allImagesAreReady && viewPosition + viewHeight / 2 > columnOffsets[minColumnIndex()] && !showSelection)
         loadImageRow();
 
-    gui.drawHelpText(window, generateHelpText());
+    gui.update();
+    window.draw(gui);
 
     scrollView();
-
-    if (folder.selectedFolderExistsNotEmpty())
-        gui.selectedFolderWarning(window);
 }
 
 bool
@@ -565,7 +580,7 @@ MultiImageView::calcProgress()
 
     auto progress =  (float) index / max;
     auto msg = std::to_string(index) + " / " + std::to_string(max);
-    gui.drawProgressBar(window, progress, msg);
+    gui.drawProgressBar(progress, msg);
 
     return 1.f;
 }

@@ -3,22 +3,30 @@
 #include "Image.h"
 #include "TextWithBackground.h"
 
-class GUI
+class GUI : public sf::Drawable
 {
     public:
-        GUI();
+        GUI(sf::RenderWindow& window);
 
-        void drawInfoBox(sf::RenderWindow& window, Image* image);
-        void drawProgressBar(sf::RenderWindow& window, float progress, std::string msg);
-        void drawSelectedIcon(sf::RenderWindow& window, Image*);
-        void drawHelpText(sf::RenderWindow& window, std::string help);
-        void selectedFolderWarning(sf::RenderWindow& window);
+        void update(void);
+
+        void drawInfoBox(Image* image);
+        void drawSelectedIcon(Image* image);
+
+        void drawProgressBar(float progress, std::string msg);
+        void helpMsg(std::string help);
 
         bool showInfo = false;
         bool showHelp = false;
         bool showSelectedFolderWarning = false;
 
+    protected:
+        virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+
     private:
+        sf::RenderWindow& window;
+        sf::Clock selectedFolderWarningClock;
+
         sf::RectangleShape progressBar;
         TextWithBackground progressLabel = TextWithBackground(TextWithBackground::Config::progress, 15);
         TextWithBackground info = TextWithBackground(TextWithBackground::Config::info, 15);

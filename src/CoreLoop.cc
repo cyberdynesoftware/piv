@@ -3,12 +3,12 @@
 
 CoreLoop::CoreLoop(char* path)
     : 
-        window(sf::VideoMode(800, 600), "piv", sf::Style::Default),
+        window(sf::VideoMode(1280, 720), "piv", sf::Style::Default),
         folder(path),
         imageView(folder, window),
         inputEvent(*this, imageView)
 {
-    window.setPosition(sf::Vector2i(80, 60));
+    window.setPosition(windowPos());
     window.setFramerateLimit(60);
 
     icon.loadFromMemory(icon_png, icon_png_len);
@@ -26,18 +26,37 @@ CoreLoop::toggleFullscreen()
 {
     if (fullscreen)
     {
-        window.create(sf::VideoMode(800, 600), "piv", sf::Style::Default);
-        window.setPosition(sf::Vector2i(100, 100));
-        window.setFramerateLimit(60);
+        setupWindow();
         fullscreen = false;
-        window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
     }
     else
     {
-        window.create(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
-        window.setFramerateLimit(60);
+        setupFullscreen();
         fullscreen = true;
     }
+    window.setFramerateLimit(60);
+}
+
+void
+CoreLoop::setupFullscreen()
+{
+    auto desktop = sf::VideoMode::getDesktopMode();
+    window.create(desktop, "piv", sf::Style::Fullscreen);
+}
+
+void
+CoreLoop::setupWindow()
+{
+    window.create(windowMode, "piv", sf::Style::Default);
+    window.setPosition(windowPos());
+    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+}
+
+sf::Vector2i
+CoreLoop::windowPos()
+{
+    auto desktop = sf::VideoMode::getDesktopMode();
+    return sf::Vector2i((desktop.width - windowMode.width) / 2, (desktop.height - windowMode.height) / 2);
 }
 
 void
