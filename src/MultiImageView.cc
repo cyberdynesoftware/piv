@@ -300,7 +300,7 @@ MultiImageView::pickImage()
         elevatedImage = findImageUnderMouse();
 
         if (elevatedImage != NULL)
-            elevatedImage->fitTo(window.getView());
+            elevatedImage->fitTo(view);
 
         imageIter = std::find(images.begin(), images.end(), elevatedImage);
 
@@ -311,6 +311,7 @@ MultiImageView::pickImage()
 Image*
 MultiImageView::findImageUnderMouse()
 {
+    window.setView(view);
     auto mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
     for (auto image : images)
@@ -346,7 +347,7 @@ MultiImageView::nextImage()
         {
             unpickImage();
             elevatedImage = *imageIter;
-            elevatedImage->fitTo(window.getView());
+            elevatedImage->fitTo(view);
             break;
         }
 }
@@ -377,7 +378,7 @@ MultiImageView::previousImage()
         {
             unpickImage();
             elevatedImage = *imageIter;
-            elevatedImage->fitTo(window.getView());
+            elevatedImage->fitTo(view);
             break;
         }
 }
@@ -486,7 +487,7 @@ MultiImageView::draw()
 
     if (elevatedImage != NULL)
     {
-        highlightBackground.setPosition(window.getView().getCenter());
+        highlightBackground.setPosition(view.getCenter());
         window.draw(highlightBackground);
         elevatedImage->update();
         window.draw(elevatedImage->sprite);
@@ -588,14 +589,14 @@ MultiImageView::calcProgress()
 void
 MultiImageView::resize()
 {
-    highlightBackground.setSize(window.getView().getSize());
-    highlightBackground.setOrigin(window.getView().getSize() / 2.f);
+    highlightBackground.setSize(view.getSize());
+    highlightBackground.setOrigin(view.getSize() / 2.f);
 
     int newTargetImageWidth = window.getSize().x / numberOfColumns;
     float factor = (float) newTargetImageWidth / targetImageWidth;
     targetImageWidth = newTargetImageWidth;
 
-    viewHeight = window.getView().getSize().y;
+    viewHeight = view.getSize().y;
     setViewPosition(viewPosition * factor);
     lastViewPosition *= factor;
 
@@ -606,7 +607,7 @@ MultiImageView::resize()
             image->setPosition(image->position * factor);
             image->sprite.scale(factor, factor);
             if (image == elevatedImage)
-                elevatedImage->fitTo(window.getView());
+                elevatedImage->fitTo(view);
         }
     }
 
