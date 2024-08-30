@@ -1,23 +1,26 @@
 #pragma once
 
 #include "Image.h"
+#include "ImageView.h"
 #include "Folder.h"
 #include "GUI.h"
+#include "ImageManager.h"
 #include <deque>
 #include <vector>
 
-class MultiImageView
+class MultiImageView : public ImageView
 {
     public:
-        MultiImageView(Folder&, sf::RenderWindow&);
+        MultiImageView(Folder&, sf::RenderWindow&, ImageManager& imageManager);
 
-        void handle(const sf::Event&);
+        void process(const sf::Event&);
         void draw(void);
         void resize(void);
 
     private:
         GUI gui;
         Folder& folder;
+        ImageManager& imageManager;
         Folder::iter folderIter;
         sf::View view;
         sf::RenderWindow& window;
@@ -40,7 +43,7 @@ class MultiImageView
         sf::RectangleShape highlightBackground;
         sf::Vector2i previousMousePosition;
 
-        void loadImageRow(void);
+        //void loadImageRow(void);
         void scrollView();
         int minColumnIndex(void);
         void layout(Image*);

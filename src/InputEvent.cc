@@ -29,13 +29,13 @@ InputEvent::process(const sf::Event& event)
                     break;
 
                 default:
-                    imageView.handle(event);
+                    imageView.process(event);
                     break;
             }
             break;
 
         default:
-            imageView.handle(event);
+            imageView.process(event);
             break;
     }
 }

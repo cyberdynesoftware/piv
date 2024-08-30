@@ -1,8 +1,8 @@
 #pragma once
 
-#include "MultiImageView.h"
+#include "SFML/Window.hpp"
+#include "SceneManager.h"
 #include "Folder.h"
-#include "InputEvent.h"
 #include "WindowManager.h"
 
 class CoreLoop : WindowManager
@@ -19,6 +19,7 @@ class CoreLoop : WindowManager
         void setupFullscreen(void);
         void setupWindow(void);
         sf::Vector2i windowPos(void);
+        void process(const sf::Event& event);
 
         sf::RenderWindow window;
         sf::Image icon;
@@ -26,6 +27,5 @@ class CoreLoop : WindowManager
         const sf::VideoMode windowMode = sf::VideoMode(1280, 720);
 
         Folder folder;
-        MultiImageView imageView;
-        InputEvent inputEvent;
+        SceneManager sceneManager;
 };

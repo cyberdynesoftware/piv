@@ -4,9 +4,10 @@
 #include <set>
 #include <cmath>
 
-MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window):
+MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window, ImageManager& imageManager):
     folder(folder),
     window(window),
+    imageManager(imageManager),
     gui(window),
     columnOffsets(numberOfColumns, 0)
 {
@@ -17,7 +18,7 @@ MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window):
     highlightBackground.setFillColor(sf::Color(0, 0, 0, 224));
     highlightBackground.setSize(window.getView().getSize());
     highlightBackground.setOrigin(window.getView().getSize() / 2.f);
-    loadImageRow();
+    imageManager.loadImages(numberOfColumns);
     previousMousePosition = sf::Mouse::getPosition();
     view = window.getView();
 
@@ -28,7 +29,7 @@ MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window):
 
     gui.helpMsg(generateHelpText());
 }
-
+/*
 void
 MultiImageView::loadImageRow()
 {
@@ -38,9 +39,9 @@ MultiImageView::loadImageRow()
         images.push_back(new Image(*folderIter++));
     }
 }
-
+*/
 void
-MultiImageView::handle(const sf::Event& event)
+MultiImageView::process(const sf::Event& event)
 {
     switch (event.type)
     {
@@ -400,7 +401,7 @@ MultiImageView::relayoutImages(int columns)
         for (int i = 0; i < numberOfColumns; i++)
             columnOffsets[i] = 0;
 
-        for (auto image : images)
+        for (auto image : imageManager.images)
             if (image->hasPosition)
                 if (!showSelection || image->selected)
                     layout(image);
@@ -455,33 +456,22 @@ MultiImageView::minColumnIndex()
 void
 MultiImageView::draw()
 {
-    bool allImagesAreReady = true;
-
     window.setView(view);
 
-    for (auto image : images)
+    for (auto image : imageManager.images)
     {
-        if (image->ready)
-        {
-            if (!image->valid) continue;
-            if (image == elevatedImage) continue;
-            if (showSelection && !image->selected) continue;
-            if (!image->hasPosition) layout(image);
+        if (image == elevatedImage) continue;
+        if (showSelection && !image->selected) continue;
+        if (!image->hasPosition) layout(image);
 
-            if (isVisible(image))
-            {
-                image->update();
-                window.draw(image->sprite);
-                if (!showSelection  && image->selected) highlight(image);
-                gui.drawInfoBox(image);
-                if (!showSelection  && image->selected) gui.drawSelectedIcon(image);
-                lastVisibleImage = image;
-            }
-        }
-        else
+        if (isVisible(image))
         {
-            allImagesAreReady = false;
-            break;
+            image->update();
+            window.draw(image->sprite);
+            if (!showSelection  && image->selected) highlight(image);
+            gui.drawInfoBox(image);
+            if (!showSelection  && image->selected) gui.drawSelectedIcon(image);
+            lastVisibleImage = image;
         }
     }
 
@@ -495,8 +485,8 @@ MultiImageView::draw()
         if (!showSelection  && elevatedImage->selected) gui.drawSelectedIcon(elevatedImage);
     }
 
-    if (allImagesAreReady && viewPosition + viewHeight / 2 > columnOffsets[minColumnIndex()] && !showSelection)
-        loadImageRow();
+    if (viewPosition + viewHeight / 2 > columnOffsets[minColumnIndex()] && !showSelection)
+        imageManager.loadImages(numberOfColumns);
 
     gui.update();
     window.draw(gui);

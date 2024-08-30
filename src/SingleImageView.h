@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ImageManager.h"
 #include "ImageView.h"
 #include "Image.h"
 #include "Folder.h"
