@@ -39,3 +39,45 @@ ImageManager::update()
         }
     }
 }
+
+void
+ImageManager::copySelectedImages()
+{
+    for (auto image : images)
+    {
+        if (image->selected)
+        {
+            folder.copyToSelection(image->path);
+        }
+    }
+}
+
+void
+ImageManager::moveSelectedImages()
+{
+    std::deque<Image*> temp;
+
+    for (auto image : images)
+    {
+        if (image->selected)
+        {
+            folder.moveToSelection(image->path);
+            delete image;
+        }
+        else
+        {
+            temp.push_back(image);
+        }
+    }
+
+    folder.scan();
+    images = temp;
+    folderIter = std::find(folder.cbegin(), folder.cend(), images.back()->path);
+    folderIter++;
+}
+
+int
+ImageManager::numberOfFiles()
+{
+    return folder.size();
+}

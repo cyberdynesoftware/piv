@@ -3,15 +3,15 @@
 #include <iostream>
 #include <set>
 #include <cmath>
+#include <format>
+#include <algorithm>
 
-MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window, ImageManager& imageManager):
-    folder(folder),
+MultiImageView::MultiImageView(sf::RenderWindow& window, ImageManager& imageManager, GUI& gui):
     window(window),
     imageManager(imageManager),
-    gui(window),
+    gui(gui),
     columnOffsets(numberOfColumns, 0)
 {
-    folderIter = folder.cbegin();
     targetImageWidth = window.getSize().x / numberOfColumns;
     viewPosition = lastViewPosition = window.getView().getCenter().y;
     viewHeight = window.getView().getSize().y;
@@ -21,25 +21,8 @@ MultiImageView::MultiImageView(Folder& folder, sf::RenderWindow& window, ImageMa
     imageManager.loadImages(numberOfColumns);
     previousMousePosition = sf::Mouse::getPosition();
     view = window.getView();
-
-    if (folder.selectedFolderExistsNotEmpty())
-    {
-        gui.showSelectedFolderWarning = true;
-    }
-
-    gui.helpMsg(generateHelpText());
 }
-/*
-void
-MultiImageView::loadImageRow()
-{
-    for (int i = 0; i < numberOfColumns; i++)
-    {
-        if (folderIter == folder.cend()) break;
-        images.push_back(new Image(*folderIter++));
-    }
-}
-*/
+
 void
 MultiImageView::process(const sf::Event& event)
 {
@@ -155,7 +138,7 @@ MultiImageView::process(const sf::Event& event)
                 case sf::Keyboard::C:
                     if (elevatedImage == NULL)
                     {
-                        for (auto image : images)
+                        for (auto image : imageManager.images)
                             image->selected = false;
 
                         showSelection = false;
@@ -177,9 +160,6 @@ MultiImageView::process(const sf::Event& event)
                     setViewPosition(window.getView().getSize().y / 2);
                     scrollSpeed = 0;
                     break;
-                case sf::Keyboard::H:
-                    gui.showHelp = true;
-                    break;
                 case sf::Keyboard::O:
                     if (elevatedImage != NULL)
                     {
@@ -190,28 +170,15 @@ MultiImageView::process(const sf::Event& event)
                     }
                     break;
                 case sf::Keyboard::Y:
-                    if (showSelection && elevatedImage == NULL)
-                        for (auto image : images)
-                            if (image->selected)
-                                folder.copyToSelection(image->path);
+                    if (elevatedImage == NULL)
+                    {
+                        imageManager.copySelectedImages();
+                    }
                     break;
                 case sf::Keyboard::X:
-                    if (showSelection && elevatedImage == NULL)
+                    if (elevatedImage == NULL)
                     {
-                        std::deque<Image*> temp;
-                        for (auto image : images)
-                            if (image->selected)
-                            {
-                                folder.moveToSelection(image->path);
-                                delete image;
-                            }
-                            else
-                                temp.push_back(image);
-
-                        folder.scan();
-                        images = temp;
-                        folderIter = std::find(folder.cbegin(), folder.cend(), images.back()->path);
-                        folderIter++;
+                        imageManager.moveSelectedImages();
                         showSelection = false;
                         relayoutImages(numberOfColumns);
                         setViewPosition(lastViewPosition);
@@ -265,9 +232,6 @@ MultiImageView::process(const sf::Event& event)
                 case sf::Keyboard::D:
                     scrollState = NONE;
                     break;
-                case sf::Keyboard::H:
-                    gui.showHelp = false;
-                    break;
                 default:
                     break;
             }
@@ -286,7 +250,7 @@ MultiImageView::setViewPosition(int centerY)
 
     if (view.getCenter().y - view.getSize().y / 2 < 0 || bottom < view.getSize().y)
         view.setCenter(view.getCenter().x, view.getSize().y / 2);
-    else if ((folderIter == folder.cend() || showSelection) && view.getCenter().y + view.getSize().y / 2 > bottom)
+    else if (/*(folderIter == folder.cend() || showSelection) &&*/ view.getCenter().y + view.getSize().y / 2 > bottom)
         view.setCenter(view.getCenter().x, bottom - view.getSize().y / 2);
 
     //window.setView(view);
@@ -303,7 +267,7 @@ MultiImageView::pickImage()
         if (elevatedImage != NULL)
             elevatedImage->fitTo(view);
 
-        imageIter = std::find(images.begin(), images.end(), elevatedImage);
+        imageIter = std::find(imageManager.images.begin(), imageManager.images.end(), elevatedImage);
 
         gui.helpMsg(generateHelpText());
     }
@@ -315,7 +279,7 @@ MultiImageView::findImageUnderMouse()
     window.setView(view);
     auto mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
-    for (auto image : images)
+    for (auto image : imageManager.images)
     {
         if (showSelection && !image->selected) continue;
         if (image->sprite.getGlobalBounds().contains(mouseCoords.x, mouseCoords.y))
@@ -343,7 +307,7 @@ MultiImageView::selectImage()
 void
 MultiImageView::nextImage()
 {
-    while (imageIter != images.end() && ++imageIter != images.end())
+    while (imageIter != imageManager.images.end() && ++imageIter != imageManager.images.end())
         if ((*imageIter)->valid)
         {
             unpickImage();
@@ -374,7 +338,7 @@ MultiImageView::unpickImage()
 void
 MultiImageView::previousImage()
 {
-    while (imageIter != images.begin())
+    while (imageIter != imageManager.images.begin())
         if ((*(--imageIter))->valid)
         {
             unpickImage();
@@ -488,9 +452,6 @@ MultiImageView::draw()
     if (viewPosition + viewHeight / 2 > columnOffsets[minColumnIndex()] && !showSelection)
         imageManager.loadImages(numberOfColumns);
 
-    gui.update();
-    window.draw(gui);
-
     scrollView();
 }
 
@@ -555,22 +516,15 @@ MultiImageView::scrollView()
 float
 MultiImageView::calcProgress()
 {
-    int index = std::find(folder.cbegin(), folder.cend(), lastVisibleImage->path) - folder.cbegin();
-    int max = 0;
+    int index = std::distance(imageManager.images.cbegin(),
+            std::find(imageManager.images.cbegin(), imageManager.images.cend(), lastVisibleImage));
 
-    if (showSelection)
-    {
-        for (auto image : images)
-            if (image->selected)
-                max++;
-    }
-    else
-    {
-        max = folder.size();
-    }
+    int max = !showSelection ? imageManager.numberOfFiles() :
+        std::count_if(imageManager.images.cbegin(), imageManager.images.cend(), 
+                [](const Image* image) { return image->selected; });
 
     auto progress =  (float) index / max;
-    auto msg = std::to_string(index) + " / " + std::to_string(max);
+    auto msg = std::format("{} / {}", index, max);
     gui.drawProgressBar(progress, msg);
 
     return 1.f;
@@ -590,7 +544,7 @@ MultiImageView::resize()
     setViewPosition(viewPosition * factor);
     lastViewPosition *= factor;
 
-    for (auto image : images)
+    for (auto image : imageManager.images)
     {
         if (image->hasPosition)
         {

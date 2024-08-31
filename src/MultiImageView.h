@@ -11,21 +11,18 @@
 class MultiImageView : public ImageView
 {
     public:
-        MultiImageView(Folder&, sf::RenderWindow&, ImageManager& imageManager);
+        MultiImageView(sf::RenderWindow&, ImageManager& imageManager, GUI&);
 
         void process(const sf::Event&);
         void draw(void);
         void resize(void);
 
     private:
-        GUI gui;
-        Folder& folder;
+        GUI& gui;
         ImageManager& imageManager;
-        Folder::iter folderIter;
         sf::View view;
         sf::RenderWindow& window;
         int numberOfColumns = 4;
-        std::deque<Image*> images;
         std::deque<Image*>::iterator imageIter;
         std::vector<int> columnOffsets;
         int columnIndex = 0;

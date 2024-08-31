@@ -11,9 +11,13 @@ class ImageManager
 
         void loadImages(int number);
         void update(void);
+
+        void copySelectedImages(void);
+        void moveSelectedImages(void);
+
+        int numberOfFiles(void);
         
         std::deque<Image*> images;
-        std::deque<Image*>::iterator imageIter;
 
     private:
         Folder& folder;
