@@ -3,7 +3,7 @@
 #include "SFML/Window.hpp"
 #include "ImageManager.h"
 #include "MultiImageView.h"
-#include "Help.h"
+#include "SingleImageView.h"
 
 class SceneManager
 {
@@ -20,6 +20,11 @@ class SceneManager
         GUI gui;
         ImageManager imageManager;
         MultiImageView multiImageView;
+        SingleImageView singleImageView;
 
-        ImageView& eventReceiver;
+        bool singleImageViewActive = false;
+        ImageView* eventReceiver;
+
+        void activateSingleImageView(void);
+        void deactivateSingleImageView(void);
 };

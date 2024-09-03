@@ -1,5 +1,4 @@
 #include "MultiImageView.h"
-#include "Help.h"
 #include <iostream>
 #include <set>
 #include <cmath>
@@ -19,7 +18,6 @@ MultiImageView::MultiImageView(sf::RenderWindow& window, ImageManager& imageMana
     highlightBackground.setSize(window.getView().getSize());
     highlightBackground.setOrigin(window.getView().getSize() / 2.f);
     imageManager.loadImages(numberOfColumns);
-    previousMousePosition = sf::Mouse::getPosition();
     view = window.getView();
 }
 
@@ -29,26 +27,17 @@ MultiImageView::process(const sf::Event& event)
     switch (event.type)
     {
         case sf::Event::MouseWheelScrolled:
-            if (elevatedImage == NULL)
-                setViewPosition(viewPosition - event.mouseWheelScroll.delta * viewHeight / 100);
-            else
-                zoom(event.mouseWheelScroll.delta);
+            setViewPosition(viewPosition - event.mouseWheelScroll.delta * viewHeight / 100);
             break;
 
         case sf::Event::MouseButtonPressed:
             switch (event.mouseButton.button)
             {
                 case sf::Mouse::Button::XButton1:
-                    if (elevatedImage == NULL)
-                        scrollState = DOWN;
-                    else
-                        nextImage();
+                    scrollState = DOWN;
                     break;
                 case sf::Mouse::Button::XButton2:
-                    if (elevatedImage == NULL)
-                        scrollState = UP;
-                    else
-                        previousImage();
+                    scrollState = UP;
                     break;
                 default:
                     break;
@@ -58,33 +47,19 @@ MultiImageView::process(const sf::Event& event)
         case sf::Event::MouseButtonReleased:
             switch (event.mouseButton.button)
             {
-                case sf::Mouse::Button::Left:
-                    scrollState = NONE;
-                    pickImage();
-                    break;
-                case sf::Mouse::Button::Right:
-                    unpickImage();
-                    break;
                 case sf::Mouse::Button::XButton1:
                 case sf::Mouse::Button::XButton2:
                     scrollState = NONE;
                     break;
                 case sf::Mouse::Button::Middle:
-                    selectImage();
+                    {
+                        Image* image = findImageUnderMouse();
+                        image->selected = !image->selected;
+                    }
                     break;
                 default:
                     break;
             }
-            break;
-
-        case sf::Event::MouseMoved:
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && elevatedImage != NULL)
-            {
-                sf::Vector2i delta(sf::Mouse::getPosition() - previousMousePosition);
-                elevatedImage->sprite.move(delta.x, delta.y);
-            }
-
-            previousMousePosition = sf::Mouse::getPosition();
             break;
 
         case sf::Event::KeyPressed:
@@ -106,17 +81,13 @@ MultiImageView::process(const sf::Event& event)
                 case sf::Keyboard::D:
                     scrollState = DOWN_FAST;
                     break;
-                case sf::Keyboard::I:
-                    gui.showInfo = (gui.showInfo) ? false : true;
-                    break;
-                case sf::Keyboard::M:
-                    unpickImage();
-                    break;
                 case sf::Keyboard::A:
-                    selectImage();
+                    {
+                        Image* image = findImageUnderMouse();
+                        image->selected = !image->selected;
+                    }
                     break;
                 case sf::Keyboard::S:
-                    if (elevatedImage == NULL)
                     {
                         showSelection = !showSelection;
 
@@ -132,11 +103,10 @@ MultiImageView::process(const sf::Event& event)
                             setViewPosition(lastViewPosition);
                         }
 
-                        gui.helpMsg(generateHelpText());
+                        //gui.helpMsg(generateHelpText());
                     }
                     break;
                 case sf::Keyboard::C:
-                    if (elevatedImage == NULL)
                     {
                         for (auto image : imageManager.images)
                             image->selected = false;
@@ -146,37 +116,17 @@ MultiImageView::process(const sf::Event& event)
                     }
                     break;
                 case sf::Keyboard::Space:
-                    if (elevatedImage == NULL)
-                        scrollState = (scrollState == NONE) ? AUTO_SCROLL : NONE;
-                    else
-                        nextImage();
-                    break;
-                case sf::Keyboard::Backspace:
-                    if (elevatedImage != NULL)
-                        previousImage();
+                    scrollState = (scrollState == NONE) ? AUTO_SCROLL : NONE;
                     break;
                 case sf::Keyboard::Home:
                 case sf::Keyboard::G:
-                    setViewPosition(window.getView().getSize().y / 2);
+                    setViewPosition(view.getSize().y / 2);
                     scrollSpeed = 0;
                     break;
-                case sf::Keyboard::O:
-                    if (elevatedImage != NULL)
-                    {
-                        if (elevatedImage->sprite.getScale().x == 1.f)
-                            elevatedImage->fitTo(window.getView());
-                        else
-                            elevatedImage->sprite.setScale(1.f, 1.f);
-                    }
-                    break;
                 case sf::Keyboard::Y:
-                    if (elevatedImage == NULL)
-                    {
-                        imageManager.copySelectedImages();
-                    }
+                    imageManager.copySelectedImages();
                     break;
                 case sf::Keyboard::X:
-                    if (elevatedImage == NULL)
                     {
                         imageManager.moveSelectedImages();
                         showSelection = false;
@@ -245,7 +195,6 @@ MultiImageView::process(const sf::Event& event)
 void
 MultiImageView::setViewPosition(int centerY)
 {
-    //sf::View view = window.getView();
     view.setCenter(view.getCenter().x, centerY);
 
     if (view.getCenter().y - view.getSize().y / 2 < 0 || bottom < view.getSize().y)
@@ -253,24 +202,7 @@ MultiImageView::setViewPosition(int centerY)
     else if (/*(folderIter == folder.cend() || showSelection) &&*/ view.getCenter().y + view.getSize().y / 2 > bottom)
         view.setCenter(view.getCenter().x, bottom - view.getSize().y / 2);
 
-    //window.setView(view);
     viewPosition = view.getCenter().y;
-}
-
-void
-MultiImageView::pickImage()
-{
-    if (elevatedImage == NULL)
-    {
-        elevatedImage = findImageUnderMouse();
-
-        if (elevatedImage != NULL)
-            elevatedImage->fitTo(view);
-
-        imageIter = std::find(imageManager.images.begin(), imageManager.images.end(), elevatedImage);
-
-        gui.helpMsg(generateHelpText());
-    }
 }
 
 Image*
@@ -282,7 +214,7 @@ MultiImageView::findImageUnderMouse()
     for (auto image : imageManager.images)
     {
         if (showSelection && !image->selected) continue;
-        if (image->sprite.getGlobalBounds().contains(mouseCoords.x, mouseCoords.y))
+        if (image->sprite.getGlobalBounds().contains(mouseCoords))
             return image;
     }
 
@@ -290,99 +222,35 @@ MultiImageView::findImageUnderMouse()
 }
 
 void
-MultiImageView::selectImage()
-{
-    if (elevatedImage == NULL)
-    {
-        Image* image = findImageUnderMouse();
-        image->selected = !image->selected;
-    }
-    else
-    {
-        elevatedImage->selected = !elevatedImage->selected;
-        nextImage();
-    }
-}
-
-void
-MultiImageView::nextImage()
-{
-    while (imageIter != imageManager.images.end() && ++imageIter != imageManager.images.end())
-        if ((*imageIter)->valid)
-        {
-            unpickImage();
-            elevatedImage = *imageIter;
-            elevatedImage->fitTo(view);
-            break;
-        }
-}
-
-void
-MultiImageView::unpickImage()
-{
-    if (elevatedImage != NULL)
-    {
-        const sf::Vector2u& imageSize = elevatedImage->sprite.getTexture()->getSize();
-        float scale = (float)targetImageWidth / imageSize.x;
-        elevatedImage->sprite.setScale(scale, scale);
-        elevatedImage->sprite.setOrigin(0, 0);
-        elevatedImage->sprite.setPosition(elevatedImage->position);
-        elevatedImage = NULL;
-
-        scrollSpeed = 0;
-
-        gui.helpMsg(generateHelpText());
-    }
-}
-
-void
-MultiImageView::previousImage()
-{
-    while (imageIter != imageManager.images.begin())
-        if ((*(--imageIter))->valid)
-        {
-            unpickImage();
-            elevatedImage = *imageIter;
-            elevatedImage->fitTo(view);
-            break;
-        }
-}
-
-void
 MultiImageView::relayoutImages(int columns)
 {
-    if (elevatedImage == NULL)
-    {
-        numberOfColumns = columns;
+    numberOfColumns = columns;
 
-        int newTargetImageWidth = window.getSize().x / numberOfColumns;
-        float factor = (float) newTargetImageWidth / targetImageWidth;
-        targetImageWidth = newTargetImageWidth;
+    int newTargetImageWidth = window.getSize().x / numberOfColumns;
+    float factor = (float) newTargetImageWidth / targetImageWidth;
+    targetImageWidth = newTargetImageWidth;
 
-        bottom = 0;
-        columnIndex = 0;
-        columnOffsets.resize(numberOfColumns);
-        for (int i = 0; i < numberOfColumns; i++)
-            columnOffsets[i] = 0;
+    bottom = 0;
+    columnIndex = 0;
+    columnOffsets.resize(numberOfColumns);
+    for (int i = 0; i < numberOfColumns; i++)
+        columnOffsets[i] = 0;
 
-        for (auto image : imageManager.images)
-            if (image->hasPosition)
-                if (!showSelection || image->selected)
-                    layout(image);
+    for (auto image : imageManager.images)
+        if (image->hasPosition)
+            if (!showSelection || image->selected)
+                layout(image);
 
-        lastViewPosition *= factor * factor;
-        setViewPosition(viewPosition * factor * factor);
-    }
+    lastViewPosition *= factor * factor;
+    setViewPosition(viewPosition * factor * factor);
 }
 
 void
 MultiImageView::layout(Image* image)
 {
-    const sf::Vector2u& imageSize = image->sprite.getTexture()->getSize();
-    float scale = (float)targetImageWidth / imageSize.x;
-    int imageHeight = imageSize.y * scale;
-    image->sprite.setScale(scale, scale);
     image->sprite.setOrigin(0, 0);
+    image->scaleTo(targetImageWidth);
+    int imageHeight = image->sprite.getGlobalBounds().height;
 
     for (int i = columnIndex + 1; i < numberOfColumns + columnIndex; i++) {
         int halfImageHeight = (i < numberOfColumns) ? imageHeight / 2 : -imageHeight / 2;
@@ -424,7 +292,7 @@ MultiImageView::draw()
 
     for (auto image : imageManager.images)
     {
-        if (image == elevatedImage) continue;
+        //if (image == elevatedImage) continue;
         if (showSelection && !image->selected) continue;
         if (!image->hasPosition) layout(image);
 
@@ -438,7 +306,7 @@ MultiImageView::draw()
             lastVisibleImage = image;
         }
     }
-
+    /*
     if (elevatedImage != NULL)
     {
         highlightBackground.setPosition(view.getCenter());
@@ -448,7 +316,7 @@ MultiImageView::draw()
         gui.drawInfoBox(elevatedImage);
         if (!showSelection  && elevatedImage->selected) gui.drawSelectedIcon(elevatedImage);
     }
-
+    */
     if (viewPosition + viewHeight / 2 > columnOffsets[minColumnIndex()] && !showSelection)
         imageManager.loadImages(numberOfColumns);
 
@@ -476,40 +344,37 @@ MultiImageView::highlight(Image* image)
 void
 MultiImageView::scrollView()
 {
-    if (elevatedImage == NULL)
+    switch (scrollState)
     {
-        switch (scrollState)
-        {
-            case UP:
-                scrollSpeed = viewHeight / -50;
-                break;
-            case DOWN:
-                scrollSpeed = viewHeight / 50;
-                break;
-            case UP_FAST:
-                scrollSpeed = viewHeight / -25;
-                break;
-            case DOWN_FAST:
-                scrollSpeed = viewHeight / 25;
-                break;
-            case AUTO_SCROLL:
-                scrollSpeed = viewHeight / 800;
-                if (scrollSpeed == 0) scrollSpeed = 1;
-                break;
-            default:
-                break;
-        }
+        case UP:
+            scrollSpeed = viewHeight / -50;
+            break;
+        case DOWN:
+            scrollSpeed = viewHeight / 50;
+            break;
+        case UP_FAST:
+            scrollSpeed = viewHeight / -25;
+            break;
+        case DOWN_FAST:
+            scrollSpeed = viewHeight / 25;
+            break;
+        case AUTO_SCROLL:
+            scrollSpeed = viewHeight / 800;
+            if (scrollSpeed == 0) scrollSpeed = 1;
+            break;
+        default:
+            break;
+    }
 
-        if (scrollSpeed != 0)
-        {
-            setViewPosition(viewPosition + scrollSpeed);
+    if (scrollSpeed != 0)
+    {
+        setViewPosition(viewPosition + scrollSpeed);
 
-            //if (scrollSpeed > 0) scrollSpeed--;
-            //else if (scrollSpeed < 0) scrollSpeed++;
-            scrollSpeed = scrollSpeed / 2;
+        //if (scrollSpeed > 0) scrollSpeed--;
+        //else if (scrollSpeed < 0) scrollSpeed++;
+        scrollSpeed = scrollSpeed / 2;
 
-            calcProgress();
-        }
+        calcProgress();
     }
 }
 
@@ -550,8 +415,6 @@ MultiImageView::resize()
         {
             image->setPosition(image->position * factor);
             image->sprite.scale(factor, factor);
-            if (image == elevatedImage)
-                elevatedImage->fitTo(view);
         }
     }
 
@@ -559,42 +422,4 @@ MultiImageView::resize()
         columnOffsets[i] *= factor;
 
     bottom *= factor;
-}
-
-std::string
-MultiImageView::generateHelpText()
-{
-    std::string help = Help::general();
-
-    if (elevatedImage != NULL)
-    {
-        help.append(Help::singleImage());
-    }
-    else
-    {
-        help.append(Help::allImages());
-        if (showSelection)
-            help.append(Help::selectedImages());
-    }
-
-    return help;
-}
-
-void
-MultiImageView::zoom(float delta)
-{
-    if (delta < 0)
-    {
-        elevatedImage->sprite.scale(0.95f, 0.95f);
-    }
-    else if (delta > 0)
-    {
-        sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-        sf::Vector2f mousePositionInSprite(mousePosition.x - elevatedImage->sprite.getGlobalBounds().left,
-                mousePosition.y - elevatedImage->sprite.getGlobalBounds().top);
-
-        elevatedImage->sprite.setOrigin(mousePositionInSprite / elevatedImage->sprite.getScale().x);
-        elevatedImage->sprite.setPosition(mousePosition);
-        elevatedImage->sprite.scale(1.05f, 1.05f);
-    }
 }

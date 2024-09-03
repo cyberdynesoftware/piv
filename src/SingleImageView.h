@@ -1,35 +1,32 @@
 #pragma once
 
 #include "ImageManager.h"
+#include "GUI.h"
 #include "ImageView.h"
 #include "Image.h"
-#include "Folder.h"
 #include <SFML/Graphics.hpp>
 
-class SingleImageView : public ImageView
+class SingleImageView : public ImageView, public sf::Drawable
 {
     public:
-        SingleImageView(Folder&, sf::RenderWindow&);
+        SingleImageView(sf::RenderWindow& window, ImageManager& imageManager, GUI& gui);
 
-        void handle(sf::Event&);
-        void draw(void);
-        void initImage(void);
+        void process(const sf::Event& event);
         void resizeEvent(void);
 
-    private:
-        Folder& folder;
-        sf::RenderWindow& window;
-        Image* image = nullptr;
-        sf::Cursor arrow;
-        sf::Cursor cross;
-        sf::Vector2i previousMousePosition;
-        bool showInfo = false;
-        bool fullscreen = true;
+    protected:
+        virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
-        void zoom(sf::Sprite&, float delta);
-        sf::Vector2f mousePositionInSprite(const sf::Sprite&);
-        void original(sf::Sprite&, bool);
-        void toggleFit(bool);
+    private:
+        ImageManager& imageManager;
+        GUI& gui;
+        sf::RenderWindow& window;
+
+        sf::RectangleShape background;
+        sf::Vector2i previousMousePosition;
+
         void next(void);
         void previous(void);
+        void zoom(float delta);
+        void toggleFit();
 };

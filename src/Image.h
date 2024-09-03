@@ -13,8 +13,9 @@ class Image
 
         void update(void);
         void setPosition(const sf::Vector2f&);
-        void centerOrigin(void);
         void fitTo(const sf::View&);
+        void scaleTo(int targetWidth);
+        void resetPositionAndScale();
 
         sf::Sprite sprite;
         bool valid;
@@ -31,6 +32,7 @@ class Image
         std::future<void> future;
         AnimatedImage* animatedImage = nullptr;
         sf::Time delay;
+        float scale = 1.f;
 
         void init(const std::string&);
         bool initIfGIF(const std::string&);
