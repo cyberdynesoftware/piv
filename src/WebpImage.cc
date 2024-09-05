@@ -3,21 +3,20 @@
 #include <fstream>
 #include <iostream>
 
-WebpImage::WebpImage(const char* filename)
-{
-    loadFile(filename);
-}
-
 WebpImage::~WebpImage()
 {
     if (decoder != nullptr)
+    {
         WebPAnimDecoderDelete(decoder);
+    }
     else
+    {
         WebPFree((void*)data.bytes);
+    }
 }
 
 void
-WebpImage::loadFile(const char* filename)
+WebpImage::init(const char* filename)
 {
     std::ifstream in(filename, std::ios::in | std::ios::binary);
     if (in)
@@ -29,7 +28,7 @@ WebpImage::loadFile(const char* filename)
         in.read((char*)data.bytes, data.size);
         in.close();
     }
-    else std::cerr << "Error opening " << filename << std::endl;
+    else std::cerr << "WebpImage: Error opening " << filename << std::endl;
 }
 
 bool
@@ -39,37 +38,37 @@ WebpImage::isWebp()
 }
 
 void
-WebpImage::prepare(sf::Sprite& sprite)
+WebpImage::prepare()
 {
     WebPAnimDecoderOptions options;
     WebPAnimDecoderOptionsInit(&options);
     options.color_mode = MODE_RGBA;
     decoder = WebPAnimDecoderNew(&data, &options);
 
-    WebPAnimInfo info;
-    WebPAnimDecoderGetInfo(decoder, &info);
+    WebPAnimInfo webpInfo;
+    WebPAnimDecoderGetInfo(decoder, &webpInfo);
 
-    animate = (info.frame_count > 1);
-    texture.create(info.canvas_width, info.canvas_height);
+    animate = (webpInfo.frame_count > 1);
+    texture.create(webpInfo.canvas_width, webpInfo.canvas_height);
     sprite.setTexture(texture, true);
+
+    prepareInfo("webp");
+    valid = true;
 }
 
 void
-WebpImage::update(sf::Time time, sf::Sprite& sprite)
+WebpImage::update(const sf::Time& time)
 {
-    if (!WebPAnimDecoderHasMoreFrames(decoder))
+    if (animate && lastFrameUpdate + sf::milliseconds(lastTimestamp) < time)
     {
-        WebPAnimDecoderReset(decoder);
-        previousTimestamp = 0;
+        if (!WebPAnimDecoderHasMoreFrames(decoder))
+        {
+            WebPAnimDecoderReset(decoder);
+        }
+
+        uint8_t* pixels;
+        WebPAnimDecoderGetNext(decoder, &pixels, &lastTimestamp);
+        texture.update(pixels);
+        lastFrameUpdate = time;
     }
-
-    uint8_t* pixels;
-    int timestamp;
-    WebPAnimDecoderGetNext(decoder, &pixels, &timestamp);
-
-    texture.update(pixels);
-
-    while (delay < time)
-        delay += sf::milliseconds(timestamp - previousTimestamp);
-    previousTimestamp = timestamp;
 }

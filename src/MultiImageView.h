@@ -16,7 +16,7 @@ class MultiImageView : public ImageView
         void process(const sf::Event&);
         void draw(void);
         void resize(void);
-        Image* findImageUnderMouse(void);
+        std::unique_ptr<Image>& findImageUnderMouse(void) const;
 
     private:
         GUI& gui;
@@ -31,7 +31,7 @@ class MultiImageView : public ImageView
         float viewPosition;
         float viewHeight;
         int targetImageWidth;
-        Image* lastVisibleImage;
+        std::unique_ptr<Image>* lastVisibleImage;
         enum SCROLL_STATES { NONE, UP, UP_FAST, DOWN, DOWN_FAST, AUTO_SCROLL };
         SCROLL_STATES scrollState = NONE;
         bool showSelection = false;
@@ -40,10 +40,10 @@ class MultiImageView : public ImageView
 
         void scrollView();
         int minColumnIndex(void);
-        void layout(Image*);
-        bool isVisible(Image*);
+        void layout(std::unique_ptr<Image>& image);
+        bool isVisible(const std::unique_ptr<Image>& image);
         void relayoutImages(int);
         void setViewPosition(int);
-        void highlight(Image*);
+        void highlight(const std::unique_ptr<Image>& image);
         float calcProgress(void);
 };

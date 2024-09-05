@@ -2,23 +2,24 @@
 
 #include <webp/demux.h>
 #include <SFML/Graphics.hpp>
-#include "AnimatedImage.h"
+#include "Image.h"
 
-class WebpImage : public AnimatedImage
+class WebpImage : public Image
 {
     public:
-        WebpImage(const char*);
         ~WebpImage();
 
         bool isWebp(void);
-        void prepare(sf::Sprite&);
-        void update(sf::Time, sf::Sprite&);
+        virtual void init(const char*);
+        virtual void prepare(void);
+        virtual void update(const sf::Time& time);
 
     private:
         WebPData data;
         WebPAnimDecoder* decoder = nullptr;
-        int previousTimestamp = 0;
-        sf::Texture texture;
+        bool animate = false;
+        sf::Time lastFrameUpdate = sf::milliseconds(0);
+        int lastTimestamp = 0;
 
         void loadFile(const char*);
 };

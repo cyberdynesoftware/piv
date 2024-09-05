@@ -1,7 +1,6 @@
 #pragma once
 
 #include "SFML/Window.hpp"
-#include "ImageManager.h"
 #include "MultiImageView.h"
 #include "SingleImageView.h"
 
@@ -21,6 +20,7 @@ class SceneManager
         ImageManager imageManager;
         MultiImageView multiImageView;
         SingleImageView singleImageView;
+        sf::Clock clock;
 
         bool singleImageViewActive = false;
         ImageView* eventReceiver;

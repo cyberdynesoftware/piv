@@ -1,18 +1,19 @@
 #pragma once
 
-#include "AnimatedImage.h"
+#include "Image.h"
 #include <SFML/Graphics.hpp>
 #include <vector>
 
-class AnimatedGIF : public AnimatedImage
+class AnimatedGIF : public Image
 {
     public:
-        AnimatedGIF(const char*);
+        AnimatedGIF();
         ~AnimatedGIF();
 
+        virtual void init(const char*);
         bool isGIF(void);
-        void load(void);
-        void update(sf::Time, sf::Sprite&);
+        virtual void prepare(void);
+        virtual void update(const sf::Time& time);
 
     private:
         struct stbi_pimpl* pimpl;
@@ -25,4 +26,6 @@ class AnimatedGIF : public AnimatedImage
 
         std::vector<Frame> frames;
         std::vector<Frame>::iterator frameIter;
+        bool animate = false;
+        sf::Time lastFrameUpdate = sf::milliseconds(0);
 };

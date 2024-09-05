@@ -2,6 +2,7 @@
 
 #include "Folder.h"
 #include "Image.h"
+#include "SFML/System.hpp"
 #include <deque>
 
 class ImageManager
@@ -10,18 +11,20 @@ class ImageManager
         ImageManager(Folder& folder);
 
         void loadImages(int number);
-        void update(void);
+        void update(const sf::Time& time);
 
         void copySelectedImages(void);
         void moveSelectedImages(void);
 
         int numberOfFiles(void);
         
-        std::deque<Image*> images;
+        std::deque<std::unique_ptr<Image>> images;
 
     private:
         Folder& folder;
         Folder::iter folderIter;
 
-        std::deque<Image*> imagesLoading;
+        std::deque<std::future<std::unique_ptr<Image>>> imagesLoading;
+
+        std::unique_ptr<Image> loadImage(const std::string& path);
 };

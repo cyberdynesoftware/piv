@@ -16,8 +16,8 @@ class Folder
         iter cend(void);
         int size(void);
         bool selectedFolderExistsNotEmpty(void);
-        void copyToSelection(std::string&);
-        void moveToSelection(std::string&);
+        void copyToSelection(const std::string&);
+        void moveToSelection(const std::string&);
         void scan(void);
         void sortCaseInsensitive(void);
         void sortByModTime(bool);

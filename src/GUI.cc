@@ -43,7 +43,7 @@ GUI::draw(sf::RenderTarget& target, sf::RenderStates states) const
 }
 
 void
-GUI::drawInfoBox(Image* image)
+GUI::drawInfoBox(const std::unique_ptr<Image>& image)
 {
     if (showInfo) 
     {
@@ -54,7 +54,7 @@ GUI::drawInfoBox(Image* image)
 }
 
 void
-GUI::drawSelectedIcon(Image* image)
+GUI::drawSelectedIcon(const std::unique_ptr<Image>& image)
 {
     const auto& imageBounds = image->sprite.getGlobalBounds();
     selectedIconCircle.setPosition(imageBounds.left + imageBounds.width - 20, imageBounds.top + 8);

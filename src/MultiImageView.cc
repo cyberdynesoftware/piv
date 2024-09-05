@@ -53,7 +53,7 @@ MultiImageView::process(const sf::Event& event)
                     break;
                 case sf::Mouse::Button::Middle:
                     {
-                        Image* image = findImageUnderMouse();
+                        auto& image = findImageUnderMouse();
                         image->selected = !image->selected;
                     }
                     break;
@@ -83,7 +83,7 @@ MultiImageView::process(const sf::Event& event)
                     break;
                 case sf::Keyboard::A:
                     {
-                        Image* image = findImageUnderMouse();
+                        auto& image = findImageUnderMouse();
                         image->selected = !image->selected;
                     }
                     break;
@@ -108,9 +108,10 @@ MultiImageView::process(const sf::Event& event)
                     break;
                 case sf::Keyboard::C:
                     {
-                        for (auto image : imageManager.images)
+                        for (auto& image : imageManager.images)
+                        {
                             image->selected = false;
-
+                        }
                         showSelection = false;
                         relayoutImages(numberOfColumns);
                     }
@@ -205,20 +206,20 @@ MultiImageView::setViewPosition(int centerY)
     viewPosition = view.getCenter().y;
 }
 
-Image*
-MultiImageView::findImageUnderMouse()
+std::unique_ptr<Image>&
+MultiImageView::findImageUnderMouse() const
 {
     window.setView(view);
     auto mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
-    for (auto image : imageManager.images)
+    for (auto& image : imageManager.images)
     {
         if (showSelection && !image->selected) continue;
         if (image->sprite.getGlobalBounds().contains(mouseCoords))
             return image;
     }
 
-    return NULL;
+    //return nullptr;
 }
 
 void
@@ -236,7 +237,7 @@ MultiImageView::relayoutImages(int columns)
     for (int i = 0; i < numberOfColumns; i++)
         columnOffsets[i] = 0;
 
-    for (auto image : imageManager.images)
+    for (auto& image : imageManager.images)
         if (image->hasPosition)
             if (!showSelection || image->selected)
                 layout(image);
@@ -246,13 +247,14 @@ MultiImageView::relayoutImages(int columns)
 }
 
 void
-MultiImageView::layout(Image* image)
+MultiImageView::layout(std::unique_ptr<Image>& image)
 {
     image->sprite.setOrigin(0, 0);
     image->scaleTo(targetImageWidth);
     int imageHeight = image->sprite.getGlobalBounds().height;
 
-    for (int i = columnIndex + 1; i < numberOfColumns + columnIndex; i++) {
+    for (int i = columnIndex + 1; i < numberOfColumns + columnIndex; i++)
+    {
         int halfImageHeight = (i < numberOfColumns) ? imageHeight / 2 : -imageHeight / 2;
         int index = i % numberOfColumns;
         if (columnOffsets[index] + halfImageHeight <= columnOffsets[columnIndex])
@@ -290,7 +292,7 @@ MultiImageView::draw()
 {
     window.setView(view);
 
-    for (auto image : imageManager.images)
+    for (auto& image : imageManager.images)
     {
         //if (image == elevatedImage) continue;
         if (showSelection && !image->selected) continue;
@@ -298,12 +300,11 @@ MultiImageView::draw()
 
         if (isVisible(image))
         {
-            image->update();
             window.draw(image->sprite);
             if (!showSelection  && image->selected) highlight(image);
             gui.drawInfoBox(image);
             if (!showSelection  && image->selected) gui.drawSelectedIcon(image);
-            lastVisibleImage = image;
+            lastVisibleImage = &image;
         }
     }
     /*
@@ -324,7 +325,7 @@ MultiImageView::draw()
 }
 
 bool
-MultiImageView::isVisible(Image* image)
+MultiImageView::isVisible(const std::unique_ptr<Image>& image)
 {
     const auto& bounds = image->sprite.getGlobalBounds();
     return (bounds.top + bounds.height > viewPosition - viewHeight / 2 &&
@@ -332,7 +333,7 @@ MultiImageView::isVisible(Image* image)
 }
 
 void
-MultiImageView::highlight(Image* image)
+MultiImageView::highlight(const std::unique_ptr<Image>& image)
 {
     const auto& imageBounds = image->sprite.getGlobalBounds();
     sf::RectangleShape highlight(sf::Vector2f(imageBounds.width, imageBounds.height));
@@ -382,11 +383,11 @@ float
 MultiImageView::calcProgress()
 {
     int index = std::distance(imageManager.images.cbegin(),
-            std::find(imageManager.images.cbegin(), imageManager.images.cend(), lastVisibleImage));
+            std::find(imageManager.images.cbegin(), imageManager.images.cend(), *lastVisibleImage));
 
     int max = !showSelection ? imageManager.numberOfFiles() :
         std::count_if(imageManager.images.cbegin(), imageManager.images.cend(), 
-                [](const Image* image) { return image->selected; });
+                [](const std::unique_ptr<Image>& image) { return image->selected; });
 
     auto progress =  (float) index / max;
     auto msg = std::format("{} / {}", index, max);
@@ -409,7 +410,7 @@ MultiImageView::resize()
     setViewPosition(viewPosition * factor);
     lastViewPosition *= factor;
 
-    for (auto image : imageManager.images)
+    for (auto& image : imageManager.images)
     {
         if (image->hasPosition)
         {
@@ -419,7 +420,9 @@ MultiImageView::resize()
     }
 
     for (int i = 0; i < numberOfColumns; i++)
+    {
         columnOffsets[i] *= factor;
+    }
 
     bottom *= factor;
 }

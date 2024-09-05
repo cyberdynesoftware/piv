@@ -113,7 +113,7 @@ SceneManager::deactivateSingleImageView()
 void
 SceneManager::update()
 {
-    imageManager.update();
+    imageManager.update(clock.getElapsedTime());
     multiImageView.draw();
 
     window.setView(window.getDefaultView());

@@ -123,7 +123,7 @@ Folder::fileExists(const std::string& p)
 }
 
 void
-Folder::copyToSelection(std::string& item)
+Folder::copyToSelection(const std::string& item)
 {
     if (!exists(selectedFolder))
         create_directory(selectedFolder);
@@ -133,7 +133,7 @@ Folder::copyToSelection(std::string& item)
 }
 
 void
-Folder::moveToSelection(std::string& item)
+Folder::moveToSelection(const std::string& item)
 {
     if (!exists(selectedFolder))
         create_directory(selectedFolder);

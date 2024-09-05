@@ -13,9 +13,14 @@ struct stbi_pimpl
     stbi__context context;
 };
 
-AnimatedGIF::AnimatedGIF(const char* filename)
+AnimatedGIF::AnimatedGIF()
 {
     pimpl = new stbi_pimpl;
+}
+
+void
+AnimatedGIF::init(const char* filename)
+{
     pimpl->file = stbi__fopen(filename, "rb");
     stbi__start_file(&pimpl->context, pimpl->file);
 }
@@ -35,7 +40,7 @@ AnimatedGIF::isGIF()
 }
 
 void
-AnimatedGIF::load()
+AnimatedGIF::prepare()
 {
     int x, y, frameCount;
     int *delays;
@@ -56,8 +61,7 @@ AnimatedGIF::load()
         frames.push_back(frame);
     }
 
-    if (frameCount > 1)
-        animate = true;
+    animate = (frameCount > 1);
 
     frameIter = frames.begin();
 
@@ -65,18 +69,23 @@ AnimatedGIF::load()
     delete[] delays;
     fclose(pimpl->file);
     pimpl->file = NULL;
+
+    prepareInfo("gif");
+    valid = true;
 }
 
 void
-AnimatedGIF::update(sf::Time time, sf::Sprite& sprite)
+AnimatedGIF::update(const sf::Time& time)
 {
-    while (delay < time)
-        delay += frameIter->delay;
+    if (animate && lastFrameUpdate + frameIter->delay < time)
+    {
+        if (frameIter++ == frames.end())
+        {
+            frameIter = frames.begin();
+        }
 
-    sprite.setTexture(frameIter->texture, false);
-
-    frameIter++;
-    
-    if (frameIter == frames.end())
-        frameIter = frames.begin();
+        sprite.setTexture(frameIter->texture, false);
+        lastFrameUpdate = time;
+    }
+    //while (delay < time) delay += frameIter->delay;
 }

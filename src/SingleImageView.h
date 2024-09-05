@@ -14,6 +14,8 @@ class SingleImageView : public ImageView, public sf::Drawable
         void process(const sf::Event& event);
         void resizeEvent(void);
 
+        std::deque<std::unique_ptr<Image>>::iterator imageIter;
+
     protected:
         virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 

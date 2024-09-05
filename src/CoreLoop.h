@@ -3,15 +3,14 @@
 #include "SFML/Window.hpp"
 #include "SceneManager.h"
 #include "Folder.h"
-#include "WindowManager.h"
 
-class CoreLoop : WindowManager
+class CoreLoop
 {
     public:
         CoreLoop(char* path);
 
-        virtual void closeWindow(void);
-        virtual void toggleFullscreen(void);
+        void closeWindow(void);
+        void toggleFullscreen(void);
 
         void runCoreLoop(void);
 

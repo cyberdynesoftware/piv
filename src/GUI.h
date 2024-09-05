@@ -10,8 +10,8 @@ class GUI : public sf::Drawable
 
         void update(void);
 
-        void drawInfoBox(Image* image);
-        void drawSelectedIcon(Image* image);
+        void drawInfoBox(const std::unique_ptr<Image>& image);
+        void drawSelectedIcon(const std::unique_ptr<Image>& image);
 
         void drawProgressBar(float progress, std::string msg);
         void helpMsg(std::string help);

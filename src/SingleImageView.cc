@@ -86,7 +86,7 @@ SingleImageView::process(const sf::Event& event)
 void
 SingleImageView::next()
 {
-    Image* image = *imageIter;
+    auto& image = *imageIter;
 
     if (imageIter != imageManager.images.end() && ++imageIter != imageManager.images.end())
     {

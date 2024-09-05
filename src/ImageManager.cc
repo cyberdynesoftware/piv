@@ -1,4 +1,9 @@
 #include "ImageManager.h"
+#include "WebpImage.h"
+#include "AnimatedGIF.h"
+#include <chrono>
+
+using namespace std::chrono_literals;
 
 ImageManager::ImageManager(Folder& folder)
     :
@@ -15,21 +20,49 @@ ImageManager::loadImages(int number)
         for (int i = 0; i < number; i++)
         {
             if (folderIter == folder.cend()) break;
-            imagesLoading.push_back(new Image(*folderIter++));
+            imagesLoading.push_back(std::async(std::launch::async, &ImageManager::loadImage, this, *folderIter++));
         }
     }
 }
 
-void
-ImageManager::update()
+    std::unique_ptr<Image>
+ImageManager::loadImage(const std::string& path)
 {
-    for (auto image: imagesLoading)
+    auto webp = std::make_unique<WebpImage>();
+    webp->init(path.c_str());
+    if (webp->isWebp())
     {
-        if (image->ready)
+        webp->prepare();
+        webp->update(sf::milliseconds(0));
+        return webp;
+    }
+
+    auto gif = std::make_unique<AnimatedGIF>();
+    gif->init(path.c_str());
+    if (gif->isGIF())
+    {
+        gif->prepare();
+        gif->update(sf::milliseconds(0));
+        return gif;
+    }
+
+    auto image = std::make_unique<Image>();
+    image->init(path.c_str());
+    image->prepare();
+    return image;
+}
+
+void
+ImageManager::update(const sf::Time& time)
+{
+    for (auto& future: imagesLoading)
+    {
+        if (future.wait_for(0s) == std::future_status::ready)
         {
+            auto image = future.get();
             if (image->valid)
             {
-                images.push_back(image);
+                images.push_back(std::move(image));
             }
             imagesLoading.pop_front();
         }
@@ -38,12 +71,17 @@ ImageManager::update()
             break;
         }
     }
+
+    for (auto& image: images)
+    {
+        image->update(time);
+    }
 }
 
 void
 ImageManager::copySelectedImages()
 {
-    for (auto image : images)
+    for (auto& image : images)
     {
         if (image->selected)
         {
@@ -55,23 +93,22 @@ ImageManager::copySelectedImages()
 void
 ImageManager::moveSelectedImages()
 {
-    std::deque<Image*> temp;
+    std::deque<std::unique_ptr<Image>> temp;
 
-    for (auto image : images)
+    for (auto& image : images)
     {
         if (image->selected)
         {
             folder.moveToSelection(image->path);
-            delete image;
         }
         else
         {
-            temp.push_back(image);
+            temp.push_back(std::move(image));
         }
     }
 
     folder.scan();
-    images = temp;
+    images = std::move(temp);
     folderIter = std::find(folder.cbegin(), folder.cend(), images.back()->path);
     folderIter++;
 }
