@@ -33,7 +33,6 @@ ImageManager::loadImage(const std::string& path)
     if (webp->isWebp())
     {
         webp->prepare();
-        webp->update(sf::milliseconds(0));
         return webp;
     }
 
@@ -42,7 +41,6 @@ ImageManager::loadImage(const std::string& path)
     if (gif->isGIF())
     {
         gif->prepare();
-        gif->update(sf::milliseconds(0));
         return gif;
     }
 
@@ -62,6 +60,7 @@ ImageManager::update(const sf::Time& time)
             auto image = future.get();
             if (image->valid)
             {
+                image->load(time);
                 images.push_back(std::move(image));
             }
             imagesLoading.pop_front();

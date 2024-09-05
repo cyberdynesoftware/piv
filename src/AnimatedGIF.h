@@ -10,9 +10,10 @@ class AnimatedGIF : public Image
         AnimatedGIF();
         ~AnimatedGIF();
 
-        virtual void init(const char*);
+        virtual void init(const std::string& p);
         bool isGIF(void);
         virtual void prepare(void);
+        virtual void load(const sf::Time& time);
         virtual void update(const sf::Time& time);
 
     private:

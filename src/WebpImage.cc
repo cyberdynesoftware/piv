@@ -16,9 +16,10 @@ WebpImage::~WebpImage()
 }
 
 void
-WebpImage::init(const char* filename)
+WebpImage::init(const std::string& p)
 {
-    std::ifstream in(filename, std::ios::in | std::ios::binary);
+    path = p;
+    std::ifstream in(path.c_str(), std::ios::in | std::ios::binary);
     if (in)
     {
         in.seekg(0, std::ios::end);
@@ -28,7 +29,7 @@ WebpImage::init(const char* filename)
         in.read((char*)data.bytes, data.size);
         in.close();
     }
-    else std::cerr << "WebpImage: Error opening " << filename << std::endl;
+    else std::cerr << "WebpImage: Error opening " << path << std::endl;
 }
 
 bool
@@ -50,6 +51,7 @@ WebpImage::prepare()
 
     animate = (webpInfo.frame_count > 1);
     texture.create(webpInfo.canvas_width, webpInfo.canvas_height);
+    texture.setSmooth(true);
     sprite.setTexture(texture, true);
 
     prepareInfo("webp");
@@ -57,18 +59,28 @@ WebpImage::prepare()
 }
 
 void
+WebpImage::load(const sf::Time& time)
+{
+    uint8_t* pixels;
+    int timestamp;
+    WebPAnimDecoderGetNext(decoder, &pixels, &timestamp);
+    delay = sf::milliseconds(timestamp - previousTimestamp);
+    previousTimestamp = timestamp;
+    texture.update(pixels);
+    lastFrameUpdate = time;
+}
+
+void
 WebpImage::update(const sf::Time& time)
 {
-    if (animate && lastFrameUpdate + sf::milliseconds(lastTimestamp) < time)
+    if (animate && (lastFrameUpdate + delay < time))
     {
         if (!WebPAnimDecoderHasMoreFrames(decoder))
         {
             WebPAnimDecoderReset(decoder);
+            previousTimestamp = 0;
         }
 
-        uint8_t* pixels;
-        WebPAnimDecoderGetNext(decoder, &pixels, &lastTimestamp);
-        texture.update(pixels);
-        lastFrameUpdate = time;
+        load(time);
     }
 }

@@ -9,7 +9,7 @@
 
 struct stbi_pimpl
 {
-    FILE *file;
+    FILE *file = NULL;
     stbi__context context;
 };
 
@@ -19,9 +19,10 @@ AnimatedGIF::AnimatedGIF()
 }
 
 void
-AnimatedGIF::init(const char* filename)
+AnimatedGIF::init(const std::string& p)
 {
-    pimpl->file = stbi__fopen(filename, "rb");
+    path = p;
+    pimpl->file = stbi__fopen(path.c_str(), "rb");
     stbi__start_file(&pimpl->context, pimpl->file);
 }
 
@@ -64,6 +65,7 @@ AnimatedGIF::prepare()
     animate = (frameCount > 1);
 
     frameIter = frames.begin();
+    sprite.setTexture(frameIter->texture, false);
 
     stbi_image_free(pixels);
     delete[] delays;
@@ -72,6 +74,13 @@ AnimatedGIF::prepare()
 
     prepareInfo("gif");
     valid = true;
+}
+
+void
+AnimatedGIF::load(const sf::Time& time)
+{
+    sprite.setTexture(frameIter->texture, false);
+    lastFrameUpdate = time;
 }
 
 void
@@ -84,8 +93,6 @@ AnimatedGIF::update(const sf::Time& time)
             frameIter = frames.begin();
         }
 
-        sprite.setTexture(frameIter->texture, false);
-        lastFrameUpdate = time;
+        load(time);
     }
-    //while (delay < time) delay += frameIter->delay;
 }

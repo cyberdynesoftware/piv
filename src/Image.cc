@@ -32,17 +32,6 @@ Image::prepareInfo(const std::string& decoder)
 }
 
 void
-Image::update(const sf::Time& time)
-{
-    /*
-    if (animatedImage && animatedImage->animate && clock.getElapsedTime() > animatedImage->delay)
-    {
-        animatedImage->update(clock.getElapsedTime(), sprite);
-    }
-    */
-}
-
-void
 Image::setPosition(const sf::Vector2f& p)
 {
     position = p;

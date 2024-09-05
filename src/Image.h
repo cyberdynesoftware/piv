@@ -9,7 +9,8 @@ class Image
     public:
         virtual void init(const std::string& path);
         virtual void prepare(void);
-        virtual void update(const sf::Time& time);
+        virtual void load(const sf::Time& time) {}
+        virtual void update(const sf::Time& time) {}
 
         void setPosition(const sf::Vector2f&);
         void fitTo(const sf::View&);
