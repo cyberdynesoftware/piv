@@ -1,14 +1,20 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <vector>
 
 class AnimatedImage
 {
-    public:
-        virtual ~AnimatedImage(void) { }
+    protected:
+        bool animate;
+        sf::Time lastFrameUpdate;
 
-        virtual void update(sf::Time, sf::Sprite&) = 0;
-        
-        bool animate = false;
-        sf::Time delay = sf::milliseconds(0);
+        struct Frame 
+        {
+            sf::Time delay;
+            sf::Texture texture;
+        };
+
+        std::vector<Frame> frames;
+        std::vector<Frame>::iterator frameIter;
 };

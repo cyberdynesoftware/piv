@@ -5,14 +5,7 @@
 
 WebpImage::~WebpImage()
 {
-    if (decoder != nullptr)
-    {
-        WebPAnimDecoderDelete(decoder);
-    }
-    else
-    {
-        WebPFree((void*)data.bytes);
-    }
+    WebPFree((void*)data.bytes);
 }
 
 void
@@ -44,16 +37,35 @@ WebpImage::prepare()
     WebPAnimDecoderOptions options;
     WebPAnimDecoderOptionsInit(&options);
     options.color_mode = MODE_RGBA;
-    decoder = WebPAnimDecoderNew(&data, &options);
+    WebPAnimDecoder* decoder = WebPAnimDecoderNew(&data, &options);
 
     WebPAnimInfo webpInfo;
     WebPAnimDecoderGetInfo(decoder, &webpInfo);
-
     animate = (webpInfo.frame_count > 1);
-    texture.create(webpInfo.canvas_width, webpInfo.canvas_height);
-    texture.setSmooth(true);
-    sprite.setTexture(texture, true);
 
+    uint8_t* pixels;
+    int timestamp;
+
+    while (WebPAnimDecoderHasMoreFrames(decoder))
+    {
+        WebPAnimDecoderGetNext(decoder, &pixels, &timestamp);
+
+        Frame frame;
+        frame.delay = sf::milliseconds(timestamp);
+        frame.texture.create(webpInfo.canvas_width, webpInfo.canvas_height);
+        frame.texture.setSmooth(true);
+        frame.texture.update(pixels);
+        
+        frames.push_back(frame);
+    }
+
+    auto delay = frames[1].delay - frames[0].delay;
+    std::for_each(frames.begin(), frames.end(), [&delay](auto& frame) { frame.delay = delay; });
+
+    WebPAnimDecoderDelete(decoder);
+
+    frameIter = frames.begin();
+    sprite.setTexture(frameIter->texture, false);
     prepareInfo("webp");
     valid = true;
 }
@@ -61,24 +73,18 @@ WebpImage::prepare()
 void
 WebpImage::load(const sf::Time& time)
 {
-    uint8_t* pixels;
-    int timestamp;
-    WebPAnimDecoderGetNext(decoder, &pixels, &timestamp);
-    delay = sf::milliseconds(timestamp - previousTimestamp);
-    previousTimestamp = timestamp;
-    texture.update(pixels);
+    sprite.setTexture(frameIter->texture, false);
     lastFrameUpdate = time;
 }
 
 void
 WebpImage::update(const sf::Time& time)
 {
-    if (animate && (lastFrameUpdate + delay < time))
+    if (animate && lastFrameUpdate + frameIter->delay < time)
     {
-        if (!WebPAnimDecoderHasMoreFrames(decoder))
+        if (++frameIter == frames.end())
         {
-            WebPAnimDecoderReset(decoder);
-            previousTimestamp = 0;
+            frameIter = frames.begin();
         }
 
         load(time);

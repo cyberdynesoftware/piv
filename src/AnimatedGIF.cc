@@ -64,14 +64,13 @@ AnimatedGIF::prepare()
 
     animate = (frameCount > 1);
 
-    frameIter = frames.begin();
-    sprite.setTexture(frameIter->texture, false);
-
     stbi_image_free(pixels);
     delete[] delays;
     fclose(pimpl->file);
     pimpl->file = NULL;
 
+    frameIter = frames.begin();
+    sprite.setTexture(frameIter->texture, false);
     prepareInfo("gif");
     valid = true;
 }
@@ -88,7 +87,7 @@ AnimatedGIF::update(const sf::Time& time)
 {
     if (animate && lastFrameUpdate + frameIter->delay < time)
     {
-        if (frameIter++ == frames.end())
+        if (++frameIter == frames.end())
         {
             frameIter = frames.begin();
         }

@@ -3,8 +3,9 @@
 #include <webp/demux.h>
 #include <SFML/Graphics.hpp>
 #include "Image.h"
+#include "AnimatedImage.h"
 
-class WebpImage : public Image
+class WebpImage : public Image, AnimatedImage
 {
     public:
         ~WebpImage();
@@ -17,11 +18,6 @@ class WebpImage : public Image
 
     private:
         WebPData data;
-        WebPAnimDecoder* decoder = nullptr;
-        bool animate = false;
-        sf::Time lastFrameUpdate;
-        sf::Time delay;
-        int previousTimestamp = 0;
 
         void loadFile(const char*);
 };
