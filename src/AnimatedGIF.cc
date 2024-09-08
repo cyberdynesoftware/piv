@@ -70,7 +70,7 @@ AnimatedGIF::prepare()
     pimpl->file = NULL;
 
     frameIter = frames.begin();
-    sprite.setTexture(frameIter->texture, false);
+    size = sf::Vector2u(x, y);
     prepareInfo("gif");
     valid = true;
 }

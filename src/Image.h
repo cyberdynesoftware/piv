@@ -18,18 +18,20 @@ class Image
         void resetPositionAndScale();
 
         sf::Sprite sprite;
+        sf::Vector2u size;
+        sf::Vector2f position;
+
         bool valid = false;
         bool hasPosition = false;
-        sf::Vector2f position;
-        std::string info;
-        std::string path;
         bool selected = false;
 
-    protected:
-        sf::Texture texture;
+        std::string info;
+        std::string path;
 
+    protected:
         void prepareInfo(const std::string& decoder);
 
     private:
+        sf::Texture texture;
         float scale = 1.f;
 };

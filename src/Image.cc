@@ -16,6 +16,7 @@ Image::prepare()
     {
         texture.setSmooth(true);
         sprite.setTexture(texture);
+        size = texture.getSize();
         prepareInfo("stb");
     }
 }
@@ -26,8 +27,8 @@ Image::prepareInfo(const std::string& decoder)
     info = std::format("{} ({})\n{}x{}, {}kB",
             Folder::filename(path),
             decoder,
-            sprite.getTexture()->getSize().x,
-            sprite.getTexture()->getSize().y,
+            size.x,
+            size.y,
             Folder::fileSize(path) / 1000);
 }
 

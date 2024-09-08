@@ -65,7 +65,7 @@ WebpImage::prepare()
     WebPAnimDecoderDelete(decoder);
 
     frameIter = frames.begin();
-    sprite.setTexture(frameIter->texture, false);
+    size = sf::Vector2u(webpInfo.canvas_width, webpInfo.canvas_height);
     prepareInfo("webp");
     valid = true;
 }
