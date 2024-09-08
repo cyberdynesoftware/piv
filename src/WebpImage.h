@@ -5,16 +5,14 @@
 #include "Image.h"
 #include "AnimatedImage.h"
 
-class WebpImage : public Image, AnimatedImage
+class WebpImage : public AnimatedImage
 {
     public:
         ~WebpImage();
 
-        bool isWebp(void);
         virtual void init(const std::string& p);
+        bool isWebp(void);
         virtual void prepare(void);
-        virtual void load(const sf::Time& time);
-        virtual void update(const sf::Time& time);
 
     private:
         WebPData data;

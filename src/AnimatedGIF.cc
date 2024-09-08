@@ -74,24 +74,3 @@ AnimatedGIF::prepare()
     prepareInfo("gif");
     valid = true;
 }
-
-void
-AnimatedGIF::load(const sf::Time& time)
-{
-    sprite.setTexture(frameIter->texture, false);
-    lastFrameUpdate = time;
-}
-
-void
-AnimatedGIF::update(const sf::Time& time)
-{
-    if (animate && lastFrameUpdate + frameIter->delay < time)
-    {
-        if (++frameIter == frames.end())
-        {
-            frameIter = frames.begin();
-        }
-
-        load(time);
-    }
-}

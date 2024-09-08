@@ -4,7 +4,7 @@
 #include "AnimatedImage.h"
 #include <SFML/Graphics.hpp>
 
-class AnimatedGIF : public Image, AnimatedImage
+class AnimatedGIF : public AnimatedImage
 {
     public:
         AnimatedGIF();
@@ -13,8 +13,6 @@ class AnimatedGIF : public Image, AnimatedImage
         virtual void init(const std::string& p);
         bool isGIF(void);
         virtual void prepare(void);
-        virtual void load(const sf::Time& time);
-        virtual void update(const sf::Time& time);
 
     private:
         struct stbi_pimpl* pimpl;

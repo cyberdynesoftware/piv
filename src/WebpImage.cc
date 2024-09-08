@@ -69,24 +69,3 @@ WebpImage::prepare()
     prepareInfo("webp");
     valid = true;
 }
-
-void
-WebpImage::load(const sf::Time& time)
-{
-    sprite.setTexture(frameIter->texture, false);
-    lastFrameUpdate = time;
-}
-
-void
-WebpImage::update(const sf::Time& time)
-{
-    if (animate && lastFrameUpdate + frameIter->delay < time)
-    {
-        if (++frameIter == frames.end())
-        {
-            frameIter = frames.begin();
-        }
-
-        load(time);
-    }
-}
