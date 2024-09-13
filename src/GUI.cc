@@ -6,11 +6,6 @@ GUI::GUI(sf::RenderWindow& window)
 {
     progressBar.setFillColor(sf::Color(255, 255, 255, 128));
 
-    selectedIconCircle.setRadius(5);
-    selectedIconCircle.setFillColor(pumpkin);
-    selectedIconCircle.setOutlineColor(sf::Color::Black);
-    selectedIconCircle.setOutlineThickness(1);
-
     warning.setTextAndWidth("Warning: folder 'piv-selected' exists and is not empty.", window.getDefaultView().getSize().x);
 }
 
@@ -40,14 +35,6 @@ GUI::draw(sf::RenderTarget& target, sf::RenderStates states) const
     {
         target.draw(help, states);
     }
-}
-
-void
-GUI::drawSelectedIcon(const std::unique_ptr<Image>& image)
-{
-    const auto& imageBounds = image->sprite.getGlobalBounds();
-    selectedIconCircle.setPosition(imageBounds.left + imageBounds.width - 20, imageBounds.top + 8);
-    window.draw(selectedIconCircle);
 }
 
 void

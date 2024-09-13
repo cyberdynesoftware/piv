@@ -14,11 +14,14 @@ MultiImageView::MultiImageView(sf::RenderWindow& window, ImageManager& imageMana
     targetImageWidth = window.getSize().x / numberOfColumns;
     viewPosition = lastViewPosition = window.getView().getCenter().y;
     viewHeight = window.getView().getSize().y;
-    highlightBackground.setFillColor(sf::Color(0, 0, 0, 224));
-    highlightBackground.setSize(window.getView().getSize());
-    highlightBackground.setOrigin(window.getView().getSize() / 2.f);
+    selectedImageForeground.setFillColor(sf::Color(255, 255, 255, 96));
     imageManager.loadImages(numberOfColumns);
     view = window.getView();
+
+    selectedIconCircle.setRadius(5);
+    selectedIconCircle.setFillColor(pumpkin);
+    selectedIconCircle.setOutlineColor(sf::Color::Black);
+    selectedIconCircle.setOutlineThickness(1);
 }
 
 void
@@ -102,8 +105,6 @@ MultiImageView::process(const sf::Event& event)
                             relayoutImages(numberOfColumns);
                             setViewPosition(lastViewPosition);
                         }
-
-                        //gui.helpMsg(generateHelpText());
                     }
                     break;
                 case sf::Keyboard::C:
@@ -294,34 +295,22 @@ MultiImageView::draw()
 
     for (auto& image : imageManager.images)
     {
-        //if (image == elevatedImage) continue;
         if (showSelection && !image->selected) continue;
         if (!image->hasPosition) layout(image);
 
         if (isVisible(image))
         {
             window.draw(image->sprite);
-            if (!showSelection  && image->selected) highlight(image);
+            if (!showSelection && image->selected) markSelectedImage(image);
             if (showInfo)
             {
                 setupInfoBox(image);
                 window.draw(info);
             }
-            if (!showSelection  && image->selected) gui.drawSelectedIcon(image);
             lastVisibleImage = &image;
         }
     }
-    /*
-    if (elevatedImage != NULL)
-    {
-        highlightBackground.setPosition(view.getCenter());
-        window.draw(highlightBackground);
-        elevatedImage->update();
-        window.draw(elevatedImage->sprite);
-        gui.drawInfoBox(elevatedImage);
-        if (!showSelection  && elevatedImage->selected) gui.drawSelectedIcon(elevatedImage);
-    }
-    */
+
     if (viewPosition + viewHeight / 2 > columnOffsets[minColumnIndex()] && !showSelection)
         imageManager.loadImages(numberOfColumns);
 
@@ -337,13 +326,15 @@ MultiImageView::isVisible(const std::unique_ptr<Image>& image)
 }
 
 void
-MultiImageView::highlight(const std::unique_ptr<Image>& image)
+MultiImageView::markSelectedImage(const std::unique_ptr<Image>& image)
 {
+    selectedImageForeground.setPosition(image->sprite.getGlobalBounds().getPosition());
+    selectedImageForeground.setSize(image->sprite.getGlobalBounds().getSize());
+    window.draw(selectedImageForeground);
+
     const auto& imageBounds = image->sprite.getGlobalBounds();
-    sf::RectangleShape highlight(sf::Vector2f(imageBounds.width, imageBounds.height));
-    highlight.setPosition(imageBounds.left, imageBounds.top);
-    highlight.setFillColor(sf::Color(255, 255, 255, 96));
-    window.draw(highlight);
+    selectedIconCircle.setPosition(imageBounds.left + imageBounds.width - 20, imageBounds.top + 8);
+    window.draw(selectedIconCircle);
 }
 
 void
@@ -383,7 +374,7 @@ MultiImageView::scrollView()
     }
 }
 
-float
+void
 MultiImageView::calcProgress()
 {
     int index = std::distance(imageManager.images.cbegin(),
@@ -396,15 +387,13 @@ MultiImageView::calcProgress()
     auto progress =  (float) index / max;
     auto msg = std::format("{} / {}", index, max);
     gui.drawProgressBar(progress, msg);
-
-    return 1.f;
 }
 
 void
 MultiImageView::resize()
 {
-    highlightBackground.setSize(view.getSize());
-    highlightBackground.setOrigin(view.getSize() / 2.f);
+    //highlightBackground.setSize(view.getSize());
+    //highlightBackground.setOrigin(view.getSize() / 2.f);
 
     int newTargetImageWidth = window.getSize().x / numberOfColumns;
     float factor = (float) newTargetImageWidth / targetImageWidth;

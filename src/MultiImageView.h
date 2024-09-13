@@ -19,10 +19,11 @@ class MultiImageView : public ImageView
         std::unique_ptr<Image>& findImageUnderMouse(void) const;
 
     private:
-        GUI& gui;
-        ImageManager& imageManager;
-        sf::View view;
         sf::RenderWindow& window;
+        ImageManager& imageManager;
+        GUI& gui;
+
+        sf::View view;
         int numberOfColumns = 4;
         std::vector<int> columnOffsets;
         int columnIndex = 0;
@@ -36,7 +37,10 @@ class MultiImageView : public ImageView
         SCROLL_STATES scrollState = NONE;
         bool showSelection = false;
         float lastViewPosition;
-        sf::RectangleShape highlightBackground;
+
+        sf::RectangleShape selectedImageForeground;
+        sf::Color pumpkin = sf::Color(245, 118, 26);
+        sf::CircleShape selectedIconCircle;
 
         void scrollView();
         int minColumnIndex(void);
@@ -44,6 +48,6 @@ class MultiImageView : public ImageView
         bool isVisible(const std::unique_ptr<Image>& image);
         void relayoutImages(int);
         void setViewPosition(int);
-        void highlight(const std::unique_ptr<Image>& image);
-        float calcProgress(void);
+        void markSelectedImage(const std::unique_ptr<Image>& image);
+        void calcProgress(void);
 };

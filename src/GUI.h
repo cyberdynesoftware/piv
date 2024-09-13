@@ -10,8 +10,6 @@ class GUI : public sf::Drawable
 
         void update(void);
 
-        void drawSelectedIcon(const std::unique_ptr<Image>& image);
-
         void drawProgressBar(float progress, std::string msg);
         void helpMsg(std::string help);
 
@@ -29,9 +27,6 @@ class GUI : public sf::Drawable
         TextWithBackground progressLabel = TextWithBackground(TextWithBackground::Config::progress, 15);
         TextWithBackground help = TextWithBackground(TextWithBackground::Config::help, 18);
         TextWithBackground warning = TextWithBackground(TextWithBackground::Config::warning, 20);
-
-        sf::Color pumpkin = sf::Color(245, 118, 26);
-        sf::CircleShape selectedIconCircle;
 
         int selectedFolderWarningCounter = 0;
 };

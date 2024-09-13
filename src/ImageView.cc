@@ -1,6 +1,7 @@
 #include "ImageView.h"
 
-bool ImageView::showInfo = false;
+bool
+ImageView::showInfo = false;
 
 void
 ImageView::setupInfoBox(const std::unique_ptr<Image>& image)
