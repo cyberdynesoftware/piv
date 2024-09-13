@@ -9,10 +9,10 @@
 class SingleImageView : public ImageView, public sf::Drawable
 {
     public:
-        SingleImageView(sf::RenderWindow& window, ImageManager& imageManager, GUI& gui);
+        SingleImageView(sf::RenderWindow& window, ImageManager& imageManager);
 
         void process(const sf::Event& event);
-        void resizeEvent(void);
+        void init(void);
 
         std::deque<std::unique_ptr<Image>>::iterator imageIter;
 
@@ -21,7 +21,6 @@ class SingleImageView : public ImageView, public sf::Drawable
 
     private:
         ImageManager& imageManager;
-        GUI& gui;
         sf::RenderWindow& window;
 
         sf::RectangleShape background;

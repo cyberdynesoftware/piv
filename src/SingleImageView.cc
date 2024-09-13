@@ -1,9 +1,8 @@
 #include "SingleImageView.h"
 #include <iostream>
 
-SingleImageView::SingleImageView(sf::RenderWindow& window, ImageManager& imageManager, GUI& gui):
+SingleImageView::SingleImageView(sf::RenderWindow& window, ImageManager& imageManager):
     imageManager(imageManager),
-    gui(gui),
     window(window)
 {
     background.setFillColor(sf::Color(0, 0, 0, 224));
@@ -91,7 +90,7 @@ SingleImageView::next()
     if (imageIter != imageManager.images.end() && ++imageIter != imageManager.images.end())
     {
         image->resetPositionAndScale();
-        (*imageIter)->fitTo(window.getDefaultView());
+        init();
     }
 }
 
@@ -101,7 +100,8 @@ SingleImageView::previous()
     if (imageIter != imageManager.images.begin())
     {
         (*imageIter)->resetPositionAndScale();
-        (*(--imageIter))->fitTo(window.getDefaultView());
+        --imageIter;
+        init();
     }
 }
 
@@ -110,11 +110,18 @@ SingleImageView::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     target.draw(background, states);
     target.draw((*imageIter)->sprite, states);
+
+    if (showInfo)
+    {
+        target.draw(info, states);
+    }
 }
 
 void
-SingleImageView::resizeEvent()
+SingleImageView::init()
 {
+    (*imageIter)->fitTo(window.getDefaultView());
+    setupInfoBox(*imageIter);
 }
 
 void

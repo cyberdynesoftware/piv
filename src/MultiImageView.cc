@@ -302,7 +302,11 @@ MultiImageView::draw()
         {
             window.draw(image->sprite);
             if (!showSelection  && image->selected) highlight(image);
-            gui.drawInfoBox(image);
+            if (showInfo)
+            {
+                setupInfoBox(image);
+                window.draw(info);
+            }
             if (!showSelection  && image->selected) gui.drawSelectedIcon(image);
             lastVisibleImage = &image;
         }

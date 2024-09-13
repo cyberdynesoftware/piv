@@ -43,17 +43,6 @@ GUI::draw(sf::RenderTarget& target, sf::RenderStates states) const
 }
 
 void
-GUI::drawInfoBox(const std::unique_ptr<Image>& image)
-{
-    if (showInfo) 
-    {
-        info.setTextAndWidth(image->info, image->sprite.getGlobalBounds().width);
-        info.setPosition(image->sprite.getGlobalBounds().getPosition());
-        window.draw(info);
-    }
-}
-
-void
 GUI::drawSelectedIcon(const std::unique_ptr<Image>& image)
 {
     const auto& imageBounds = image->sprite.getGlobalBounds();

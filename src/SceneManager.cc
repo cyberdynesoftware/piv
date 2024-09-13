@@ -7,7 +7,7 @@ SceneManager::SceneManager(Folder& folder, sf::RenderWindow& window)
         gui(window),
         imageManager(folder),
         multiImageView(window, imageManager, gui),
-        singleImageView(window, imageManager, gui)
+        singleImageView(window, imageManager)
 {
     eventReceiver = &multiImageView;
 
@@ -37,7 +37,7 @@ SceneManager::process(const sf::Event& event)
                     deactivateSingleImageView();
                     break;
                 case sf::Keyboard::I:
-                    gui.showInfo = !gui.showInfo;
+                    eventReceiver->showInfo = !eventReceiver->showInfo;
                     break;
                 default:
                     eventReceiver->process(event);
@@ -86,7 +86,7 @@ SceneManager::activateSingleImageView()
         singleImageViewActive = true;
         eventReceiver = &singleImageView;
         singleImageView.imageIter = std::find(imageManager.images.begin(), imageManager.images.end(), multiImageView.findImageUnderMouse());
-        (*singleImageView.imageIter)->fitTo(window.getDefaultView());
+        singleImageView.init();
 
         auto help = Help::general();
         help.append(Help::singleImage());
