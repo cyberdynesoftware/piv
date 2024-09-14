@@ -10,7 +10,7 @@ class GUI : public sf::Drawable
 
         void update(void);
 
-        void drawProgressBar(float progress, std::string msg);
+        void drawProgressBar(int index, int max);
         void helpMsg(std::string help);
 
         bool showHelp = false;

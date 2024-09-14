@@ -1,4 +1,5 @@
 #include "GUI.h"
+#include <format>
 
 GUI::GUI(sf::RenderWindow& window)
     :
@@ -38,9 +39,12 @@ GUI::draw(sf::RenderTarget& target, sf::RenderStates states) const
 }
 
 void
-GUI::drawProgressBar(float progress, std::string msg)
+GUI::drawProgressBar(int index, int max)
 {
-    int progressBarWidth = 15;
+    auto progress =  (float) index / max;
+    auto msg = std::format("{} / {}", index, max);
+
+    auto progressBarWidth = 15;
     progressBar.setSize(sf::Vector2f(progressBarWidth, progress * window.getDefaultView().getSize().y));
     progressBar.setPosition(window.getDefaultView().getSize().x - progressBarWidth, 0);
 

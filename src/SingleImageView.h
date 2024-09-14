@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ImageManager.h"
-#include "GUI.h"
 #include "ImageView.h"
 #include "Image.h"
 #include <SFML/Graphics.hpp>

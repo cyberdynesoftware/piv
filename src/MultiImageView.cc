@@ -2,7 +2,6 @@
 #include <iostream>
 #include <set>
 #include <cmath>
-#include <format>
 #include <algorithm>
 
 MultiImageView::MultiImageView(sf::RenderWindow& window, ImageManager& imageManager, GUI& gui):
@@ -384,9 +383,7 @@ MultiImageView::calcProgress()
         std::count_if(imageManager.images.cbegin(), imageManager.images.cend(), 
                 [](const std::unique_ptr<Image>& image) { return image->selected; });
 
-    auto progress =  (float) index / max;
-    auto msg = std::format("{} / {}", index, max);
-    gui.drawProgressBar(progress, msg);
+    gui.drawProgressBar(index, max);
 }
 
 void
