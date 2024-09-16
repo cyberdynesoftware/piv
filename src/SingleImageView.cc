@@ -142,6 +142,7 @@ SingleImageView::zoom(float delta)
         (*imageIter)->sprite.setPosition(mousePosition);
         (*imageIter)->sprite.scale(1.05f, 1.05f);
     }
+    setupInfoBox(*imageIter);
 }
 
 void
@@ -155,4 +156,5 @@ SingleImageView::toggleFit()
     {
         (*imageIter)->sprite.setScale(1.f, 1.f);
     }
+    setupInfoBox(*imageIter);
 }
