@@ -11,11 +11,10 @@ MultiImageView::MultiImageView(sf::RenderWindow& window, ImageManager& imageMana
     columnOffsets(numberOfColumns, 0)
 {
     targetImageWidth = window.getSize().x / numberOfColumns;
-    viewPosition = lastViewPosition = window.getView().getCenter().y;
-    viewHeight = window.getView().getSize().y;
-    selectedImageForeground.setFillColor(sf::Color(255, 255, 255, 96));
     imageManager.loadImages(numberOfColumns);
-    view = window.getView();
+    view.it = window.getView();
+
+    selectedImageForeground.setFillColor(sf::Color(255, 255, 255, 96));
 
     selectedIconCircle.setRadius(5);
     selectedIconCircle.setFillColor(pumpkin);
@@ -28,31 +27,9 @@ MultiImageView::process(const sf::Event& event)
 {
     switch (event.type)
     {
-        case sf::Event::MouseWheelScrolled:
-            setViewPosition(viewPosition - event.mouseWheelScroll.delta * viewHeight / 100);
-            break;
-
-        case sf::Event::MouseButtonPressed:
-            switch (event.mouseButton.button)
-            {
-                case sf::Mouse::Button::XButton1:
-                    scrollState = DOWN;
-                    break;
-                case sf::Mouse::Button::XButton2:
-                    scrollState = UP;
-                    break;
-                default:
-                    break;
-            }
-            break;
-
         case sf::Event::MouseButtonReleased:
             switch (event.mouseButton.button)
             {
-                case sf::Mouse::Button::XButton1:
-                case sf::Mouse::Button::XButton2:
-                    scrollState = NONE;
-                    break;
                 case sf::Mouse::Button::Middle:
                     {
                         auto& image = findImageUnderMouse();
@@ -60,6 +37,7 @@ MultiImageView::process(const sf::Event& event)
                     }
                     break;
                 default:
+                    view.process(event);
                     break;
             }
             break;
@@ -67,22 +45,6 @@ MultiImageView::process(const sf::Event& event)
         case sf::Event::KeyPressed:
             switch (event.key.code)
             {
-                case sf::Keyboard::Up:
-                case sf::Keyboard::K:
-                    scrollState = UP;
-                    break;
-                case sf::Keyboard::Down:
-                case sf::Keyboard::J:
-                    scrollState = DOWN;
-                    break;
-                case sf::Keyboard::PageUp:
-                case sf::Keyboard::U:
-                    scrollState = UP_FAST;
-                    break;
-                case sf::Keyboard::PageDown:
-                case sf::Keyboard::D:
-                    scrollState = DOWN_FAST;
-                    break;
                 case sf::Keyboard::A:
                     {
                         auto& image = findImageUnderMouse();
@@ -95,14 +57,14 @@ MultiImageView::process(const sf::Event& event)
 
                         if (showSelection)
                         {
-                            lastViewPosition = viewPosition;
+                            lastViewPosition = view.it.getCenter().y;
                             relayoutImages(numberOfColumns);
-                            setViewPosition(window.getView().getSize().y / 2);
+                            view.setPosition(window.getView().getSize().y / 2);
                         }
                         else
                         {
                             relayoutImages(numberOfColumns);
-                            setViewPosition(lastViewPosition);
+                            view.setPosition(lastViewPosition);
                         }
                     }
                     break;
@@ -116,14 +78,6 @@ MultiImageView::process(const sf::Event& event)
                         relayoutImages(numberOfColumns);
                     }
                     break;
-                case sf::Keyboard::Space:
-                    scrollState = (scrollState == NONE) ? AUTO_SCROLL : NONE;
-                    break;
-                case sf::Keyboard::Home:
-                case sf::Keyboard::G:
-                    setViewPosition(view.getSize().y / 2);
-                    scrollSpeed = 0;
-                    break;
                 case sf::Keyboard::Y:
                     imageManager.copySelectedImages();
                     break;
@@ -132,7 +86,7 @@ MultiImageView::process(const sf::Event& event)
                         imageManager.moveSelectedImages();
                         showSelection = false;
                         relayoutImages(numberOfColumns);
-                        setViewPosition(lastViewPosition);
+                        view.setPosition(lastViewPosition);
                     }
                     break;
                 case sf::Keyboard::Num1:
@@ -166,50 +120,21 @@ MultiImageView::process(const sf::Event& event)
                     relayoutImages(10);
                     break;
                 default:
-                    break;
-            }
-            break;
-
-        case sf::Event::KeyReleased:
-            switch (event.key.code)
-            {
-                case sf::Keyboard::Up:
-                case sf::Keyboard::K:
-                case sf::Keyboard::Down:
-                case sf::Keyboard::J:
-                case sf::Keyboard::PageUp:
-                case sf::Keyboard::U:
-                case sf::Keyboard::PageDown:
-                case sf::Keyboard::D:
-                    scrollState = NONE;
-                    break;
-                default:
+                    view.process(event);
                     break;
             }
             break;
 
         default:
+            view.process(event);
             break;
     }
-}
-
-void
-MultiImageView::setViewPosition(int centerY)
-{
-    view.setCenter(view.getCenter().x, centerY);
-
-    if (view.getCenter().y - view.getSize().y / 2 < 0 || bottom < view.getSize().y)
-        view.setCenter(view.getCenter().x, view.getSize().y / 2);
-    else if (/*(folderIter == folder.cend() || showSelection) &&*/ view.getCenter().y + view.getSize().y / 2 > bottom)
-        view.setCenter(view.getCenter().x, bottom - view.getSize().y / 2);
-
-    viewPosition = view.getCenter().y;
 }
 
 std::unique_ptr<Image>&
 MultiImageView::findImageUnderMouse() const
 {
-    window.setView(view);
+    window.setView(view.it);
     auto mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
     for (auto& image : imageManager.images)
@@ -231,7 +156,7 @@ MultiImageView::relayoutImages(int columns)
     float factor = (float) newTargetImageWidth / targetImageWidth;
     targetImageWidth = newTargetImageWidth;
 
-    bottom = 0;
+    view.bottom = 0;
     columnIndex = 0;
     columnOffsets.resize(numberOfColumns);
     for (int i = 0; i < numberOfColumns; i++)
@@ -243,7 +168,7 @@ MultiImageView::relayoutImages(int columns)
                 layout(image);
 
     lastViewPosition *= factor * factor;
-    setViewPosition(viewPosition * factor * factor);
+    view.setPosition(view.it.getCenter().y * factor * factor);
 }
 
 void
@@ -267,8 +192,8 @@ MultiImageView::layout(std::unique_ptr<Image>& image)
     image->setPosition(sf::Vector2f(targetImageWidth * columnIndex, columnOffsets[columnIndex]));
     columnOffsets[columnIndex] += imageHeight;
 
-    if (image->position.y + imageHeight > bottom)
-        bottom = image->position.y + imageHeight;
+    if (image->position.y + imageHeight > view.bottom)
+        view.bottom = image->position.y + imageHeight;
 }
 
 int
@@ -290,17 +215,19 @@ MultiImageView::minColumnIndex()
 void
 MultiImageView::draw()
 {
-    window.setView(view);
+    window.setView(view.it);
 
     for (auto& image : imageManager.images)
     {
         if (showSelection && !image->selected) continue;
+
         if (!image->hasPosition) layout(image);
 
-        if (isVisible(image))
+        if (view.isVisible(image))
         {
             window.draw(image->sprite);
             if (!showSelection && image->selected) markSelectedImage(image);
+
             if (showInfo)
             {
                 setupInfoBox(image);
@@ -310,18 +237,15 @@ MultiImageView::draw()
         }
     }
 
-    if (viewPosition + viewHeight / 2 > columnOffsets[minColumnIndex()] && !showSelection)
+    if (view.getBottom() > columnOffsets[minColumnIndex()] && !showSelection)
+    {
         imageManager.loadImages(numberOfColumns);
+    }
 
-    scrollView();
-}
-
-bool
-MultiImageView::isVisible(const std::unique_ptr<Image>& image)
-{
-    const auto& bounds = image->sprite.getGlobalBounds();
-    return (bounds.top + bounds.height > viewPosition - viewHeight / 2 &&
-            bounds.top < viewPosition + viewHeight / 2);
+    if (view.update())
+    {
+        calcProgress();
+    }
 }
 
 void
@@ -337,56 +261,6 @@ MultiImageView::markSelectedImage(const std::unique_ptr<Image>& image)
 }
 
 void
-MultiImageView::scrollView()
-{
-    switch (scrollState)
-    {
-        case UP:
-            scrollSpeed = viewHeight / -50;
-            break;
-        case DOWN:
-            scrollSpeed = viewHeight / 50;
-            break;
-        case UP_FAST:
-            scrollSpeed = viewHeight / -25;
-            break;
-        case DOWN_FAST:
-            scrollSpeed = viewHeight / 25;
-            break;
-        case AUTO_SCROLL:
-            scrollSpeed = viewHeight / 800;
-            if (scrollSpeed == 0) scrollSpeed = 1;
-            break;
-        default:
-            break;
-    }
-
-    if (scrollSpeed != 0)
-    {
-        setViewPosition(viewPosition + scrollSpeed);
-
-        //if (scrollSpeed > 0) scrollSpeed--;
-        //else if (scrollSpeed < 0) scrollSpeed++;
-        scrollSpeed = scrollSpeed / 2;
-
-        calcProgress();
-    }
-}
-
-void
-MultiImageView::calcProgress()
-{
-    int index = std::distance(imageManager.images.cbegin(),
-            std::find(imageManager.images.cbegin(), imageManager.images.cend(), *lastVisibleImage));
-
-    int max = !showSelection ? imageManager.numberOfFiles() :
-        std::count_if(imageManager.images.cbegin(), imageManager.images.cend(), 
-                [](const std::unique_ptr<Image>& image) { return image->selected; });
-
-    gui.drawProgressBar(index, max);
-}
-
-void
 MultiImageView::resize()
 {
     //highlightBackground.setSize(view.getSize());
@@ -396,8 +270,7 @@ MultiImageView::resize()
     float factor = (float) newTargetImageWidth / targetImageWidth;
     targetImageWidth = newTargetImageWidth;
 
-    viewHeight = view.getSize().y;
-    setViewPosition(viewPosition * factor);
+    view.setPosition(view.it.getCenter().y * factor);
     lastViewPosition *= factor;
 
     for (auto& image : imageManager.images)
@@ -414,5 +287,18 @@ MultiImageView::resize()
         columnOffsets[i] *= factor;
     }
 
-    bottom *= factor;
+    view.bottom *= factor;
+}
+
+void
+MultiImageView::calcProgress()
+{
+    int index = std::distance(imageManager.images.cbegin(),
+            std::find(imageManager.images.cbegin(), imageManager.images.cend(), *lastVisibleImage));
+
+    int max = !showSelection ? imageManager.numberOfFiles() :
+        std::count_if(imageManager.images.cbegin(), imageManager.images.cend(), 
+                [](const std::unique_ptr<Image>& image) { return image->selected; });
+
+    gui.drawProgressBar(index, max);
 }
