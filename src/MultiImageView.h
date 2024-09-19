@@ -37,7 +37,6 @@ class MultiImageView : public ImageView
         sf::Color pumpkin = sf::Color(245, 118, 26);
         sf::CircleShape selectedIconCircle;
 
-        int minColumnIndex(void);
         void layout(std::unique_ptr<Image>& image);
         void relayoutImages(int);
         void markSelectedImage(const std::unique_ptr<Image>& image);

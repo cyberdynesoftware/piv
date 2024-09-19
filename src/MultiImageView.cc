@@ -207,22 +207,6 @@ MultiImageView::layout(std::unique_ptr<Image>& image)
         view.bottom = image->position.y + imageHeight;
 }
 
-int
-MultiImageView::minColumnIndex()
-{
-    int columnIndex = 0;
-    int minColumnOffset = columnOffsets[columnIndex];
-    for (int i = 0; i < numberOfColumns; i++)
-    {
-        if (columnOffsets[i] < minColumnOffset)
-        {
-            minColumnOffset = columnOffsets[i];
-            columnIndex = i;
-        }
-    }
-    return columnIndex;
-}
-
 void
 MultiImageView::draw()
 {
@@ -248,7 +232,7 @@ MultiImageView::draw()
         }
     }
 
-    if (view.getBottom() > columnOffsets[minColumnIndex()] && !showSelection)
+    if (view.getBottom() > *std::ranges::min_element(columnOffsets) && !showSelection)
     {
         imageManager.loadImages(numberOfColumns);
     }
