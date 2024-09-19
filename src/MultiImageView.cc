@@ -31,10 +31,7 @@ MultiImageView::process(const sf::Event& event)
             switch (event.mouseButton.button)
             {
                 case sf::Mouse::Button::Middle:
-                    {
-                        auto& image = findImageUnderMouse();
-                        image->selected = !image->selected;
-                    }
+                    selectImage();
                     break;
                 default:
                     view.process(event);
@@ -46,10 +43,7 @@ MultiImageView::process(const sf::Event& event)
             switch (event.key.code)
             {
                 case sf::Keyboard::A:
-                    {
-                        auto& image = findImageUnderMouse();
-                        image->selected = !image->selected;
-                    }
+                    selectImage();
                     break;
                 case sf::Keyboard::S:
                     {
@@ -131,20 +125,37 @@ MultiImageView::process(const sf::Event& event)
     }
 }
 
-std::unique_ptr<Image>&
+std::deque<std::unique_ptr<Image>>::iterator
 MultiImageView::findImageUnderMouse() const
 {
     window.setView(view.it);
     auto mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
-    for (auto& image : imageManager.images)
+    for (auto imageIter = imageManager.images.begin();
+            imageIter != imageManager.images.end();
+            imageIter++)
     {
-        if (showSelection && !image->selected) continue;
-        if (image->sprite.getGlobalBounds().contains(mouseCoords))
-            return image;
+        if (showSelection && !(*imageIter)->selected)
+        {
+            continue;
+        }
+        if ((*imageIter)->sprite.getGlobalBounds().contains(mouseCoords))
+        {
+            return imageIter;
+        }
     }
 
-    //return nullptr;
+    return imageManager.images.end();
+}
+
+void 
+MultiImageView::selectImage()
+{
+    auto image = findImageUnderMouse();
+    if (image != imageManager.images.end())
+    {
+        (*image)->selected = !(*image)->selected;
+    }
 }
 
 void

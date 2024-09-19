@@ -85,7 +85,7 @@ SceneManager::activateSingleImageView()
     {
         singleImageViewActive = true;
         eventReceiver = &singleImageView;
-        singleImageView.imageIter = std::find(imageManager.images.begin(), imageManager.images.end(), multiImageView.findImageUnderMouse());
+        singleImageView.imageIter = multiImageView.findImageUnderMouse();
         singleImageView.init();
 
         auto help = Help::general();

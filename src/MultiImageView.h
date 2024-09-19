@@ -17,7 +17,7 @@ class MultiImageView : public ImageView
         void process(const sf::Event&);
         void draw(void);
         void resize(void);
-        std::unique_ptr<Image>& findImageUnderMouse(void) const;
+        std::deque<std::unique_ptr<Image>>::iterator findImageUnderMouse(void) const;
 
     private:
         sf::RenderWindow& window;
@@ -42,4 +42,5 @@ class MultiImageView : public ImageView
         void relayoutImages(int);
         void markSelectedImage(const std::unique_ptr<Image>& image);
         void calcProgress(void);
+        void selectImage(void);
 };
