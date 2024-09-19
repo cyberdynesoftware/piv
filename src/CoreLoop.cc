@@ -7,7 +7,7 @@ CoreLoop::CoreLoop(char* path)
         folder(path),
         sceneManager(folder, window)
 {
-    window.setPosition(windowPos());
+    window.setPosition(desktopCenterPosition());
     window.setFramerateLimit(60);
 
     icon.loadFromMemory(icon_png, icon_png_len);
@@ -15,44 +15,25 @@ CoreLoop::CoreLoop(char* path)
 }
 
 void
-CoreLoop::closeWindow()
-{
-    window.close();
-}
-
-void
 CoreLoop::toggleFullscreen()
 {
     if (fullscreen)
     {
-        setupWindow();
+        window.create(windowMode, "piv", sf::Style::Default);
+        window.setPosition(desktopCenterPosition());
+        window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
         fullscreen = false;
     }
     else
     {
-        setupFullscreen();
+        window.create(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
         fullscreen = true;
     }
     window.setFramerateLimit(60);
 }
 
-void
-CoreLoop::setupFullscreen()
-{
-    auto desktop = sf::VideoMode::getDesktopMode();
-    window.create(desktop, "piv", sf::Style::Fullscreen);
-}
-
-void
-CoreLoop::setupWindow()
-{
-    window.create(windowMode, "piv", sf::Style::Default);
-    window.setPosition(windowPos());
-    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
-}
-
 sf::Vector2i
-CoreLoop::windowPos()
+CoreLoop::desktopCenterPosition()
 {
     auto desktop = sf::VideoMode::getDesktopMode();
     return sf::Vector2i((desktop.width - windowMode.width) / 2, (desktop.height - windowMode.height) / 2);
@@ -82,14 +63,14 @@ CoreLoop::process(const sf::Event& event)
     switch (event.type)
     {
         case sf::Event::Closed:
-            closeWindow();
+            window.close();
             break;
 
         case sf::Event::KeyPressed:
             switch (event.key.code)
             {
                 case sf::Keyboard::Escape:
-                    closeWindow();
+                    window.close();
                     break;
 
                 case sf::Keyboard::F:

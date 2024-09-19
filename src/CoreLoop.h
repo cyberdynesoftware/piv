@@ -9,15 +9,11 @@ class CoreLoop
     public:
         CoreLoop(char* path);
 
-        void closeWindow(void);
-        void toggleFullscreen(void);
-
         void runCoreLoop(void);
 
     private:
-        void setupFullscreen(void);
-        void setupWindow(void);
-        sf::Vector2i windowPos(void);
+        void toggleFullscreen(void);
+        sf::Vector2i desktopCenterPosition(void);
         void process(const sf::Event& event);
 
         sf::RenderWindow window;
