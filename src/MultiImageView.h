@@ -16,7 +16,7 @@ class MultiImageView : public ImageView
 
         void process(const sf::Event&);
         void draw(void);
-        void resize(void);
+        void resize(float width, float height);
         std::deque<std::unique_ptr<Image>>::iterator findImageUnderMouse(void) const;
 
     private:

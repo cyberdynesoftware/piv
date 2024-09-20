@@ -72,6 +72,15 @@ SceneManager::process(const sf::Event& event)
             }
             break;
 
+        case sf::Event::Resized:
+            multiImageView.resize(event.size.width, event.size.height);
+
+            if (singleImageViewActive)
+            {
+                singleImageView.init();
+            }
+            break;
+
         default:
             eventReceiver->process(event);
             break;
@@ -83,14 +92,18 @@ SceneManager::activateSingleImageView()
 {
     if (!singleImageViewActive)
     {
-        singleImageViewActive = true;
-        eventReceiver = &singleImageView;
-        singleImageView.imageIter = multiImageView.findImageUnderMouse();
-        singleImageView.init();
+        auto targetImage = multiImageView.findImageUnderMouse();
+        if (targetImage != imageManager.images.end())
+        {
+            singleImageViewActive = true;
+            eventReceiver = &singleImageView;
+            singleImageView.imageIter = targetImage;
+            singleImageView.init();
 
-        auto help = Help::general();
-        help.append(Help::singleImage());
-        gui.helpMsg(help);
+            auto help = Help::general();
+            help.append(Help::singleImage());
+            gui.helpMsg(help);
+        }
     }
 }
 

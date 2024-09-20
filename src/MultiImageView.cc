@@ -221,13 +221,18 @@ MultiImageView::draw()
         if (view.isVisible(image))
         {
             window.draw(image->sprite);
-            if (!showSelection && image->selected) markSelectedImage(image);
+
+            if (!showSelection && image->selected)
+            {
+                markSelectedImage(image);
+            }
 
             if (showInfo)
             {
                 setupInfoBox(image);
                 window.draw(info);
             }
+
             lastVisibleImage = &image;
         }
     }
@@ -256,16 +261,15 @@ MultiImageView::markSelectedImage(const std::unique_ptr<Image>& image)
 }
 
 void
-MultiImageView::resize()
+MultiImageView::resize(float width, float height)
 {
-    //highlightBackground.setSize(view.getSize());
-    //highlightBackground.setOrigin(view.getSize() / 2.f);
+    view.it.setSize(width, height);
 
     int newTargetImageWidth = window.getSize().x / numberOfColumns;
     float factor = (float) newTargetImageWidth / targetImageWidth;
     targetImageWidth = newTargetImageWidth;
 
-    view.setPosition(view.it.getCenter().y * factor);
+    view.it.setCenter(window.getSize().x / 2, view.it.getCenter().y * factor);
     lastViewPosition *= factor;
 
     for (auto& image : imageManager.images)
@@ -273,7 +277,7 @@ MultiImageView::resize()
         if (image->hasPosition)
         {
             image->setPosition(image->position * factor);
-            image->sprite.scale(factor, factor);
+            image->scaleTo(newTargetImageWidth);
         }
     }
 
@@ -292,7 +296,7 @@ MultiImageView::calcProgress()
             std::find(imageManager.images.cbegin(), imageManager.images.cend(), *lastVisibleImage));
 
     int max = !showSelection ? imageManager.numberOfFiles() :
-        std::count_if(imageManager.images.cbegin(), imageManager.images.cend(), 
+        std::ranges::count_if(imageManager.images, 
                 [](const std::unique_ptr<Image>& image) { return image->selected; });
 
     gui.drawProgressBar(index, max);

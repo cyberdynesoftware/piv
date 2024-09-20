@@ -121,6 +121,7 @@ void
 SingleImageView::init()
 {
     (*imageIter)->fitTo(window.getDefaultView());
+    background.setSize(window.getDefaultView().getSize());
     setupInfoBox(*imageIter);
 }
 
