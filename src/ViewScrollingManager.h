@@ -3,10 +3,13 @@
 #include "GUI.h"
 #include "Image.h"
 #include "SFML/Graphics.hpp"
+#include "box2d/box2d.h"
 
 class ViewScrollingManager
 {
     public:
+        ViewScrollingManager();
+
         void process(const sf::Event&);
         bool update(void);
         bool isVisible(const std::unique_ptr<Image>& image);
@@ -23,4 +26,6 @@ class ViewScrollingManager
 
         enum SCROLL_STATES { NONE, UP, UP_FAST, DOWN, DOWN_FAST, AUTO_SCROLL };
         SCROLL_STATES scrollState = NONE;
+
+        b2WorldId worldId;
 };

@@ -1,5 +1,11 @@
 #include "ViewScrollingManager.h"
 
+ViewScrollingManager::ViewScrollingManager()
+{
+    b2WorldDef worldDef = b2DefaultWorldDef();
+    worldId = b2CreateWorld(&worldDef);
+}
+
 void
 ViewScrollingManager::process(const sf::Event& event)
 {
