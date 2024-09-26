@@ -207,7 +207,16 @@ MultiImageView::layout(std::unique_ptr<Image>& image)
         camera.bottom = image->position.y + imageHeight;
 }
 
-void
+    void
+MultiImageView::update(const sf::Time& time)
+{
+    if (camera.update(time))
+    {
+        calcProgress();
+    }
+}
+
+    void
 MultiImageView::draw()
 {
     window.setView(camera.view);
@@ -240,11 +249,6 @@ MultiImageView::draw()
     if (camera.getBottom() > *std::ranges::min_element(columnOffsets) && !showSelection)
     {
         imageManager.loadImages(numberOfColumns);
-    }
-
-    if (camera.update())
-    {
-        calcProgress();
     }
 }
 

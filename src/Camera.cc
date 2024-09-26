@@ -1,9 +1,11 @@
 #include "Camera.h"
 
-ViewScrollingManager::ViewScrollingManager()
+Camera::Camera()
 {
     b2WorldDef worldDef = b2DefaultWorldDef();
+    worldDef.gravity = (b2Vec2){ 0.f, 0.f };
     worldId = b2CreateWorld(&worldDef);
+    createCameraBody();
 }
 
 void
@@ -12,7 +14,15 @@ Camera::process(const sf::Event& event)
     switch (event.type)
     {
         case sf::Event::MouseWheelScrolled:
-            setPosition(view.getCenter().y - event.mouseWheelScroll.delta * view.getSize().y / 100);
+            if (event.mouseWheelScroll.delta > 0)
+            {
+                b2Body_ApplyLinearImpulseToCenter(cameraBodyId, (b2Vec2){ 0.f, 1.f }, true);
+            }
+            else
+            {
+                b2Body_ApplyLinearImpulseToCenter(cameraBodyId, (b2Vec2){ 0.f, -1.f }, true);
+            }
+            //setPosition(view.getCenter().y - event.mouseWheelScroll.delta * view.getSize().y / 100);
             break;
 
         case sf::Event::MouseButtonPressed:
@@ -97,8 +107,15 @@ Camera::process(const sf::Event& event)
 }
 
 bool
-Camera::update()
+Camera::update(const sf::Time& time)
 {
+    auto timeStep = (time - lastUpdate).asSeconds();
+    lastUpdate = time;
+    b2World_Step(worldId, timeStep, 1);
+
+    auto pos = b2Body_GetPosition(cameraBodyId);
+    printf("%4.2f %4.2f\n", pos.x, pos.y);
+
     switch (scrollState)
     {
         case UP:
@@ -123,7 +140,7 @@ Camera::update()
 
     if (scrollSpeed != 0)
     {
-        setPosition(view.getCenter().y + scrollSpeed);
+        //setPosition(view.getCenter().y + scrollSpeed);
         scrollSpeed = scrollSpeed / 2;
         return true;
     }
@@ -159,4 +176,22 @@ Camera::isVisible(const std::unique_ptr<Image>& image)
 {
     const auto& bounds = image->sprite.getGlobalBounds();
     return (bounds.top + bounds.height > getTop() && bounds.top < getBottom());
+}
+
+void
+Camera::createCameraBody()
+{
+    b2BodyDef bodyDef = b2DefaultBodyDef();
+    bodyDef.type = b2_dynamicBody;
+    bodyDef.position = (b2Vec2){ 0.f, 0.f };
+    bodyDef.linearDamping = 5.f;
+    bodyDef.fixedRotation = true;
+
+    cameraBodyId = b2CreateBody(worldId, &bodyDef);
+
+    b2Polygon box = b2MakeBox(0.1f, 0.1f);
+
+    b2ShapeDef shape = b2DefaultShapeDef();
+
+    b2CreatePolygonShape(cameraBodyId, &shape, &box);
 }

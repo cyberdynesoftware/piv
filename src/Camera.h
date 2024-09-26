@@ -8,10 +8,10 @@
 class Camera
 {
     public:
-        ViewScrollingManager();
+        Camera();
 
         void process(const sf::Event&);
-        bool update(void);
+        bool update(const sf::Time& time);
         bool isVisible(const std::unique_ptr<Image>& image);
         void setPosition(int);
         float getTop(void);
@@ -28,4 +28,8 @@ class Camera
         SCROLL_STATES scrollState = NONE;
 
         b2WorldId worldId;
+        b2BodyId cameraBodyId;
+        sf::Time lastUpdate;
+
+        void createCameraBody();
 };
