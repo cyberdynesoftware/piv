@@ -5,7 +5,7 @@
 #include "SFML/Graphics.hpp"
 #include "box2d/box2d.h"
 
-class ViewScrollingManager
+class Camera
 {
     public:
         ViewScrollingManager();
@@ -17,7 +17,7 @@ class ViewScrollingManager
         float getTop(void);
         float getBottom(void);
 
-        sf::View it;
+        sf::View view;
 
         float bottom = 0.f;
 

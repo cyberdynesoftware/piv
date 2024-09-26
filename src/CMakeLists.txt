@@ -11,5 +11,5 @@ target_sources(piv PRIVATE main.cc
     ImageView.cc
     MultiImageView.cc
     SingleImageView.cc
-    ViewScrollingManager.cc)
+    Camera.cc)
 target_include_directories(piv PRIVATE ${CMAKE_CURRENT_LIST_DIR})

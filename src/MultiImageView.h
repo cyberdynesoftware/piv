@@ -4,7 +4,7 @@
 #include "ImageView.h"
 #include "GUI.h"
 #include "ImageManager.h"
-#include "ViewScrollingManager.h"
+#include "Camera.h"
 #include <deque>
 #include <vector>
 #include <SFML/Graphics.hpp>
@@ -22,7 +22,7 @@ class MultiImageView : public ImageView
     private:
         sf::RenderWindow& window;
         ImageManager& imageManager;
-        ViewScrollingManager view;
+        Camera camera;
         GUI& gui;
 
         int numberOfColumns = 4;

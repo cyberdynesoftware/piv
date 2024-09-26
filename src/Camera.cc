@@ -1,4 +1,4 @@
-#include "ViewScrollingManager.h"
+#include "Camera.h"
 
 ViewScrollingManager::ViewScrollingManager()
 {
@@ -7,12 +7,12 @@ ViewScrollingManager::ViewScrollingManager()
 }
 
 void
-ViewScrollingManager::process(const sf::Event& event)
+Camera::process(const sf::Event& event)
 {
     switch (event.type)
     {
         case sf::Event::MouseWheelScrolled:
-            setPosition(it.getCenter().y - event.mouseWheelScroll.delta * it.getSize().y / 100);
+            setPosition(view.getCenter().y - event.mouseWheelScroll.delta * view.getSize().y / 100);
             break;
 
         case sf::Event::MouseButtonPressed:
@@ -65,7 +65,7 @@ ViewScrollingManager::process(const sf::Event& event)
                     break;
                 case sf::Keyboard::Home:
                 case sf::Keyboard::G:
-                    setPosition(it.getSize().y / 2);
+                    setPosition(view.getSize().y / 2);
                     scrollSpeed = 0;
                     break;
                 default:
@@ -97,24 +97,24 @@ ViewScrollingManager::process(const sf::Event& event)
 }
 
 bool
-ViewScrollingManager::update()
+Camera::update()
 {
     switch (scrollState)
     {
         case UP:
-            scrollSpeed = it.getSize().y / -50;
+            scrollSpeed = view.getSize().y / -50;
             break;
         case DOWN:
-            scrollSpeed = it.getSize().y / 50;
+            scrollSpeed = view.getSize().y / 50;
             break;
         case UP_FAST:
-            scrollSpeed = it.getSize().y / -25;
+            scrollSpeed = view.getSize().y / -25;
             break;
         case DOWN_FAST:
-            scrollSpeed = it.getSize().y / 25;
+            scrollSpeed = view.getSize().y / 25;
             break;
         case AUTO_SCROLL:
-            scrollSpeed = it.getSize().y / 800;
+            scrollSpeed = view.getSize().y / 800;
             if (scrollSpeed == 0) scrollSpeed = 1;
             break;
         default:
@@ -123,7 +123,7 @@ ViewScrollingManager::update()
 
     if (scrollSpeed != 0)
     {
-        setPosition(it.getCenter().y + scrollSpeed);
+        setPosition(view.getCenter().y + scrollSpeed);
         scrollSpeed = scrollSpeed / 2;
         return true;
     }
@@ -132,30 +132,30 @@ ViewScrollingManager::update()
 }
 
 void
-ViewScrollingManager::setPosition(int centerY)
+Camera::setPosition(int centerY)
 {
-    it.setCenter(it.getCenter().x, centerY);
+    view.setCenter(view.getCenter().x, centerY);
 
-    if (getTop() < 0 || bottom < it.getSize().y)
-        it.setCenter(it.getCenter().x, it.getSize().y / 2);
-    else if (/*(folderIter == folder.cend() || showSelection) &&*/ it.getCenter().y + it.getSize().y / 2 > bottom)
-        it.setCenter(it.getCenter().x, bottom - it.getSize().y / 2);
+    if (getTop() < 0 || bottom < view.getSize().y)
+        view.setCenter(view.getCenter().x, view.getSize().y / 2);
+    else if (/*(folderIter == folder.cend() || showSelection) &&*/ view.getCenter().y + view.getSize().y / 2 > bottom)
+        view.setCenter(view.getCenter().x, bottom - view.getSize().y / 2);
 }
 
 float
-ViewScrollingManager::getTop()
+Camera::getTop()
 {
-    return it.getCenter().y - it.getSize().y / 2.f;
+    return view.getCenter().y - view.getSize().y / 2.f;
 }
 
 float
-ViewScrollingManager::getBottom()
+Camera::getBottom()
 {
-    return it.getCenter().y + it.getSize().y / 2.f;
+    return view.getCenter().y + view.getSize().y / 2.f;
 }
 
 bool
-ViewScrollingManager::isVisible(const std::unique_ptr<Image>& image)
+Camera::isVisible(const std::unique_ptr<Image>& image)
 {
     const auto& bounds = image->sprite.getGlobalBounds();
     return (bounds.top + bounds.height > getTop() && bounds.top < getBottom());
