@@ -12,7 +12,7 @@ MultiImageView::MultiImageView(sf::RenderWindow& window, ImageManager& imageMana
 {
     targetImageWidth = window.getSize().x / numberOfColumns;
     imageManager.loadImages(numberOfColumns);
-    view.it = window.getView();
+    camera.view = window.getView();
 
     selectedImageForeground.setFillColor(sf::Color(255, 255, 255, 96));
 
@@ -34,7 +34,7 @@ MultiImageView::process(const sf::Event& event)
                     selectImage();
                     break;
                 default:
-                    view.process(event);
+                    camera.process(event);
                     break;
             }
             break;
@@ -51,14 +51,14 @@ MultiImageView::process(const sf::Event& event)
 
                         if (showSelection)
                         {
-                            lastViewPosition = view.it.getCenter().y;
+                            lastViewPosition = camera.view.getCenter().y;
                             relayoutImages(numberOfColumns);
-                            view.setPosition(window.getView().getSize().y / 2);
+                            camera.setPosition(window.getView().getSize().y / 2);
                         }
                         else
                         {
                             relayoutImages(numberOfColumns);
-                            view.setPosition(lastViewPosition);
+                            camera.setPosition(lastViewPosition);
                         }
                     }
                     break;
@@ -80,7 +80,7 @@ MultiImageView::process(const sf::Event& event)
                         imageManager.moveSelectedImages();
                         showSelection = false;
                         relayoutImages(numberOfColumns);
-                        view.setPosition(lastViewPosition);
+                        camera.setPosition(lastViewPosition);
                     }
                     break;
                 case sf::Keyboard::Num1:
@@ -114,13 +114,13 @@ MultiImageView::process(const sf::Event& event)
                     relayoutImages(10);
                     break;
                 default:
-                    view.process(event);
+                    camera.process(event);
                     break;
             }
             break;
 
         default:
-            view.process(event);
+            camera.process(event);
             break;
     }
 }
@@ -128,7 +128,7 @@ MultiImageView::process(const sf::Event& event)
 std::deque<std::unique_ptr<Image>>::iterator
 MultiImageView::findImageUnderMouse() const
 {
-    window.setView(view.it);
+    window.setView(camera.view);
     auto mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
     for (auto imageIter = imageManager.images.begin();
@@ -167,7 +167,7 @@ MultiImageView::relayoutImages(int columns)
     float factor = (float) newTargetImageWidth / targetImageWidth;
     targetImageWidth = newTargetImageWidth;
 
-    view.bottom = 0;
+    camera.bottom = 0;
     columnIndex = 0;
     columnOffsets.resize(numberOfColumns);
     for (int i = 0; i < numberOfColumns; i++)
@@ -179,7 +179,7 @@ MultiImageView::relayoutImages(int columns)
                 layout(image);
 
     lastViewPosition *= factor * factor;
-    view.setPosition(view.it.getCenter().y * factor * factor);
+    camera.setPosition(camera.view.getCenter().y * factor * factor);
 }
 
 void
@@ -203,14 +203,14 @@ MultiImageView::layout(std::unique_ptr<Image>& image)
     image->setPosition(sf::Vector2f(targetImageWidth * columnIndex, columnOffsets[columnIndex]));
     columnOffsets[columnIndex] += imageHeight;
 
-    if (image->position.y + imageHeight > view.bottom)
-        view.bottom = image->position.y + imageHeight;
+    if (image->position.y + imageHeight > camera.bottom)
+        camera.bottom = image->position.y + imageHeight;
 }
 
 void
 MultiImageView::draw()
 {
-    window.setView(view.it);
+    window.setView(camera.view);
 
     for (auto& image : imageManager.images)
     {
@@ -218,7 +218,7 @@ MultiImageView::draw()
 
         if (!image->hasPosition) layout(image);
 
-        if (view.isVisible(image))
+        if (camera.isVisible(image))
         {
             window.draw(image->sprite);
 
@@ -237,12 +237,12 @@ MultiImageView::draw()
         }
     }
 
-    if (view.getBottom() > *std::ranges::min_element(columnOffsets) && !showSelection)
+    if (camera.getBottom() > *std::ranges::min_element(columnOffsets) && !showSelection)
     {
         imageManager.loadImages(numberOfColumns);
     }
 
-    if (view.update())
+    if (camera.update())
     {
         calcProgress();
     }
@@ -263,13 +263,13 @@ MultiImageView::markSelectedImage(const std::unique_ptr<Image>& image)
 void
 MultiImageView::resize(float width, float height)
 {
-    view.it.setSize(width, height);
+    camera.view.setSize(width, height);
 
     int newTargetImageWidth = window.getSize().x / numberOfColumns;
     float factor = (float) newTargetImageWidth / targetImageWidth;
     targetImageWidth = newTargetImageWidth;
 
-    view.it.setCenter(window.getSize().x / 2, view.it.getCenter().y * factor);
+    camera.view.setCenter(window.getSize().x / 2, camera.view.getCenter().y * factor);
     lastViewPosition *= factor;
 
     for (auto& image : imageManager.images)
@@ -286,7 +286,7 @@ MultiImageView::resize(float width, float height)
         columnOffsets[i] *= factor;
     }
 
-    view.bottom *= factor;
+    camera.bottom *= factor;
 }
 
 void

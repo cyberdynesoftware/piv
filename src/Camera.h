@@ -4,7 +4,7 @@
 #include "Image.h"
 #include "SFML/Graphics.hpp"
 
-class ViewScrollingManager
+class Camera
 {
     public:
         void process(const sf::Event&);
@@ -14,7 +14,7 @@ class ViewScrollingManager
         float getTop(void);
         float getBottom(void);
 
-        sf::View it;
+        sf::View view;
 
         float bottom = 0.f;
 
