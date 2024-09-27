@@ -22,14 +22,13 @@ class Camera
         float bottom = 0.f;
 
     private:
-        int scrollSpeed = 0;
-
-        enum SCROLL_STATES { NONE, UP, UP_FAST, DOWN, DOWN_FAST, AUTO_SCROLL };
-        SCROLL_STATES scrollState = NONE;
+        enum SCROLL_STATE { NONE, UP, UP_FAST, DOWN, DOWN_FAST, AUTO_SCROLL };
+        SCROLL_STATE scrollState = NONE;
 
         b2WorldId worldId;
         b2BodyId cameraBodyId;
         sf::Time lastUpdate;
 
-        void createCameraBody();
+        void applyForce(void);
+        void createCameraBody(void);
 };

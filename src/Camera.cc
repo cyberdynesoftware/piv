@@ -14,15 +14,10 @@ Camera::process(const sf::Event& event)
     switch (event.type)
     {
         case sf::Event::MouseWheelScrolled:
-            if (event.mouseWheelScroll.delta > 0)
             {
-                b2Body_ApplyLinearImpulseToCenter(cameraBodyId, (b2Vec2){ 0.f, 1.f }, true);
+                auto newtons = event.mouseWheelScroll.delta < 0 ? 1.f : -1.f;
+                b2Body_ApplyLinearImpulseToCenter(cameraBodyId, (b2Vec2){ 0.f, newtons }, true);
             }
-            else
-            {
-                b2Body_ApplyLinearImpulseToCenter(cameraBodyId, (b2Vec2){ 0.f, -1.f }, true);
-            }
-            //setPosition(view.getCenter().y - event.mouseWheelScroll.delta * view.getSize().y / 100);
             break;
 
         case sf::Event::MouseButtonPressed:
@@ -76,7 +71,7 @@ Camera::process(const sf::Event& event)
                 case sf::Keyboard::Home:
                 case sf::Keyboard::G:
                     setPosition(view.getSize().y / 2);
-                    scrollSpeed = 0;
+                    //scrollSpeed = 0;
                     break;
                 default:
                     break;
@@ -106,44 +101,66 @@ Camera::process(const sf::Event& event)
     }
 }
 
-bool
-Camera::update(const sf::Time& time)
+void
+Camera::applyForce()
 {
-    auto timeStep = (time - lastUpdate).asSeconds();
-    lastUpdate = time;
-    b2World_Step(worldId, timeStep, 1);
-
-    auto pos = b2Body_GetPosition(cameraBodyId);
-    printf("%4.2f %4.2f\n", pos.x, pos.y);
-
+    auto newtons = 0.f;
     switch (scrollState)
     {
         case UP:
-            scrollSpeed = view.getSize().y / -50;
+            newtons = -1.f;
             break;
         case DOWN:
-            scrollSpeed = view.getSize().y / 50;
+            newtons = 1.f;
             break;
         case UP_FAST:
-            scrollSpeed = view.getSize().y / -25;
+            newtons = -4.f;
             break;
         case DOWN_FAST:
-            scrollSpeed = view.getSize().y / 25;
+            newtons = 4.f;
             break;
         case AUTO_SCROLL:
-            scrollSpeed = view.getSize().y / 800;
-            if (scrollSpeed == 0) scrollSpeed = 1;
+            newtons = 0.5f;
             break;
         default:
             break;
     }
+    b2Body_ApplyForceToCenter(cameraBodyId, (b2Vec2){ 0.f, newtons }, true);
+}
 
+bool
+Camera::update(const sf::Time& time)
+{
+    if (scrollState != NONE)
+    {
+        applyForce();
+    }
+
+    auto timeStep = (time - lastUpdate).asSeconds();
+    lastUpdate = time;
+
+    b2World_Step(worldId, timeStep, 1);
+
+    auto events = b2World_GetBodyEvents(worldId);
+    for (int i = 0; i < events.moveCount; i++)
+    {
+        const auto* event = events.moveEvents + i;
+        if (B2_ID_EQUALS(event->bodyId, cameraBodyId))
+        {
+            float y = view.getSize().y * event->transform.p.y / 10.f + view.getSize().y / 2.f;
+            view.setCenter(view.getCenter().x, y);
+            return true;
+        }
+    }
+
+    /*
     if (scrollSpeed != 0)
     {
-        //setPosition(view.getCenter().y + scrollSpeed);
+        setPosition(view.getCenter().y + scrollSpeed);
         scrollSpeed = scrollSpeed / 2;
         return true;
     }
+    */
 
     return false;
 }
