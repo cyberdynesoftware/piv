@@ -2,7 +2,6 @@
 
 #include "Image.h"
 #include "ImageView.h"
-#include "GUI.h"
 #include "ImageManager.h"
 #include "Camera.h"
 #include <deque>
@@ -12,19 +11,18 @@
 class MultiImageView : public ImageView
 {
     public:
-        MultiImageView(sf::RenderWindow&, ImageManager& imageManager, GUI&);
+        MultiImageView(sf::RenderWindow&, ImageManager&, Camera&);
 
         void process(const sf::Event&);
-        void update(const sf::Time& time);
         void draw(void);
         void resize(float width, float height);
         std::deque<std::unique_ptr<Image>>::iterator findImageUnderMouse(void) const;
+        std::pair<int, int> calcProgress(void);
 
     private:
         sf::RenderWindow& window;
         ImageManager& imageManager;
-        Camera camera;
-        GUI& gui;
+        Camera& camera;
 
         int numberOfColumns = 4;
         std::vector<int> columnOffsets;
@@ -41,6 +39,5 @@ class MultiImageView : public ImageView
         void layout(std::unique_ptr<Image>& image);
         void relayoutImages(int);
         void markSelectedImage(const std::unique_ptr<Image>& image);
-        void calcProgress(void);
         void selectImage(void);
 };

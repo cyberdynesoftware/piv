@@ -6,7 +6,7 @@ SceneManager::SceneManager(Folder& folder, sf::RenderWindow& window)
         window(window),
         gui(window),
         imageManager(folder),
-        multiImageView(window, imageManager, gui),
+        multiImageView(window, imageManager, camera),
         singleImageView(window, imageManager)
 {
     eventReceiver = &multiImageView;
@@ -127,10 +127,18 @@ void
 SceneManager::update()
 {
     imageManager.update(clock.getElapsedTime());
-    multiImageView.update(clock.getElapsedTime());
+
+    window.setView(camera.view);
+
     multiImageView.draw();
 
     window.setView(window.getDefaultView());
+
+    if (camera.update(clock.getElapsedTime()))
+    {
+        auto progress = multiImageView.calcProgress();
+        gui.drawProgressBar(progress.first, progress.second);
+    }
 
     if (singleImageViewActive)
     {

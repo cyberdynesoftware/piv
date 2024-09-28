@@ -4,10 +4,10 @@
 #include <cmath>
 #include <algorithm>
 
-MultiImageView::MultiImageView(sf::RenderWindow& window, ImageManager& imageManager, GUI& gui):
+MultiImageView::MultiImageView(sf::RenderWindow& window, ImageManager& imageManager, Camera& camera):
     window(window),
     imageManager(imageManager),
-    gui(gui),
+    camera(camera),
     columnOffsets(numberOfColumns, 0)
 {
     targetImageWidth = window.getSize().x / numberOfColumns;
@@ -208,19 +208,8 @@ MultiImageView::layout(std::unique_ptr<Image>& image)
 }
 
     void
-MultiImageView::update(const sf::Time& time)
-{
-    if (camera.update(time))
-    {
-        calcProgress();
-    }
-}
-
-    void
 MultiImageView::draw()
 {
-    window.setView(camera.view);
-
     for (auto& image : imageManager.images)
     {
         if (showSelection && !image->selected) continue;
@@ -293,15 +282,15 @@ MultiImageView::resize(float width, float height)
     camera.bottom *= factor;
 }
 
-void
+std::pair<int, int>
 MultiImageView::calcProgress()
 {
     int index = std::distance(imageManager.images.cbegin(),
-            std::find(imageManager.images.cbegin(), imageManager.images.cend(), *lastVisibleImage));
+            std::find(imageManager.images.cbegin(), imageManager.images.cend(), *lastVisibleImage)) + 1;
 
     int max = !showSelection ? imageManager.numberOfFiles() :
         std::ranges::count_if(imageManager.images, 
                 [](const std::unique_ptr<Image>& image) { return image->selected; });
 
-    gui.drawProgressBar(index, max);
+    return { index, max };
 }

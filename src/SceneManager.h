@@ -3,6 +3,9 @@
 #include "SFML/Window.hpp"
 #include "MultiImageView.h"
 #include "SingleImageView.h"
+#include "GUI.h"
+#include "Camera.h"
+#include "ImageManager.h"
 
 class SceneManager
 {
@@ -16,6 +19,7 @@ class SceneManager
         sf::RenderWindow& window;
         GUI gui;
         ImageManager imageManager;
+        Camera camera;
 
         MultiImageView multiImageView;
         SingleImageView singleImageView;
