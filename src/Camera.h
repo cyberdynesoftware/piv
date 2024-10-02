@@ -27,8 +27,12 @@ class Camera
 
         b2WorldId worldId;
         b2BodyId cameraBodyId;
+        b2BodyId staticBodyId;
+        b2JointId springJointId;
         sf::Time lastUpdate;
 
         void applyForce(void);
         void createCameraBody(void);
+        b2BodyId createStaticBody(float y);
+        b2JointId createSpringJoint(b2BodyId a, b2BodyId b);
 };

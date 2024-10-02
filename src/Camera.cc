@@ -6,6 +6,8 @@ Camera::Camera()
     worldDef.gravity = (b2Vec2){ 0.f, 0.f };
     worldId = b2CreateWorld(&worldDef);
     createCameraBody();
+    staticBodyId = createStaticBody(-10.f);
+    springJointId = createSpringJoint(staticBodyId, cameraBodyId);
 }
 
 void
@@ -15,7 +17,7 @@ Camera::process(const sf::Event& event)
     {
         case sf::Event::MouseWheelScrolled:
             {
-                auto newtons = event.mouseWheelScroll.delta < 0 ? 1.f : -1.f;
+                auto newtons = event.mouseWheelScroll.delta < 0 ? 5.f : -5.f;
                 b2Body_ApplyLinearImpulseToCenter(cameraBodyId, (b2Vec2){ 0.f, newtons }, true);
             }
             break;
@@ -108,16 +110,16 @@ Camera::applyForce()
     switch (scrollState)
     {
         case UP:
-            newtons = -1.f;
+            newtons = -10.f;
             break;
         case DOWN:
-            newtons = 1.f;
+            newtons = 10.f;
             break;
         case UP_FAST:
-            newtons = -4.f;
+            newtons = -40.f;
             break;
         case DOWN_FAST:
-            newtons = 4.f;
+            newtons = 40.f;
             break;
         case AUTO_SCROLL:
             newtons = 0.5f;
@@ -131,6 +133,21 @@ Camera::applyForce()
 bool
 Camera::update(const sf::Time& time)
 {
+    if (getTop() < 0.f)
+    {
+        if (!b2Body_IsEnabled(staticBodyId))
+        {
+            b2Body_Enable(staticBodyId);
+        }
+    }
+    else
+    {
+        if (b2Body_IsEnabled(staticBodyId))
+        {
+            b2Body_Disable(staticBodyId);
+        }
+    }
+
     if (scrollState != NONE)
     {
         applyForce();
@@ -206,9 +223,32 @@ Camera::createCameraBody()
 
     cameraBodyId = b2CreateBody(worldId, &bodyDef);
 
-    b2Polygon box = b2MakeBox(0.1f, 0.1f);
+    b2MassData massData;
+    massData.mass = 1.f;
+    massData.center = (b2Vec2){ 0.f, 0.f };
+    massData.rotationalInertia = 0.f;
+    b2Body_SetMassData(cameraBodyId, massData);
+}
 
-    b2ShapeDef shape = b2DefaultShapeDef();
+b2BodyId
+Camera::createStaticBody(float y)
+{
+    b2BodyDef bodyDef = b2DefaultBodyDef();
+    bodyDef.type = b2_staticBody;
+    bodyDef.position = (b2Vec2){ 0.f, y };
+    return b2CreateBody(worldId, &bodyDef);
+}
 
-    b2CreatePolygonShape(cameraBodyId, &shape, &box);
+b2JointId
+Camera::createSpringJoint(b2BodyId a, b2BodyId b)
+{
+    b2DistanceJointDef jointDef = b2DefaultDistanceJointDef();
+    jointDef.bodyIdA = a;
+    jointDef.bodyIdB = b;
+    jointDef.collideConnected = false;
+    jointDef.length = 10.f;
+    jointDef.enableSpring = true;
+    jointDef.hertz = 1.f;
+    jointDef.dampingRatio = 1.f;
+    return b2CreateDistanceJoint(worldId, &jointDef);
 }
