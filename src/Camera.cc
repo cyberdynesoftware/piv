@@ -6,8 +6,8 @@ Camera::Camera()
     worldDef.gravity = (b2Vec2){ 0.f, 0.f };
     worldId = b2CreateWorld(&worldDef);
     createCameraBody();
-    staticBodyId = createStaticBody(-10.f);
-    springJointId = createSpringJoint(staticBodyId, cameraBodyId);
+    topGuardBodyId = createStaticBody(-springLength);
+    topGuardSpringJointId = createSpringJoint(topGuardBodyId, cameraBodyId);
 }
 
 void
@@ -16,6 +16,7 @@ Camera::process(const sf::Event& event)
     switch (event.type)
     {
         case sf::Event::MouseWheelScrolled:
+            if (bottom > view.getSize().y)
             {
                 auto newtons = event.mouseWheelScroll.delta < 0 ? 5.f : -5.f;
                 b2Body_ApplyLinearImpulseToCenter(cameraBodyId, (b2Vec2){ 0.f, newtons }, true);
@@ -72,8 +73,8 @@ Camera::process(const sf::Event& event)
                     break;
                 case sf::Keyboard::Home:
                 case sf::Keyboard::G:
-                    setPosition(view.getSize().y / 2);
-                    //scrollSpeed = 0;
+                    b2Body_Enable(topGuardBodyId);
+                    scrollState = TOP;
                     break;
                 default:
                     break;
@@ -122,7 +123,7 @@ Camera::applyForce()
             newtons = 40.f;
             break;
         case AUTO_SCROLL:
-            newtons = 0.5f;
+            newtons = 5.f;
             break;
         default:
             break;
@@ -133,22 +134,14 @@ Camera::applyForce()
 bool
 Camera::update(const sf::Time& time)
 {
-    if (getTop() < 0.f)
+    evalTopGuardSpring();
+
+    if (b2Body_IsValid(adjustBodyId) && (!b2Body_IsAwake(cameraBodyId) || scrollState != ADJUST))
     {
-        if (!b2Body_IsEnabled(staticBodyId))
-        {
-            b2Body_Enable(staticBodyId);
-        }
-    }
-    else
-    {
-        if (b2Body_IsEnabled(staticBodyId))
-        {
-            b2Body_Disable(staticBodyId);
-        }
+        b2DestroyBody(adjustBodyId);
     }
 
-    if (scrollState != NONE)
+    if (scrollState != NONE && bottom > view.getSize().y)
     {
         applyForce();
     }
@@ -164,33 +157,62 @@ Camera::update(const sf::Time& time)
         const auto* event = events.moveEvents + i;
         if (B2_ID_EQUALS(event->bodyId, cameraBodyId))
         {
-            float y = view.getSize().y * event->transform.p.y / 10.f + view.getSize().y / 2.f;
-            view.setCenter(view.getCenter().x, y);
+            view.setCenter(view.getCenter().x, toViewCenter(event->transform.p.y));
             return true;
         }
     }
 
-    /*
-    if (scrollSpeed != 0)
-    {
-        setPosition(view.getCenter().y + scrollSpeed);
-        scrollSpeed = scrollSpeed / 2;
-        return true;
-    }
-    */
-
     return false;
 }
 
-void
-Camera::setPosition(int centerY)
+float
+Camera::toViewCenter(float y)
 {
-    view.setCenter(view.getCenter().x, centerY);
+    return view.getSize().y * y / 10.f + view.getSize().y / 2.f;
+}
 
-    if (getTop() < 0 || bottom < view.getSize().y)
-        view.setCenter(view.getCenter().x, view.getSize().y / 2);
-    else if (/*(folderIter == folder.cend() || showSelection) &&*/ view.getCenter().y + view.getSize().y / 2 > bottom)
-        view.setCenter(view.getCenter().x, bottom - view.getSize().y / 2);
+float
+Camera::toB2BodyPos(float y)
+{
+    return y * 10.f / view.getSize().y;
+}
+
+void
+Camera::evalTopGuardSpring()
+{
+    if (getTop() < 0.f)
+    {
+        if (!b2Body_IsEnabled(topGuardBodyId))
+        {
+            b2Body_Enable(topGuardBodyId);
+        }
+    }
+    else
+    {
+        if (b2Body_IsEnabled(topGuardBodyId) && scrollState != TOP)
+        {
+            b2Body_Disable(topGuardBodyId);
+        }
+    }
+}
+
+void
+Camera::adjustPosition(float top)
+{
+    auto y = toB2BodyPos(top);
+    y += getTop() > top ? springLength : -springLength;
+    adjustBodyId = createStaticBody(y);
+    adjustSpringJointId = createSpringJoint(adjustBodyId, cameraBodyId);
+    b2Body_SetAwake(cameraBodyId, true);
+    scrollState = ADJUST;
+}
+
+void
+Camera::teleport(float top)
+{
+    auto y = toB2BodyPos(top);
+    b2Body_SetTransform(cameraBodyId, (b2Vec2){ 0, y }, b2Body_GetRotation(cameraBodyId));
+    b2Body_SetAwake(cameraBodyId, true);
 }
 
 float
@@ -246,7 +268,7 @@ Camera::createSpringJoint(b2BodyId a, b2BodyId b)
     jointDef.bodyIdA = a;
     jointDef.bodyIdB = b;
     jointDef.collideConnected = false;
-    jointDef.length = 10.f;
+    jointDef.length = springLength;
     jointDef.enableSpring = true;
     jointDef.hertz = 1.f;
     jointDef.dampingRatio = 1.f;

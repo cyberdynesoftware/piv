@@ -13,7 +13,8 @@ class Camera
         void process(const sf::Event&);
         bool update(const sf::Time& time);
         bool isVisible(const std::unique_ptr<Image>& image);
-        void setPosition(int);
+        void adjustPosition(float top);
+        void teleport(float top);
         float getTop(void);
         float getBottom(void);
 
@@ -22,17 +23,23 @@ class Camera
         float bottom = 0.f;
 
     private:
-        enum SCROLL_STATE { NONE, UP, UP_FAST, DOWN, DOWN_FAST, AUTO_SCROLL };
+        enum SCROLL_STATE { NONE, UP, UP_FAST, DOWN, DOWN_FAST, AUTO_SCROLL, TOP, ADJUST };
         SCROLL_STATE scrollState = NONE;
 
+        sf::Time lastUpdate;
         b2WorldId worldId;
         b2BodyId cameraBodyId;
-        b2BodyId staticBodyId;
-        b2JointId springJointId;
-        sf::Time lastUpdate;
+        b2BodyId topGuardBodyId;
+        b2JointId topGuardSpringJointId;
+        b2BodyId adjustBodyId;
+        b2JointId adjustSpringJointId;
+        const float springLength = 10.f;
 
-        void applyForce(void);
+        float toViewCenter(float y);
+        float toB2BodyPos(float y);
         void createCameraBody(void);
+        void applyForce(void);
+        void evalTopGuardSpring(void);
         b2BodyId createStaticBody(float y);
         b2JointId createSpringJoint(b2BodyId a, b2BodyId b);
 };

@@ -51,14 +51,14 @@ MultiImageView::process(const sf::Event& event)
 
                         if (showSelection)
                         {
-                            lastViewPosition = camera.view.getCenter().y;
+                            lastViewPosition = camera.getTop();
                             relayoutImages(numberOfColumns);
-                            camera.setPosition(window.getView().getSize().y / 2);
+                            camera.adjustPosition(0.f);
                         }
                         else
                         {
                             relayoutImages(numberOfColumns);
-                            camera.setPosition(lastViewPosition);
+                            camera.adjustPosition(lastViewPosition);
                         }
                     }
                     break;
@@ -80,7 +80,7 @@ MultiImageView::process(const sf::Event& event)
                         imageManager.moveSelectedImages();
                         showSelection = false;
                         relayoutImages(numberOfColumns);
-                        camera.setPosition(lastViewPosition);
+                        camera.adjustPosition(0.f);
                     }
                     break;
                 case sf::Keyboard::Num1:
@@ -178,8 +178,9 @@ MultiImageView::relayoutImages(int columns)
             if (!showSelection || image->selected)
                 layout(image);
 
-    lastViewPosition *= factor * factor;
-    camera.setPosition(camera.view.getCenter().y * factor * factor);
+    lastViewPosition = camera.getTop() * factor * factor;
+    camera.teleport(lastViewPosition);
+    printf("relayout: %d %f %f\n", columns, camera.getTop(), lastViewPosition);
 }
 
 void
@@ -254,16 +255,17 @@ MultiImageView::markSelectedImage(const std::unique_ptr<Image>& image)
 }
 
 void
-MultiImageView::resize(float width, float height)
+MultiImageView::resize(int width, int height)
 {
-    camera.view.setSize(width, height);
-
     int newTargetImageWidth = window.getSize().x / numberOfColumns;
     float factor = (float) newTargetImageWidth / targetImageWidth;
     targetImageWidth = newTargetImageWidth;
 
-    camera.view.setCenter(window.getSize().x / 2, camera.view.getCenter().y * factor);
-    lastViewPosition *= factor;
+    lastViewPosition = camera.getTop() * factor;
+    camera.view.setSize(width, height);
+    camera.view.setCenter(width / 2, camera.view.getCenter().y + (height - height / factor) / 2);
+    camera.teleport(lastViewPosition);
+    printf("resize2: %d %f %f\n", height, camera.getTop(), lastViewPosition);
 
     for (auto& image : imageManager.images)
     {
