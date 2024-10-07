@@ -5,8 +5,8 @@ Camera::Camera()
     b2WorldDef worldDef = b2DefaultWorldDef();
     worldDef.gravity = (b2Vec2){ 0.f, 0.f };
     worldId = b2CreateWorld(&worldDef);
-    createCameraBody();
-    topGuardBodyId = createStaticBody(-springLength);
+    createCameraBody(toB2BodyPos(view.getCenter().y));
+    topGuardBodyId = createStaticBody(toB2BodyPos(view.getCenter().y) - springLength);
     topGuardSpringJointId = createSpringJoint(topGuardBodyId, cameraBodyId);
 }
 
@@ -111,10 +111,10 @@ Camera::applyForce()
     switch (scrollState)
     {
         case UP:
-            newtons = -10.f;
+            newtons = -16.f;
             break;
         case DOWN:
-            newtons = 10.f;
+            newtons = 16.f;
             break;
         case UP_FAST:
             newtons = -40.f;
@@ -123,7 +123,7 @@ Camera::applyForce()
             newtons = 40.f;
             break;
         case AUTO_SCROLL:
-            newtons = 5.f;
+            newtons = 2.f;
             break;
         default:
             break;
@@ -168,7 +168,7 @@ Camera::update(const sf::Time& time)
 float
 Camera::toViewCenter(float y)
 {
-    return view.getSize().y * y / 10.f + view.getSize().y / 2.f;
+    return view.getSize().y * y / 10.f;
 }
 
 float
@@ -208,9 +208,9 @@ Camera::adjustPosition(float top)
 }
 
 void
-Camera::teleport(float top)
+Camera::teleport(float center)
 {
-    auto y = toB2BodyPos(top);
+    auto y = toB2BodyPos((center > view.getSize().y / 2.f) ? center : view.getSize().y / 2.f);
     b2Body_SetTransform(cameraBodyId, (b2Vec2){ 0, y }, b2Body_GetRotation(cameraBodyId));
     b2Body_SetAwake(cameraBodyId, true);
 }
@@ -235,11 +235,11 @@ Camera::isVisible(const std::unique_ptr<Image>& image)
 }
 
 void
-Camera::createCameraBody()
+Camera::createCameraBody(float y)
 {
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.type = b2_dynamicBody;
-    bodyDef.position = (b2Vec2){ 0.f, 0.f };
+    bodyDef.position = (b2Vec2){ 0.f, y };
     bodyDef.linearDamping = 5.f;
     bodyDef.fixedRotation = true;
 

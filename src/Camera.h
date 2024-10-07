@@ -14,7 +14,7 @@ class Camera
         bool update(const sf::Time& time);
         bool isVisible(const std::unique_ptr<Image>& image);
         void adjustPosition(float top);
-        void teleport(float top);
+        void teleport(float center);
         float getTop(void);
         float getBottom(void);
 
@@ -37,7 +37,7 @@ class Camera
 
         float toViewCenter(float y);
         float toB2BodyPos(float y);
-        void createCameraBody(void);
+        void createCameraBody(float y);
         void applyForce(void);
         void evalTopGuardSpring(void);
         b2BodyId createStaticBody(float y);

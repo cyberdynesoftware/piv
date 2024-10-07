@@ -53,12 +53,12 @@ MultiImageView::process(const sf::Event& event)
                         {
                             lastViewPosition = camera.getTop();
                             relayoutImages(numberOfColumns);
-                            camera.adjustPosition(0.f);
+                            camera.teleport(camera.view.getSize().y / 2.f);
                         }
                         else
                         {
                             relayoutImages(numberOfColumns);
-                            camera.adjustPosition(lastViewPosition);
+                            camera.teleport(lastViewPosition);
                         }
                     }
                     break;
@@ -80,7 +80,7 @@ MultiImageView::process(const sf::Event& event)
                         imageManager.moveSelectedImages();
                         showSelection = false;
                         relayoutImages(numberOfColumns);
-                        camera.adjustPosition(0.f);
+                        camera.teleport(camera.view.getSize().y / 2.f);
                     }
                     break;
                 case sf::Keyboard::Num1:
@@ -178,9 +178,8 @@ MultiImageView::relayoutImages(int columns)
             if (!showSelection || image->selected)
                 layout(image);
 
-    lastViewPosition = camera.getTop() * factor * factor;
+    lastViewPosition = camera.view.getCenter().y * factor * factor;
     camera.teleport(lastViewPosition);
-    printf("relayout: %d %f %f\n", columns, camera.getTop(), lastViewPosition);
 }
 
 void
@@ -261,11 +260,10 @@ MultiImageView::resize(int width, int height)
     float factor = (float) newTargetImageWidth / targetImageWidth;
     targetImageWidth = newTargetImageWidth;
 
-    lastViewPosition = camera.getTop() * factor;
+    lastViewPosition = camera.view.getCenter().y * factor;
     camera.view.setSize(width, height);
-    camera.view.setCenter(width / 2, camera.view.getCenter().y + (height - height / factor) / 2);
+    camera.view.setCenter(width / 2, lastViewPosition);
     camera.teleport(lastViewPosition);
-    printf("resize2: %d %f %f\n", height, camera.getTop(), lastViewPosition);
 
     for (auto& image : imageManager.images)
     {
