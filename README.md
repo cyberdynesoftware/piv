@@ -3,8 +3,7 @@
 * Supports most common image formats.
 * Plays animations (gif and webp).
 * Images occupy 100% of the window. No decorations, no fuss.
-* Images are layouted in columns. The number of columns can be adjusted on the
-  fly.
+* Images are layouted in columns. The number of columns can be adjusted on the fly.
 * Copy or move images to a selection folder.
 
 ## Build
@@ -19,6 +18,7 @@ cmake --build build
 
 * [sfml](https://www.sfml-dev.org)
 * [libwebp](https://developers.google.com/speed/webp)
+* [box2d](https://box2d.org)
 
 ## Usage
 

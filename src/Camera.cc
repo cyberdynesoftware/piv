@@ -5,9 +5,15 @@ Camera::Camera()
     b2WorldDef worldDef = b2DefaultWorldDef();
     worldDef.gravity = (b2Vec2){ 0.f, 0.f };
     worldId = b2CreateWorld(&worldDef);
+
     createCameraBody(toB2BodyPos(view.getCenter().y));
+
     topGuardBodyId = createStaticBody(toB2BodyPos(view.getCenter().y) - springLength);
     topGuardSpringJointId = createSpringJoint(topGuardBodyId, cameraBodyId);
+
+    bottomGuardBodyId = createStaticBody(0.f);
+    bottomGuardSpringJointId = createSpringJoint(bottomGuardBodyId, cameraBodyId);
+    b2Body_Disable(bottomGuardBodyId);
 }
 
 void
@@ -134,7 +140,12 @@ Camera::applyForce()
 bool
 Camera::update(const sf::Time& time)
 {
-    evalTopGuardSpring();
+    enforceTopGuardConstraint();
+
+    if (bottom > view.getSize().y)
+    {
+        enforceBottomGuardConstraint();
+    }
 
     if (b2Body_IsValid(adjustBodyId) && (!b2Body_IsAwake(cameraBodyId) || scrollState != ADJUST))
     {
@@ -178,7 +189,7 @@ Camera::toB2BodyPos(float y)
 }
 
 void
-Camera::evalTopGuardSpring()
+Camera::enforceTopGuardConstraint()
 {
     if (getTop() < 0.f)
     {
@@ -192,6 +203,28 @@ Camera::evalTopGuardSpring()
         if (b2Body_IsEnabled(topGuardBodyId) && scrollState != TOP)
         {
             b2Body_Disable(topGuardBodyId);
+        }
+    }
+}
+
+void
+Camera::enforceBottomGuardConstraint()
+{
+    if (getBottom() > bottom)
+    {
+        if (!b2Body_IsEnabled(bottomGuardBodyId))
+        {
+            b2Body_SetTransform(bottomGuardBodyId,
+                    (b2Vec2){ 0, toB2BodyPos(bottom - view.getSize().y / 2) - springLength },
+                    b2Body_GetRotation(bottomGuardBodyId));
+            b2Body_Enable(bottomGuardBodyId);
+        }
+    }
+    else
+    {
+        if (b2Body_IsEnabled(bottomGuardBodyId))
+        {
+            b2Body_Disable(bottomGuardBodyId);
         }
     }
 }

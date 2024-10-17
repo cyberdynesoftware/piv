@@ -31,6 +31,8 @@ class Camera
         b2BodyId cameraBodyId;
         b2BodyId topGuardBodyId;
         b2JointId topGuardSpringJointId;
+        b2BodyId bottomGuardBodyId;
+        b2JointId bottomGuardSpringJointId;
         b2BodyId adjustBodyId;
         b2JointId adjustSpringJointId;
         const float springLength = 10.f;
@@ -39,7 +41,8 @@ class Camera
         float toB2BodyPos(float y);
         void createCameraBody(float y);
         void applyForce(void);
-        void evalTopGuardSpring(void);
+        void enforceTopGuardConstraint(void);
+        void enforceBottomGuardConstraint(void);
         b2BodyId createStaticBody(float y);
         b2JointId createSpringJoint(b2BodyId a, b2BodyId b);
 };
