@@ -46,42 +46,16 @@ MultiImageView::process(const sf::Event& event)
                     selectImage();
                     break;
                 case sf::Keyboard::S:
-                    {
-                        showSelection = !showSelection;
-
-                        if (showSelection)
-                        {
-                            lastViewPosition = camera.getTop();
-                            relayoutImages(numberOfColumns);
-                            camera.teleport(camera.view.getSize().y / 2.f);
-                        }
-                        else
-                        {
-                            relayoutImages(numberOfColumns);
-                            camera.teleport(lastViewPosition);
-                        }
-                    }
+                    toggleShowSelection();
                     break;
                 case sf::Keyboard::C:
-                    {
-                        for (auto& image : imageManager.images)
-                        {
-                            image->selected = false;
-                        }
-                        showSelection = false;
-                        relayoutImages(numberOfColumns);
-                    }
+                    clearSelection();
                     break;
                 case sf::Keyboard::Y:
                     imageManager.copySelectedImages();
                     break;
                 case sf::Keyboard::X:
-                    {
-                        imageManager.moveSelectedImages();
-                        showSelection = false;
-                        relayoutImages(numberOfColumns);
-                        camera.teleport(camera.view.getSize().y / 2.f);
-                    }
+                    moveSelectedImages();
                     break;
                 case sf::Keyboard::Num1:
                     relayoutImages(1);
@@ -159,6 +133,44 @@ MultiImageView::selectImage()
 }
 
 void
+MultiImageView::toggleShowSelection()
+{
+    showSelection = !showSelection;
+
+    if (showSelection)
+    {
+        lastViewPosition = camera.getTop();
+        relayoutImages(numberOfColumns);
+        camera.teleport(camera.view.getSize().y / 2.f);
+    }
+    else
+    {
+        relayoutImages(numberOfColumns);
+        camera.teleport(lastViewPosition);
+    }
+}
+
+void
+MultiImageView::clearSelection()
+{
+    for (auto& image : imageManager.images)
+    {
+        image->selected = false;
+    }
+    showSelection = false;
+    relayoutImages(numberOfColumns);
+}
+
+void
+MultiImageView::moveSelectedImages()
+{
+    imageManager.moveSelectedImages();
+    showSelection = false;
+    relayoutImages(numberOfColumns);
+    camera.teleport(camera.view.getSize().y / 2.f);
+}
+
+void
 MultiImageView::relayoutImages(int columns)
 {
     numberOfColumns = columns;
@@ -170,13 +182,15 @@ MultiImageView::relayoutImages(int columns)
     camera.bottom = 0;
     columnIndex = 0;
     columnOffsets.resize(numberOfColumns);
-    for (int i = 0; i < numberOfColumns; i++)
-        columnOffsets[i] = 0;
+    std::ranges::fill(columnOffsets, 0);
 
     for (auto& image : imageManager.images)
-        if (image->hasPosition)
-            if (!showSelection || image->selected)
-                layout(image);
+    {
+        if (image->hasPosition && (!showSelection || image->selected))
+        {
+            layout(image);
+        }
+    }
 
     lastViewPosition = camera.view.getCenter().y * factor * factor;
     camera.teleport(lastViewPosition);
@@ -187,13 +201,19 @@ MultiImageView::layout(std::unique_ptr<Image>& image)
 {
     image->sprite.setOrigin(0, 0);
     image->scaleTo(targetImageWidth);
-    int imageHeight = image->sprite.getGlobalBounds().height;
+    auto imageHeight = image->sprite.getGlobalBounds().height;
 
-    for (int i = columnIndex + 1; i < numberOfColumns + columnIndex; i++)
+    for (auto i = columnIndex + 1; i <= numberOfColumns + columnIndex; i++)
     {
-        int halfImageHeight = (i < numberOfColumns) ? imageHeight / 2 : -imageHeight / 2;
-        int index = i % numberOfColumns;
-        if (columnOffsets[index] + halfImageHeight <= columnOffsets[columnIndex])
+        auto index = i % numberOfColumns;
+        auto pivot = columnOffsets[columnIndex];
+
+        if (i >= numberOfColumns)
+        {
+            pivot += imageHeight;
+        }
+
+        if (columnOffsets[index] < pivot)
         {
             columnIndex = index;
             break;
@@ -204,7 +224,9 @@ MultiImageView::layout(std::unique_ptr<Image>& image)
     columnOffsets[columnIndex] += imageHeight;
 
     if (image->position.y + imageHeight > camera.bottom)
+    {
         camera.bottom = image->position.y + imageHeight;
+    }
 }
 
     void
@@ -212,9 +234,15 @@ MultiImageView::draw()
 {
     for (auto& image : imageManager.images)
     {
-        if (showSelection && !image->selected) continue;
+        if (showSelection && !image->selected)
+        {
+            continue;
+        }
 
-        if (!image->hasPosition) layout(image);
+        if (!image->hasPosition)
+        {
+            layout(image);
+        }
 
         if (camera.isVisible(image))
         {

@@ -40,4 +40,7 @@ class MultiImageView : public ImageView
         void relayoutImages(int);
         void markSelectedImage(const std::unique_ptr<Image>& image);
         void selectImage(void);
+        void toggleShowSelection(void);
+        void clearSelection(void);
+        void moveSelectedImages(void);
 };
