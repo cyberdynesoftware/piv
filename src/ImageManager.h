@@ -20,6 +20,9 @@ class ImageManager
         
         std::deque<std::unique_ptr<Image>> images;
 
+        enum SORT_ORDER { NAME, RANDOM, OLDEST, NEWEST, ENUM_GUARD };
+        void changeSortOrder(SORT_ORDER sortOrder);
+
     private:
         Folder& folder;
         Folder::iter folderIter;

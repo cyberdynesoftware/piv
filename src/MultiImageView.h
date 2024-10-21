@@ -36,6 +36,8 @@ class MultiImageView : public ImageView
         sf::Color pumpkin = sf::Color(245, 118, 26);
         sf::CircleShape selectedIconCircle;
 
+        ImageManager::SORT_ORDER sortOrder = ImageManager::SORT_ORDER::NAME;
+
         void layout(std::unique_ptr<Image>& image);
         void relayoutImages(int);
         void markSelectedImage(const std::unique_ptr<Image>& image);
@@ -43,4 +45,6 @@ class MultiImageView : public ImageView
         void toggleShowSelection(void);
         void clearSelection(void);
         void moveSelectedImages(void);
+        void toggleSortOrder(void);
+        void reset(void);
 };

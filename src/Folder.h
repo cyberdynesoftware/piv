@@ -9,11 +9,9 @@ class Folder
         Folder(const char* arg);
 
         typedef std::vector<std::string>::const_iterator iter;
-        iter currentItem;
-        bool imageSelected = false;
-
         iter cbegin(void);
         iter cend(void);
+
         int size(void);
         bool selectedFolderExistsNotEmpty(void);
         void copyToSelection(const std::string&);

@@ -11,7 +11,6 @@ MultiImageView::MultiImageView(sf::RenderWindow& window, ImageManager& imageMana
     columnOffsets(numberOfColumns, 0)
 {
     targetImageWidth = window.getSize().x / numberOfColumns;
-    imageManager.loadImages(numberOfColumns);
     camera.view = window.getView();
 
     selectedImageForeground.setFillColor(sf::Color(255, 255, 255, 96));
@@ -50,6 +49,9 @@ MultiImageView::process(const sf::Event& event)
                     break;
                 case sf::Keyboard::C:
                     clearSelection();
+                    break;
+                case sf::Keyboard::O:
+                    toggleSortOrder();
                     break;
                 case sf::Keyboard::Y:
                     imageManager.copySelectedImages();
@@ -171,6 +173,30 @@ MultiImageView::moveSelectedImages()
 }
 
 void
+MultiImageView::toggleSortOrder()
+{
+    auto intEnum = static_cast<int>(sortOrder);
+    sortOrder = static_cast<ImageManager::SORT_ORDER>(++intEnum);
+
+    if (sortOrder == ImageManager::SORT_ORDER::ENUM_GUARD)
+    {
+        sortOrder = ImageManager::SORT_ORDER::NAME;
+    }
+
+    reset();
+    imageManager.changeSortOrder(sortOrder);
+    camera.teleport(camera.view.getSize().y / 2.f);
+}
+
+void
+MultiImageView::reset()
+{
+    camera.bottom = 0;
+    columnIndex = 0;
+    std::ranges::fill(columnOffsets, 0);
+}
+
+void
 MultiImageView::relayoutImages(int columns)
 {
     numberOfColumns = columns;
@@ -179,10 +205,8 @@ MultiImageView::relayoutImages(int columns)
     float factor = (float) newTargetImageWidth / targetImageWidth;
     targetImageWidth = newTargetImageWidth;
 
-    camera.bottom = 0;
-    columnIndex = 0;
     columnOffsets.resize(numberOfColumns);
-    std::ranges::fill(columnOffsets, 0);
+    reset();
 
     for (auto& image : imageManager.images)
     {

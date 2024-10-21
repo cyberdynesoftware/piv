@@ -14,24 +14,17 @@ Folder::Folder(const char* arg)
     if (is_directory(status(p)))
     {
         folderPath = p.string();
-        scan();
-        currentItem = files.cbegin();
     }
     else if (p.parent_path().empty())
     {
         folderPath = current_path().string();
-        scan();
-        currentItem = std::find(files.cbegin(), files.cend(), (current_path() / p).string());
-        imageSelected = true;
     }
     else
     {
         folderPath = p.parent_path().string();
-        scan();
-        currentItem = std::find(files.cbegin(), files.cend(), p.string());
-        imageSelected = true;
     }
 
+    scan();
     selectedFolder = path(folderPath).append("piv-selected").string();
     srand(time(NULL));
 }

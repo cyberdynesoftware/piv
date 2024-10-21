@@ -117,3 +117,26 @@ ImageManager::numberOfFiles()
 {
     return folder.size();
 }
+
+void
+ImageManager::changeSortOrder(SORT_ORDER sortOrder)
+{
+    switch (sortOrder)
+    {
+        case NAME:
+            folder.sortCaseInsensitive();
+            break;
+        case RANDOM:
+            break;
+        case OLDEST:
+            folder.sortByModTime(true);
+            break;
+        case NEWEST:
+            folder.sortByModTime(false);
+            break;
+    }
+
+    images.clear();
+    imagesLoading.clear();
+    folderIter = folder.cbegin();
+}
