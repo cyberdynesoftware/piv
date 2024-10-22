@@ -127,6 +127,7 @@ ImageManager::changeSortOrder(SORT_ORDER sortOrder)
             folder.sortCaseInsensitive();
             break;
         case RANDOM:
+            folder.shuffle();
             break;
         case OLDEST:
             folder.sortByModTime(true);

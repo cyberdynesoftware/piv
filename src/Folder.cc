@@ -1,6 +1,7 @@
 #include "Folder.h"
 #include <iostream>
 #include <algorithm>
+#include <random>
 #include <stdlib.h>
 #include <time.h>
 #include <filesystem>
@@ -26,7 +27,6 @@ Folder::Folder(const char* arg)
 
     scan();
     selectedFolder = path(folderPath).append("piv-selected").string();
-    srand(time(NULL));
 }
 
 void
@@ -36,8 +36,12 @@ Folder::scan()
     files.clear();
 
     for (directory_iterator dir_iter(p); dir_iter != directory_iterator(); dir_iter++)
+    {
         if (!is_directory(dir_iter->path()))
+        {
             files.push_back(dir_iter->path().string());
+        }
+    }
 
     if (files.empty())
     {
@@ -45,19 +49,15 @@ Folder::scan()
         exit(1);
     }
 
-    //std::sort(files.begin(), files.end());
     sortCaseInsensitive();
-    //sortByModTime(true);
 }
 
 void
 Folder::sortCaseInsensitive()
 {
     sort(files.begin(), files.end(), [] (const std::string& lhs, const std::string& rhs)
-            {
-            return lexicographical_compare(lhs.cbegin(), lhs.cend(), rhs.cbegin(), rhs.cend(),
-                    [] (const char& lhs, const char& rhs) 
-                    { return tolower(lhs) < tolower(rhs); } );
+            { return lexicographical_compare(lhs.cbegin(), lhs.cend(), rhs.cbegin(), rhs.cend(),
+                    [] (const char& lhs, const char& rhs) { return tolower(lhs) < tolower(rhs); });
             }
         );
 }
@@ -66,10 +66,16 @@ void
 Folder::sortByModTime(bool desc)
 {
     sort(files.begin(), files.end(), [desc] (const std::string& lhs, const std::string& rhs)
-            {
-            return (last_write_time(path(lhs)) < last_write_time(path(rhs)) != desc);
-            }
+            { return (last_write_time(path(lhs)) < last_write_time(path(rhs)) != desc); }
         );
+}
+
+void
+Folder::shuffle()
+{
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::ranges::shuffle(files, g);
 }
 
 bool

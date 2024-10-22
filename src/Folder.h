@@ -19,6 +19,7 @@ class Folder
         void scan(void);
         void sortCaseInsensitive(void);
         void sortByModTime(bool);
+        void shuffle(void);
 
         static std::string filename(const std::string&);
         static int fileSize(const std::string&);
