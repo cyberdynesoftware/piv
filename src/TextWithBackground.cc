@@ -1,11 +1,9 @@
 #include "TextWithBackground.h"
-#include "font.h"
+#include "FontHolder.h"
 
 TextWithBackground::TextWithBackground(Config config, unsigned int textSize)
 {
-    font.loadFromMemory(font_ttf, font_ttf_len);
-
-    text.setFont(font);
+    text.setFont(FontHolder::font);
     text.setCharacterSize(textSize);
 
     switch (config)

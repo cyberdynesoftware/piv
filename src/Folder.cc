@@ -79,7 +79,7 @@ Folder::shuffle()
 }
 
 bool
-Folder::selectedFolderExistsNotEmpty()
+Folder::selectedFolderExistsNotEmpty() const
 {
     return exists(path(selectedFolder)) && !is_empty(path(selectedFolder));
 }

@@ -1,5 +1,6 @@
 #include "CoreLoop.h"
 #include "icon.h"
+#include "FontHolder.h"
 
 CoreLoop::CoreLoop(char* path)
     : 
@@ -12,6 +13,9 @@ CoreLoop::CoreLoop(char* path)
 
     icon.loadFromMemory(icon_png, icon_png_len);
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+
+    FontHolder::init();
+    sceneManager.checkFolder(folder);
 }
 
 void

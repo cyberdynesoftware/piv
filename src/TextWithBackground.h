@@ -13,12 +13,11 @@ class TextWithBackground : public sf::Drawable
         void setPosition(const sf::Vector2f& position);
         void setCenterPosition(const sf::Vector2f& position);
 
+        sf::Text text;
+
     protected:
         virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
     private:
-        sf::Font font;
-
-        sf::Text text;
         sf::RectangleShape background;
 };

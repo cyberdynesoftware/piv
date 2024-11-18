@@ -13,7 +13,7 @@ class Folder
         iter cend(void);
 
         int size(void);
-        bool selectedFolderExistsNotEmpty(void);
+        bool selectedFolderExistsNotEmpty(void) const;
         void copyToSelection(const std::string&);
         void moveToSelection(const std::string&);
         void scan(void);

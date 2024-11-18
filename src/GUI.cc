@@ -1,5 +1,6 @@
 #include "GUI.h"
 #include <format>
+#include <iostream>
 
 GUI::GUI(sf::RenderWindow& window)
     :
@@ -8,28 +9,24 @@ GUI::GUI(sf::RenderWindow& window)
     progressBar.setFillColor(sf::Color(255, 255, 255, 128));
 
     warning.setTextAndWidth("Warning: folder 'piv-selected' exists and is not empty.", window.getDefaultView().getSize().x);
+
 }
 
 void
-GUI::update()
+GUI::update(const sf::Time& time)
 {
-    if (showSelectedFolderWarning)
+    if (notification && time > notification->timeStamp + notification->timeout)
     {
-        if (selectedFolderWarningClock.getElapsedTime() > sf::seconds(5.f))
-        {
-            showSelectedFolderWarning = false;
-        }
+        notification = nullptr;
     }
 }
 
 void
 GUI::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    window.setView(window.getDefaultView());
-
-    if (showSelectedFolderWarning)
+    if (notification)
     {
-        target.draw(warning, states);
+        target.draw(*notification, states);
     }
 
     if (showHelp)

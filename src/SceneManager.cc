@@ -1,5 +1,7 @@
 #include "SceneManager.h"
+#include "Notification.h"
 #include "Help.h"
+#include <iostream>
 
 SceneManager::SceneManager(Folder& folder, sf::RenderWindow& window)
     :
@@ -11,15 +13,27 @@ SceneManager::SceneManager(Folder& folder, sf::RenderWindow& window)
 {
     eventReceiver = &multiImageView;
 
-    if (folder.selectedFolderExistsNotEmpty())
-    {
-        gui.showSelectedFolderWarning = true;
-    }
-
     auto help = Help::general();
     help.append(Help::allImages());
     help.append(Help::selectedImages());
     gui.helpMsg(help);
+}
+
+void
+SceneManager::checkFolder(const Folder& folder)
+{
+    if (folder.selectedFolderExistsNotEmpty())
+    {
+        gui.notification = std::make_unique<Notification>();
+        gui.notification->setMessage("Warning: folder 'piv-selected' exists and is not empty.")
+            .setColor(sf::Color::Red)
+            .setSize(20)
+            .setWidth(window.getDefaultView().getSize().x)
+            .setPosition(sf::Vector2f(0, 0));
+
+        gui.notification->timeout = sf::seconds(4.f);
+        gui.notification->timeStamp = clock.getElapsedTime();
+    }
 }
 
 void
@@ -145,6 +159,6 @@ SceneManager::update()
         window.draw(singleImageView);
     }
 
-    gui.update();
+    gui.update(clock.getElapsedTime());
     window.draw(gui);
 }

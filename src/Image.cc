@@ -17,7 +17,7 @@ Image::prepare()
         texture.setSmooth(true);
         sprite.setTexture(texture);
         size = texture.getSize();
-        prepareInfo("stb");
+        prepareInfo("std");
     }
 }
 

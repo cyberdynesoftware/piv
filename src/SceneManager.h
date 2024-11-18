@@ -12,6 +12,7 @@ class SceneManager
     public:
         SceneManager(Folder& folder, sf::RenderWindow& window);
 
+        void checkFolder(const Folder& folder);
         void process(const sf::Event& event);
         void update(void);
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SFML/Window.hpp"
-#include "TextWithBackground.h"
+#include "Notification.h"
 #include "Image.h"
 #include <memory>
 
@@ -13,7 +13,7 @@ class ImageView
         static bool showInfo;
 
     protected:
-        TextWithBackground info = TextWithBackground(TextWithBackground::Config::info, 15);
+        Notification info;
 
         void setupInfoBox(const std::unique_ptr<Image>& image);
 };

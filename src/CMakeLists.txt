@@ -1,10 +1,12 @@
 target_sources(piv PRIVATE main.cc 
     CoreLoop.cc
     Folder.cc
+    FontHolder.cc
     Image.cc
     AnimatedGIF.cc
     WebpImage.cc
     GUI.cc
+    Notification.cc
     TextWithBackground.cc
     ImageManager.cc
     SceneManager.cc

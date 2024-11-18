@@ -2,19 +2,23 @@
 
 #include "Image.h"
 #include "TextWithBackground.h"
+#include "Notification.h"
+#include "SFML/Graphics.hpp"
+#include "SFML/System.hpp"
 
 class GUI : public sf::Drawable
 {
     public:
         GUI(sf::RenderWindow& window);
 
-        void update(void);
+        void update(const sf::Time& time);
 
         void drawProgressBar(int index, int max);
         void helpMsg(std::string help);
 
         bool showHelp = false;
-        bool showSelectedFolderWarning = false;
+
+        std::unique_ptr<struct Notification> notification = nullptr;
 
     protected:
         virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
