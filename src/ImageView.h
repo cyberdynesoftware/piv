@@ -12,6 +12,8 @@ class ImageView
 
         static bool showInfo;
 
+        virtual std::string helpMsg(void) = 0;
+
     protected:
         Notification info;
 

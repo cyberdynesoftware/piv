@@ -1,4 +1,5 @@
 #include "SingleImageView.h"
+#include "Help.h"
 #include <iostream>
 
 SingleImageView::SingleImageView(sf::RenderWindow& window, ImageManager& imageManager):
@@ -158,4 +159,12 @@ SingleImageView::toggleFit()
         (*imageIter)->sprite.setScale(1.f, 1.f);
     }
     setupInfoBox(*imageIter);
+}
+
+std::string
+SingleImageView::helpMsg()
+{
+    auto help = Help::general();
+    help.append(Help::singleImage());
+    return help;
 }

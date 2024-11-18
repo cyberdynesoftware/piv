@@ -1,4 +1,5 @@
 #include "MultiImageView.h"
+#include "Help.h"
 #include <iostream>
 #include <set>
 #include <cmath>
@@ -345,4 +346,18 @@ MultiImageView::calcProgress()
                 [](const std::unique_ptr<Image>& image) { return image->selected; });
 
     return { index, max };
+}
+
+std::string
+MultiImageView::helpMsg()
+{
+    auto help = Help::general();
+    help.append(Help::allImages());
+
+    if (showSelection)
+    {
+        help.append(Help::selectedImages());
+    }
+
+    return help;
 }

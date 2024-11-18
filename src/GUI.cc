@@ -7,9 +7,6 @@ GUI::GUI(sf::RenderWindow& window)
         window(window)
 {
     progressBar.setFillColor(sf::Color(255, 255, 255, 128));
-
-    warning.setTextAndWidth("Warning: folder 'piv-selected' exists and is not empty.", window.getDefaultView().getSize().x);
-
 }
 
 void
@@ -55,8 +52,9 @@ GUI::drawProgressBar(int index, int max)
 }
 
 void
-GUI::helpMsg(std::string msg)
+GUI::showHelpMsg(std::string msg)
 {
     help.setTextAndPadding(msg, sf::Vector2f(50.f, 20.f));
     help.setCenterPosition(window.getDefaultView().getCenter());
+    showHelp = true;
 }

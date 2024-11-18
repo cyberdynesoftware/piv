@@ -18,6 +18,7 @@ class MultiImageView : public ImageView
         void resize(int width, int height);
         std::deque<std::unique_ptr<Image>>::iterator findImageUnderMouse(void) const;
         std::pair<int, int> calcProgress(void);
+        std::string helpMsg(void);
 
     private:
         sf::RenderWindow& window;

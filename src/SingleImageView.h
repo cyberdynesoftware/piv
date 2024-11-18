@@ -12,6 +12,7 @@ class SingleImageView : public ImageView, public sf::Drawable
 
         void process(const sf::Event& event);
         void init(void);
+        std::string helpMsg(void);
 
         std::deque<std::unique_ptr<Image>>::iterator imageIter;
 

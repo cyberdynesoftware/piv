@@ -1,6 +1,5 @@
 #include "SceneManager.h"
 #include "Notification.h"
-#include "Help.h"
 #include <iostream>
 
 SceneManager::SceneManager(Folder& folder, sf::RenderWindow& window)
@@ -12,11 +11,6 @@ SceneManager::SceneManager(Folder& folder, sf::RenderWindow& window)
         singleImageView(window, imageManager)
 {
     eventReceiver = &multiImageView;
-
-    auto help = Help::general();
-    help.append(Help::allImages());
-    help.append(Help::selectedImages());
-    gui.helpMsg(help);
 }
 
 void
@@ -45,7 +39,7 @@ SceneManager::process(const sf::Event& event)
             switch (event.key.code)
             {
                 case sf::Keyboard::H:
-                    gui.showHelp = true;
+                    gui.showHelpMsg(eventReceiver->helpMsg());
                     break;
                 case sf::Keyboard::M:
                     deactivateSingleImageView();
@@ -113,10 +107,6 @@ SceneManager::activateSingleImageView()
             eventReceiver = &singleImageView;
             singleImageView.imageIter = targetImage;
             singleImageView.init();
-
-            auto help = Help::general();
-            help.append(Help::singleImage());
-            gui.helpMsg(help);
         }
     }
 }
@@ -129,11 +119,6 @@ SceneManager::deactivateSingleImageView()
         (*singleImageView.imageIter)->resetPositionAndScale();
         singleImageViewActive = false;
         eventReceiver = &multiImageView;
-
-        auto help = Help::general();
-        help.append(Help::allImages());
-        help.append(Help::selectedImages());
-        gui.helpMsg(help);
     }
 }
 
