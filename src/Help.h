@@ -44,6 +44,8 @@ class Help
             result.append(line);
             snprintf(line, 100, "%-25s%s\n", "A, Mouse middle", "(Un)select image under mouse");
             result.append(line);
+            snprintf(line, 100, "%-25s%s\n", "U", "Toggle sort order");
+            result.append(line);
             return result;
         }
 

@@ -27,8 +27,11 @@ class SceneManager
         ImageView* eventReceiver;
         bool singleImageViewActive = false;
 
+        ImageManager::SORT_ORDER sortOrder = ImageManager::SORT_ORDER::NAME;
         sf::Clock clock;
 
         void activateSingleImageView(void);
         void deactivateSingleImageView(void);
+        void toggleSortOrder(void);
+        std::string sortOrderToString(ImageManager::SORT_ORDER sortOrder) const;
 };

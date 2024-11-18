@@ -1,6 +1,5 @@
 #include "SceneManager.h"
 #include "Notification.h"
-#include <iostream>
 
 SceneManager::SceneManager(Folder& folder, sf::RenderWindow& window)
     :
@@ -46,6 +45,9 @@ SceneManager::process(const sf::Event& event)
                     break;
                 case sf::Keyboard::I:
                     eventReceiver->showInfo = !eventReceiver->showInfo;
+                    break;
+                case sf::Keyboard::U:
+                    toggleSortOrder();
                     break;
                 default:
                     eventReceiver->process(event);
@@ -146,4 +148,46 @@ SceneManager::update()
 
     gui.update(clock.getElapsedTime());
     window.draw(gui);
+}
+
+void
+SceneManager::toggleSortOrder()
+{
+    if (!singleImageViewActive)
+    {
+        auto intEnum = static_cast<int>(sortOrder);
+        sortOrder = static_cast<ImageManager::SORT_ORDER>(++intEnum);
+
+        if (sortOrder == ImageManager::SORT_ORDER::ENUM_GUARD)
+        {
+            sortOrder = ImageManager::SORT_ORDER::NAME;
+        }
+
+        multiImageView.reset();
+        imageManager.changeSortOrder(sortOrder);
+        camera.teleport(camera.view.getSize().y / 2.f);
+
+        gui.notification = std::make_unique<Notification>();
+        gui.notification->setMessage("Sort order: " + sortOrderToString(sortOrder))
+            .setColor(sf::Color::White)
+            .setSize(18)
+            .setWidth(window.getDefaultView().getSize().x)
+            .setPosition(sf::Vector2f(0, 0));
+
+        gui.notification->timeout = sf::seconds(2.f);
+        gui.notification->timeStamp = clock.getElapsedTime();
+    }
+}
+
+std::string
+SceneManager::sortOrderToString(ImageManager::SORT_ORDER sortOrder) const
+{
+    switch (sortOrder)
+    {
+        case ImageManager::SORT_ORDER::NAME: return "Name";
+        case ImageManager::SORT_ORDER::RANDOM: return "Random";
+        case ImageManager::SORT_ORDER::OLDEST: return "Oldest";
+        case ImageManager::SORT_ORDER::NEWEST: return "Newest";
+        default: return "?";
+    }
 }

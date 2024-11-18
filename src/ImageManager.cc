@@ -130,10 +130,10 @@ ImageManager::changeSortOrder(SORT_ORDER sortOrder)
             folder.shuffle();
             break;
         case OLDEST:
-            folder.sortByModTime(true);
+            folder.sortByModTime(false);
             break;
         case NEWEST:
-            folder.sortByModTime(false);
+            folder.sortByModTime(true);
             break;
     }
 

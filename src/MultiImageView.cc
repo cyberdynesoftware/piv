@@ -51,9 +51,6 @@ MultiImageView::process(const sf::Event& event)
                 case sf::Keyboard::C:
                     clearSelection();
                     break;
-                case sf::Keyboard::O:
-                    toggleSortOrder();
-                    break;
                 case sf::Keyboard::Y:
                     imageManager.copySelectedImages();
                     break;
@@ -174,22 +171,6 @@ MultiImageView::moveSelectedImages()
 }
 
 void
-MultiImageView::toggleSortOrder()
-{
-    auto intEnum = static_cast<int>(sortOrder);
-    sortOrder = static_cast<ImageManager::SORT_ORDER>(++intEnum);
-
-    if (sortOrder == ImageManager::SORT_ORDER::ENUM_GUARD)
-    {
-        sortOrder = ImageManager::SORT_ORDER::NAME;
-    }
-
-    reset();
-    imageManager.changeSortOrder(sortOrder);
-    camera.teleport(camera.view.getSize().y / 2.f);
-}
-
-void
 MultiImageView::reset()
 {
     camera.bottom = 0;
@@ -254,7 +235,7 @@ MultiImageView::layout(std::unique_ptr<Image>& image)
     }
 }
 
-    void
+void
 MultiImageView::draw()
 {
     for (auto& image : imageManager.images)
