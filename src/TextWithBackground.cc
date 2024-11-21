@@ -64,5 +64,5 @@ TextWithBackground::setCenterPosition(const sf::Vector2f& position)
     background.setPosition(position);
 
     text.setOrigin(text.getLocalBounds().getSize() / 2.f);
-    text.setPosition(position - text.getLocalBounds().getPosition());
+    text.setPosition(position + text.getLocalBounds().getPosition());
 }

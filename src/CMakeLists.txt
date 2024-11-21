@@ -7,6 +7,7 @@ target_sources(piv PRIVATE main.cc
     WebpImage.cc
     GUI.cc
     Notification.cc
+    Dialog.cc
     TextWithBackground.cc
     ImageManager.cc
     SceneManager.cc

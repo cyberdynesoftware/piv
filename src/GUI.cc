@@ -26,9 +26,9 @@ GUI::draw(sf::RenderTarget& target, sf::RenderStates states) const
         target.draw(*notification, states);
     }
 
-    if (showHelp)
+    if (dialog)
     {
-        target.draw(help, states);
+        target.draw(*dialog, states);
     }
 }
 
@@ -54,7 +54,16 @@ GUI::drawProgressBar(int index, int max)
 void
 GUI::showHelpMsg(std::string msg)
 {
-    help.setTextAndPadding(msg, sf::Vector2f(50.f, 20.f));
-    help.setCenterPosition(window.getDefaultView().getCenter());
-    showHelp = true;
+    dialog = std::make_unique<Dialog>();
+    dialog->setMessage(msg)
+        .setColor(sf::Color::White)
+        .setSize(18)
+        .setPadding(sf::Vector2f(50.f, 20.f))
+        .setCenter(window.getDefaultView().getCenter());
+}
+
+void
+GUI::dismissHelpMsg()
+{
+    dialog = nullptr;
 }

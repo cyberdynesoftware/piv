@@ -59,7 +59,7 @@ SceneManager::process(const sf::Event& event)
             switch (event.key.code)
             {
                 case sf::Keyboard::H:
-                    gui.showHelp = false;
+                    gui.dismissHelpMsg();
                     break;
                 default:
                     eventReceiver->process(event);
