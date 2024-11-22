@@ -8,6 +8,7 @@ target_sources(piv PRIVATE main.cc
     GUI.cc
     Notification.cc
     Dialog.cc
+    ProgressBarLabel.cc
     TextWithBackground.cc
     ImageManager.cc
     SceneManager.cc

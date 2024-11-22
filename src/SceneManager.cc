@@ -137,8 +137,7 @@ SceneManager::update()
 
     if (camera.update(clock.getElapsedTime()))
     {
-        auto progress = multiImageView.calcProgress();
-        gui.drawProgressBar(progress.first, progress.second);
+        gui.drawProgressBar(multiImageView.calcProgress());
     }
 
     if (singleImageViewActive)

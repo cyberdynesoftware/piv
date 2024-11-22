@@ -33,22 +33,20 @@ GUI::draw(sf::RenderTarget& target, sf::RenderStates states) const
 }
 
 void
-GUI::drawProgressBar(int index, int max)
+GUI::drawProgressBar(std::pair<int, int> progress)
 {
-    auto progress =  (float) index / max;
-    auto msg = std::format("{} / {}", index, max);
+    auto progressFraction =  (float) progress.first / progress.second;
 
     auto progressBarWidth = 15;
-    progressBar.setSize(sf::Vector2f(progressBarWidth, progress * window.getDefaultView().getSize().y));
+    progressBar.setSize(sf::Vector2f(progressBarWidth, progressFraction * window.getDefaultView().getSize().y));
     progressBar.setPosition(window.getDefaultView().getSize().x - progressBarWidth, 0);
 
-    progressLabel.setTextAndPadding(msg, sf::Vector2f(10.f, 10.f));
-    progressLabel.setCenterPosition(sf::Vector2f(window.getDefaultView().getSize().x - progressBarWidth - 40,
-                progress * window.getDefaultView().getSize().y));
+    auto windowSize = window.getDefaultView().getSize();
+    progressBarLabel.setMessage(std::format("{} / {}", progress.first, progress.second))
+        .setPosition(sf::Vector2f(windowSize.x, windowSize.y * progressFraction), progressFraction);
 
-    window.setView(window.getDefaultView());
     window.draw(progressBar);
-    window.draw(progressLabel);
+    window.draw(progressBarLabel);
 }
 
 void

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Image.h"
-#include "TextWithBackground.h"
 #include "Notification.h"
 #include "Dialog.h"
+#include "ProgressBarLabel.h"
 #include "SFML/Graphics.hpp"
 #include "SFML/System.hpp"
 
@@ -14,7 +14,7 @@ class GUI : public sf::Drawable
 
         void update(const sf::Time& time);
 
-        void drawProgressBar(int index, int max);
+        void drawProgressBar(std::pair<int, int> progress);
         void showHelpMsg(std::string help);
         void dismissHelpMsg(void);
 
@@ -28,5 +28,5 @@ class GUI : public sf::Drawable
 
         std::unique_ptr<Dialog> dialog = nullptr;
         sf::RectangleShape progressBar;
-        TextWithBackground progressLabel = TextWithBackground(TextWithBackground::Config::progress, 15);
+        ProgressBarLabel progressBarLabel;
 };
