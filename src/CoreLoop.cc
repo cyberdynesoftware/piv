@@ -30,7 +30,9 @@ CoreLoop::toggleFullscreen()
     }
     else
     {
-        window.create(sf::VideoMode::getDesktopMode(), "piv", sf::Style::Fullscreen);
+        auto desktopMode = sf::VideoMode::getDesktopMode();
+        window.create(desktopMode, "piv", sf::Style::Fullscreen);
+        sceneManager.resize(desktopMode.width, desktopMode.height);
         fullscreen = true;
     }
     window.setFramerateLimit(60);
@@ -79,7 +81,6 @@ CoreLoop::process(const sf::Event& event)
 
                 case sf::Keyboard::F:
                     toggleFullscreen();
-                    //imageView.resize();
                     break;
 
                 default:

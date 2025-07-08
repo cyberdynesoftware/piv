@@ -15,6 +15,7 @@ class SceneManager
         void checkFolder(const Folder& folder);
         void process(const sf::Event& event);
         void update(void);
+        void resize(int width, int height);
 
     private:
         sf::RenderWindow& window;

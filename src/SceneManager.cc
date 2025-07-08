@@ -83,17 +83,23 @@ SceneManager::process(const sf::Event& event)
             break;
 
         case sf::Event::Resized:
-            multiImageView.resize(event.size.width, event.size.height);
-
-            if (singleImageViewActive)
-            {
-                singleImageView.init();
-            }
+            resize(event.size.width, event.size.height);
             break;
 
         default:
             eventReceiver->process(event);
             break;
+    }
+}
+
+void
+SceneManager::resize(int width, int height)
+{
+    multiImageView.resize(width, height);
+
+    if (singleImageViewActive)
+    {
+        singleImageView.init();
     }
 }
 

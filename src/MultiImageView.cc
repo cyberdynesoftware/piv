@@ -290,7 +290,8 @@ MultiImageView::markSelectedImage(const std::unique_ptr<Image>& image)
 void
 MultiImageView::resize(int width, int height)
 {
-    int newTargetImageWidth = window.getSize().x / numberOfColumns;
+    std::cout << width << std::endl;
+    int newTargetImageWidth = width / numberOfColumns;
     float factor = (float) newTargetImageWidth / targetImageWidth;
     targetImageWidth = newTargetImageWidth;
 
