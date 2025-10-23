@@ -9,7 +9,7 @@ CoreLoop::CoreLoop(char* path)
         sceneManager(folder, window)
 {
     window.setPosition(desktopCenterPosition());
-    window.setFramerateLimit(60);
+    window.setVerticalSyncEnabled(true);
 
     icon.loadFromMemory(icon_png, icon_png_len);
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
@@ -35,7 +35,7 @@ CoreLoop::toggleFullscreen()
         sceneManager.resize(desktopMode.width, desktopMode.height);
         fullscreen = true;
     }
-    window.setFramerateLimit(60);
+    window.setVerticalSyncEnabled(true);
 }
 
 sf::Vector2i
