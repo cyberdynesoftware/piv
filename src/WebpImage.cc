@@ -59,8 +59,10 @@ WebpImage::prepare()
         frames.push_back(frame);
     }
 
-    auto delay = frames[1].delay - frames[0].delay;
-    std::for_each(frames.begin(), frames.end(), [&delay](auto& frame) { frame.delay = delay; });
+    if (frames.size() > 1) {
+        auto delay = frames[1].delay - frames[0].delay;
+        std::for_each(frames.begin(), frames.end(), [&delay](auto& frame) { frame.delay = delay; });
+    }
 
     WebPAnimDecoderDelete(decoder);
 
