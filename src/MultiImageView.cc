@@ -52,10 +52,14 @@ MultiImageView::process(const sf::Event& event)
                     clearSelection();
                     break;
                 case sf::Keyboard::Y:
-                    imageManager.copySelectedImages();
+                    if (showSelection) {
+                        imageManager.copySelectedImages();
+                    }
                     break;
                 case sf::Keyboard::X:
-                    moveSelectedImages();
+                    if (showSelection) {
+                        moveSelectedImages();
+                    }
                     break;
                 case sf::Keyboard::Num1:
                     relayoutImages(1);
@@ -139,14 +143,14 @@ MultiImageView::toggleShowSelection()
 
     if (showSelection)
     {
-        lastViewPosition = camera.getTop();
+        allImagesCameraPosition = camera.view.getCenter().y;
         relayoutImages(numberOfColumns);
         camera.teleport(camera.view.getSize().y / 2.f);
     }
     else
     {
         relayoutImages(numberOfColumns);
-        camera.teleport(lastViewPosition);
+        camera.teleport(allImagesCameraPosition);
     }
 }
 
@@ -209,7 +213,7 @@ MultiImageView::layout(std::unique_ptr<Image>& image)
     image->scaleTo(targetImageWidth);
     auto imageHeight = image->sprite.getGlobalBounds().height;
 
-    for (auto i = columnIndex + 1; i <= numberOfColumns + columnIndex; i++)
+    for (auto i = columnIndex; i <= numberOfColumns + columnIndex; i++)
     {
         auto index = i % numberOfColumns;
         auto pivot = columnOffsets[columnIndex];

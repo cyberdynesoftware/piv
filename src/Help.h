@@ -38,13 +38,13 @@ class Help
             result.append(line);
             snprintf(line, 100, "%-25s%s\n", "I", "Show info");
             result.append(line);
-            snprintf(line, 100, "%-25s%s\n", "S", "Switch to selected images / all images");
+            snprintf(line, 100, "%-25s%s\n", "S", "Toggle selection / all images");
             result.append(line);
-            snprintf(line, 100, "%-25s%s\n", "C", "Clear all selected images");
+            snprintf(line, 100, "%-25s%s\n", "C", "Clear selection");
             result.append(line);
             snprintf(line, 100, "%-25s%s\n", "A, Mouse middle", "(Un)select image under mouse");
             result.append(line);
-            snprintf(line, 100, "%-25s%s\n", "U", "Toggle sort order");
+            snprintf(line, 100, "%-25s%s\n", "O", "Toggle sort order");
             result.append(line);
             return result;
         }
@@ -65,7 +65,7 @@ class Help
             result.append(line);
             snprintf(line, 100, "%-25s%s\n", "A, Mouse middle", "(Un)select image");
             result.append(line);
-            snprintf(line, 100, "%-25s%s\n", "O", "Toggle image original size");
+            snprintf(line, 100, "%-25s%s\n", "T", "Toggle image original size");
             result.append(line);
             return result;
         }

@@ -46,7 +46,7 @@ SceneManager::process(const sf::Event& event)
                 case sf::Keyboard::I:
                     eventReceiver->showInfo = !eventReceiver->showInfo;
                     break;
-                case sf::Keyboard::U:
+                case sf::Keyboard::O:
                     toggleSortOrder();
                     break;
                 default:

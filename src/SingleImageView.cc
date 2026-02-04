@@ -30,7 +30,7 @@ SingleImageView::process(const sf::Event& event)
                     (*imageIter)->selected = !(*imageIter)->selected;
                     next();
                     break;
-                case sf::Keyboard::O:
+                case sf::Keyboard::T:
                     toggleFit();
                     break;
                 default:
@@ -86,11 +86,10 @@ SingleImageView::process(const sf::Event& event)
 void
 SingleImageView::next()
 {
-    auto& image = *imageIter;
-
-    if (imageIter != imageManager.images.end() && ++imageIter != imageManager.images.end())
+    if (imageIter != imageManager.images.end() && (imageIter + 1) != imageManager.images.end())
     {
-        image->resetPositionAndScale();
+        (*imageIter)->resetPositionAndScale();
+        imageIter++;
         init();
     }
 }

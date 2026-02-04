@@ -33,6 +33,7 @@ class MultiImageView : public ImageView
         std::unique_ptr<Image>* lastVisibleImage;
         bool showSelection = false;
         float lastViewPosition;
+        float allImagesCameraPosition;
 
         sf::RectangleShape selectedImageForeground;
         sf::Color pumpkin = sf::Color(245, 118, 26);
